@@ -33,8 +33,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       final isLoggedIn = authState.valueOrNull != null;
-      final isPublicRoute = RoutePaths.publicRoutes.contains(location);
 
+      // Splash es una parada transitoria, no un destino — una vez resuelto
+      // el estado de sesión, siempre se sale de ahí hacia Home o Welcome.
+      // (Antes esto faltaba y, al no estar logueado, `/splash` calificaba
+      // como "ruta pública" y el router se quedaba ahí para siempre.)
+      if (location == RoutePaths.splash) {
+        return isLoggedIn ? RoutePaths.root : RoutePaths.welcome;
+      }
+
+      final isPublicRoute = RoutePaths.publicRoutes.contains(location);
       if (!isLoggedIn && !isPublicRoute) return RoutePaths.welcome;
       if (isLoggedIn && isPublicRoute) return RoutePaths.root;
       return null;

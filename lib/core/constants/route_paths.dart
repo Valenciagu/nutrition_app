@@ -9,8 +9,11 @@ abstract final class RoutePaths {
   static const String signUp = '/sign-up';
   static const String forgotPassword = '/forgot-password';
 
-  /// Rutas que no requieren sesión — usadas por el `redirect` del router.
-  static const List<String> publicRoutes = [splash, welcome, login, signUp, forgotPassword];
+  /// Rutas donde un usuario sin sesión puede quedarse (no lo mandan a
+  /// Welcome). `splash` NO va aquí a propósito: es una parada transitoria
+  /// que siempre redirige hacia otro lado, nunca un destino final — ver el
+  /// `redirect` en `app_router.dart`.
+  static const List<String> publicRoutes = [welcome, login, signUp, forgotPassword];
 
   // Reservado para próximas épicas: onboarding, home, plan de nutrición,
   // recetas, análisis de fotos, lista de compras, perfil, suscripción.
