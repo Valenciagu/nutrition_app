@@ -1,0 +1,47 @@
+{
+  "@@locale": "es",
+  "appTitle": "NutritionApp",
+  "@appTitle": {
+    "description": "Nombre provisional de la app (pendiente de branding definitivo). Se usa igual en todos los idiomas por ahora."
+  },
+  "homePlaceholderTitle": "Tu asistente de nutrición",
+  "@homePlaceholderTitle": {
+    "description": "Temporary placeholder headline shown until the real Home feature (Epic 4) is built."
+  },
+  "homePlaceholderMessage": "Muy pronto podrás ver tu plan diario, recetas y lista de compras aquí.",
+  "@homePlaceholderMessage": {
+    "description": "Temporary placeholder body text shown until the real Home feature (Epic 4) is built."
+  },
+  "genericErrorTitle": "Algo salió mal",
+  "@genericErrorTitle": {
+    "description": "Generic error state title used across the app when a specific message isn't available."
+  },
+  "genericErrorMessage": "No pudimos completar esta acción. Intenta de nuevo.",
+  "@genericErrorMessage": {
+    "description": "Generic error state body text."
+  },
+  "retryButtonLabel": "Reintentar",
+  "@retryButtonLabel": {
+    "description": "Label for the button that retries a failed action."
+  },
+  "cancelButtonLabel": "Cancelar",
+  "@cancelButtonLabel": {
+    "description": "Label for a generic cancel action."
+  },
+  "saveButtonLabel": "Guardar",
+  "@saveButtonLabel": {
+    "description": "Label for a generic save/confirm action."
+  },
+  "continueButtonLabel": "Continuar",
+  "@continueButtonLabel": {
+    "description": "Label for a generic continue/next-step action."
+  },
+  "loadingMessage": "Cargando…",
+  "@loadingMessage": {
+    "description": "Generic loading indicator text."
+  },
+  "emptyStateDefaultMessage": "No hay nada por aquí todavía.",
+  "@emptyStateDefaultMessage": {
+    "description": "Generic empty-state message used when a feature has no feature-specific copy yet."
+  }
+}

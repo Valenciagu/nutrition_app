@@ -1,0 +1,14 @@
+{
+  "@@locale": "en",
+  "appTitle": "NutritionApp",
+  "homePlaceholderTitle": "Your nutrition assistant",
+  "homePlaceholderMessage": "Soon you'll see your daily plan, recipes and shopping list here.",
+  "genericErrorTitle": "Something went wrong",
+  "genericErrorMessage": "We couldn't complete this action. Please try again.",
+  "retryButtonLabel": "Retry",
+  "cancelButtonLabel": "Cancel",
+  "saveButtonLabel": "Save",
+  "continueButtonLabel": "Continue",
+  "loadingMessage": "Loading…",
+  "emptyStateDefaultMessage": "There's nothing here yet."
+}
