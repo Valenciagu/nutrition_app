@@ -25,11 +25,18 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after both the initial scaffold and the design-token rebuild. Not yet run on an Android/iOS device/emulator (none attached in this environment) or manually eyeballed in a browser.
 
 ## Epic 2 — Authentication
-- [ ] Scaffold: `features/authentication/{data,domain,presentation}`.
-- [ ] Sign up / sign in / password reset (Firebase Auth email+password).
-- [ ] Session persistence + sign out + account deletion entry point.
-- [ ] Auth guard integrated into router (Epic 1 router).
-- Depends on: Foundation (Epic 1), design for Fase 2 screens (EPIC0-002).
+- [x] Scaffold: `features/authentication/{data,domain,presentation}`.
+- [x] Sign up / sign in / password reset (Firebase Auth email+password) — screens A1-A5 (Splash, Welcome, Login, SignUp, ForgotPassword).
+- [x] Session persistence (Firebase Auth handles this natively) + sign out (temporary button on the Home placeholder).
+- [x] Auth guard integrated into router (`redirect` + `GoRouterRefreshStream`).
+- [ ] AUTH-101 — Account deletion entry point. Deferred to Epic 11 (Profile), where it has an actual home in the UI.
+- [ ] AUTH-102 — Email verification flow. Deferred (Instrucciones.md: "when appropriate", not MVP-critical).
+- [ ] AUTH-103 — Google/Apple social sign-in. Deferred: needs `google_sign_in`/`sign_in_with_apple` + OAuth/Apple Developer setup the user hasn't provided yet. **Ask the user before starting** this one (new deps + external console config).
+- [ ] AUTH-104 — Real "open mail app" action on the password-reset-sent screen (needs `url_launcher`, not added yet).
+- [ ] AUTH-105 — Real Terms/Privacy Policy content + links (needs legal copy from the user).
+- [ ] AUTH-106 — Real guest-mode persistence once Onboarding/Plan (Epics 3/6) exist (currently "Seguir sin cuenta" just goes to Home with nothing saved).
+- **Hard runtime dependency: FOUND-009 (Firebase project).** The feature compiles and analyzes clean, but can't actually sign in/up until a real Firebase project is connected — `main.dart` shows a developer-facing "Firebase not configured" screen in the meantime (see `documentation/authentication.md`).
+- Depends on: Foundation (Epic 1), design for Fase 2 Block A (done, see `documentation/design_screens_auth.md`). Block B (Onboarding, B1-B9) of the same canvas file is intentionally not read yet — will be read when Epic 3 starts.
 
 ## Epic 3 — Onboarding
 - [ ] Data model for onboarding answers (age, sex, height, weight, activity level, goal, preferences, allergies, intolerances, meals/day, cooking ability/equipment, time, budget, country, health conditions).

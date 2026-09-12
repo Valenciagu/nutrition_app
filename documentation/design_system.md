@@ -2,7 +2,7 @@
 
 Transcribed from the Claude Design canvas linked in `desing.md` (project `d3c0cd06-9d89-4ceb-b4b7-0f3f858d37c1`, files `Fase 1 - Fundamentos.dc.html` and `Fichas de componentes.dc.html`, read 2026-09-11). This is the source of truth for implementation — read this before `DesignSync`-fetching anything, and extend it when a new `Fase N` file gets read.
 
-Not yet transcribed: `Fase 2 - Auth y Onboarding`, `Fase 3 - Home`, `Fase 4 - Plan y Recetas`, `Fases 5-12 - Entrega final`, `ios-frame.jsx`, `support.js`, `uploads/desygn.md.md`. Fetch and add a section here when a feature needs one of those.
+Not yet transcribed: `Fase 2 - Auth y Onboarding` Block B (Onboarding, 9 steps — Block A/Auth is done, see `documentation/design_screens_auth.md`), `Fase 3 - Home`, `Fase 4 - Plan y Recetas`, `Fases 5-12 - Entrega final`, `ios-frame.jsx`, `support.js`, `uploads/desygn.md.md`. Fetch and add a section here (or a dedicated `design_screens_<feature>.md`, as done for Auth) when a feature needs one of those.
 
 ## Product design direction
 

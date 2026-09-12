@@ -43,5 +43,80 @@
   "emptyStateDefaultMessage": "No hay nada por aquí todavía.",
   "@emptyStateDefaultMessage": {
     "description": "Generic empty-state message used when a feature has no feature-specific copy yet."
-  }
+  },
+  "signOutButtonLabel": "Cerrar sesión",
+
+  "fieldEmailLabel": "Email",
+  "fieldPasswordLabel": "Contraseña",
+  "fieldNameLabel": "Nombre",
+  "fieldShowPasswordAction": "Ver",
+  "fieldHidePasswordAction": "Ocultar",
+  "commonOrDivider": "o",
+  "commonBackAction": "Volver",
+
+  "legalAcceptPrefix": "Al continuar aceptas los ",
+  "legalCheckboxPrefix": "Acepto los ",
+  "legalTermsLabel": "Términos",
+  "legalMiddleAnd": " y la ",
+  "legalPrivacyPolicyLabel": "Política de privacidad.",
+
+  "authSplashTagline": "Tu nutricionista de bolsillo",
+
+  "authWelcomeHeadline": "Come mejor sin contar cada gramo",
+  "authWelcomeSubtitle": "Tu plan, tus recetas y una IA que se adapta a lo que comes de verdad.",
+  "authWelcomeStartButton": "Empezar",
+  "authWelcomeHaveAccountButton": "Ya tengo cuenta",
+
+  "authLoginTitle": "Hola de nuevo",
+  "authLoginForgotPassword": "¿Olvidaste tu contraseña?",
+  "authLoginSubmitButton": "Entrar",
+  "authLoginSignUpPrompt": "¿Nuevo por aquí? ",
+  "authLoginSignUpAction": "Crea tu cuenta",
+
+  "authSignUpTitle": "Crea tu cuenta",
+  "authSignUpPlanReadyBanner": "Tu plan ya está calculado. Guárdalo para no perderlo.",
+  "authSignUpSubmitWithPlanButton": "Guardar mi plan",
+  "authSignUpSubmitButton": "Crear cuenta",
+  "authSignUpGuestAction": "Seguir sin cuenta",
+  "authPasswordHintMin": "Mínimo 8 caracteres",
+  "authPasswordStrengthWeak": "Muy corta. Usa al menos 8 caracteres.",
+  "authPasswordStrengthMedium": "Segura. Añade un número o símbolo para hacerla más fuerte.",
+  "authPasswordStrengthStrong": "Contraseña fuerte.",
+
+  "authForgotPasswordTitle": "Recuperar contraseña",
+  "authForgotPasswordSubtitle": "Te enviaremos un enlace para crear una contraseña nueva.",
+  "authForgotPasswordSubmitButton": "Enviar enlace",
+  "authForgotPasswordSentTitle": "Revisa tu correo",
+  "authForgotPasswordSentMessage": "Enviamos un enlace a {email} para crear una contraseña nueva.",
+  "@authForgotPasswordSentMessage": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authForgotPasswordOpenMailButton": "Abrir mi correo",
+  "authForgotPasswordResendCountdown": "Reenviar en {seconds}",
+  "@authForgotPasswordResendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authForgotPasswordResendAction": "Reenviar enlace",
+
+  "authErrorInvalidCredentials": "Revisa tu contraseña.",
+  "authErrorInvalidEmail": "Ese correo no parece válido.",
+  "authErrorEmailAlreadyInUse": "Ya existe una cuenta con este correo.",
+  "authErrorWeakPassword": "Elige una contraseña más segura.",
+  "authErrorTooManyRequests": "Demasiados intentos. Espera un momento e intenta de nuevo.",
+  "authErrorGeneric": "No pudimos completar la acción. Intenta de nuevo.",
+
+  "validationEmailRequired": "Ingresa tu correo.",
+  "validationEmailInvalid": "Ese correo no parece válido.",
+  "validationPasswordRequired": "Ingresa tu contraseña.",
+  "validationPasswordTooShort": "Debe tener al menos 8 caracteres.",
+  "validationNameRequired": "Ingresa tu nombre.",
+  "validationTermsRequired": "Debes aceptar los términos para continuar."
 }

@@ -28,6 +28,8 @@ class AppTextField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.textInputAction,
+    this.showPasswordActionLabel,
+    this.hidePasswordActionLabel,
   });
 
   final String label;
@@ -47,6 +49,12 @@ class AppTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final TextInputAction? textInputAction;
+
+  /// Etiquetas del toggle de visibilidad para [AppTextFieldKind.password]
+  /// (la pantalla de Login muestra texto "Ver"/"Ocultar", no un ícono).
+  /// Deben venir de `context.l10n` — nunca un literal en el llamador.
+  final String? showPasswordActionLabel;
+  final String? hidePasswordActionLabel;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -157,10 +165,9 @@ class _AppTextFieldState extends State<AppTextField> {
               if (widget.kind == AppTextFieldKind.password)
                 GestureDetector(
                   onTap: () => setState(() => _obscure = !_obscure),
-                  child: Icon(
-                    _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    size: 20,
-                    color: colors.textSecondary,
+                  child: Text(
+                    (_obscure ? widget.showPasswordActionLabel : widget.hidePasswordActionLabel) ?? '',
+                    style: AppTypography.label.copyWith(fontSize: 12.5, color: colors.actionPrimary),
                   ),
                 ),
             ],

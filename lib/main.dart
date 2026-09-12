@@ -1,16 +1,24 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/localization/generated/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/firebase_setup_required_page.dart';
 
-// NOTE(FOUND-009): Firebase.initializeApp() intentionally isn't wired up
-// yet — it needs `flutterfire configure` run against a real Firebase
-// project first (see TASKS.md > FOUND-009, PROJECT_CONTEXT.md > Known
-// blockers). Add it here, before runApp(), once that's done.
-void main() {
-  runApp(const ProviderScope(child: NutritionApp()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    // Sin `firebase_options.dart` (generado por `flutterfire configure`)
+    // esto lanza — ver TASKS.md > FOUND-009. Se atrapa abajo para no
+    // mostrar un crash críptico mientras esa tarea sigue pendiente.
+    await Firebase.initializeApp();
+    runApp(const ProviderScope(child: NutritionApp()));
+  } catch (error) {
+    runApp(FirebaseSetupRequiredPage(error: error));
+  }
 }
 
 class NutritionApp extends ConsumerWidget {

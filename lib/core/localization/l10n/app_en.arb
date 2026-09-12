@@ -10,5 +10,80 @@
   "saveButtonLabel": "Save",
   "continueButtonLabel": "Continue",
   "loadingMessage": "Loading…",
-  "emptyStateDefaultMessage": "There's nothing here yet."
+  "emptyStateDefaultMessage": "There's nothing here yet.",
+  "signOutButtonLabel": "Sign out",
+
+  "fieldEmailLabel": "Email",
+  "fieldPasswordLabel": "Password",
+  "fieldNameLabel": "Name",
+  "fieldShowPasswordAction": "Show",
+  "fieldHidePasswordAction": "Hide",
+  "commonOrDivider": "or",
+  "commonBackAction": "Back",
+
+  "legalAcceptPrefix": "By continuing you accept the ",
+  "legalCheckboxPrefix": "I accept the ",
+  "legalTermsLabel": "Terms",
+  "legalMiddleAnd": " and the ",
+  "legalPrivacyPolicyLabel": "Privacy Policy.",
+
+  "authSplashTagline": "Your pocket nutritionist",
+
+  "authWelcomeHeadline": "Eat better without counting every gram",
+  "authWelcomeSubtitle": "Your plan, your recipes, and an AI that adapts to what you actually eat.",
+  "authWelcomeStartButton": "Get started",
+  "authWelcomeHaveAccountButton": "I already have an account",
+
+  "authLoginTitle": "Welcome back",
+  "authLoginForgotPassword": "Forgot your password?",
+  "authLoginSubmitButton": "Sign in",
+  "authLoginSignUpPrompt": "New here? ",
+  "authLoginSignUpAction": "Create an account",
+
+  "authSignUpTitle": "Create your account",
+  "authSignUpPlanReadyBanner": "Your plan is ready. Save it so you don't lose it.",
+  "authSignUpSubmitWithPlanButton": "Save my plan",
+  "authSignUpSubmitButton": "Create account",
+  "authSignUpGuestAction": "Continue without an account",
+  "authPasswordHintMin": "At least 8 characters",
+  "authPasswordStrengthWeak": "Too short. Use at least 8 characters.",
+  "authPasswordStrengthMedium": "Secure. Add a number or symbol to make it stronger.",
+  "authPasswordStrengthStrong": "Strong password.",
+
+  "authForgotPasswordTitle": "Reset your password",
+  "authForgotPasswordSubtitle": "We'll send you a link to create a new password.",
+  "authForgotPasswordSubmitButton": "Send link",
+  "authForgotPasswordSentTitle": "Check your email",
+  "authForgotPasswordSentMessage": "We sent a link to {email} to create a new password.",
+  "@authForgotPasswordSentMessage": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authForgotPasswordOpenMailButton": "Open my email",
+  "authForgotPasswordResendCountdown": "Resend in {seconds}",
+  "@authForgotPasswordResendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authForgotPasswordResendAction": "Resend link",
+
+  "authErrorInvalidCredentials": "Check your password.",
+  "authErrorInvalidEmail": "That email doesn't look right.",
+  "authErrorEmailAlreadyInUse": "An account with this email already exists.",
+  "authErrorWeakPassword": "Choose a stronger password.",
+  "authErrorTooManyRequests": "Too many attempts. Wait a moment and try again.",
+  "authErrorGeneric": "We couldn't complete that. Please try again.",
+
+  "validationEmailRequired": "Enter your email.",
+  "validationEmailInvalid": "That email doesn't look right.",
+  "validationPasswordRequired": "Enter your password.",
+  "validationPasswordTooShort": "Must be at least 8 characters.",
+  "validationNameRequired": "Enter your name.",
+  "validationTermsRequired": "You must accept the terms to continue."
 }

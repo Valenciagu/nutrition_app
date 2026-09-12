@@ -3,8 +3,15 @@
 abstract final class RoutePaths {
   static const String root = '/';
 
-  // Reserved for upcoming epics — added here as each feature is scaffolded:
-  // authentication (sign in / sign up / reset password), onboarding,
-  // home, nutrition plan, recipes, food analysis, shopping list, profile,
-  // subscription.
+  static const String splash = '/splash';
+  static const String welcome = '/welcome';
+  static const String login = '/login';
+  static const String signUp = '/sign-up';
+  static const String forgotPassword = '/forgot-password';
+
+  /// Rutas que no requieren sesión — usadas por el `redirect` del router.
+  static const List<String> publicRoutes = [splash, welcome, login, signUp, forgotPassword];
+
+  // Reservado para próximas épicas: onboarding, home, plan de nutrición,
+  // recetas, análisis de fotos, lista de compras, perfil, suscripción.
 }
