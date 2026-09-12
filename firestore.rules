@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// Reglas mínimas para lo que existe hoy (Épica 3: Onboarding). Revisión de
+// seguridad completa diferida a la Épica 15 (Instrucciones.md §80) — esto
+// solo evita que `users/{userId}` quede sin protección (modo prueba/bloqueo
+// por defecto de un proyecto de Firebase nuevo) ahora que hay una escritura
+// real desde el cliente.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

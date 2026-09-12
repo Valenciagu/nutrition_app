@@ -4,13 +4,13 @@
   "@appTitle": {
     "description": "Nombre provisional de la app (pendiente de branding definitivo). Se usa igual en todos los idiomas por ahora."
   },
-  "homePlaceholderTitle": "Tu asistente de nutrición",
-  "@homePlaceholderTitle": {
-    "description": "Temporary placeholder headline shown until the real Home feature (Epic 4) is built."
+  "comingSoonTitle": "Muy pronto",
+  "@comingSoonTitle": {
+    "description": "Generic placeholder title for a tab/section that isn't built yet."
   },
-  "homePlaceholderMessage": "Muy pronto podrás ver tu plan diario, recetas y lista de compras aquí.",
-  "@homePlaceholderMessage": {
-    "description": "Temporary placeholder body text shown until the real Home feature (Epic 4) is built."
+  "comingSoonMessage": "Esta sección todavía se está construyendo.",
+  "@comingSoonMessage": {
+    "description": "Generic placeholder body text for a tab/section that isn't built yet."
   },
   "genericErrorTitle": "Algo salió mal",
   "@genericErrorTitle": {
@@ -118,5 +118,156 @@
   "validationPasswordRequired": "Ingresa tu contraseña.",
   "validationPasswordTooShort": "Debe tener al menos 8 caracteres.",
   "validationNameRequired": "Ingresa tu nombre.",
-  "validationTermsRequired": "Debes aceptar los términos para continuar."
+  "validationTermsRequired": "Debes aceptar los términos para continuar.",
+
+  "onboardingStepCounter": "{current}/{total}",
+  "@onboardingStepCounter": {
+    "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "onboardingStepAnnouncement": "Paso {current} de {total}",
+  "@onboardingStepAnnouncement": {
+    "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } }
+  },
+
+  "onboardingGoalTitle": "¿Cuál es tu objetivo?",
+  "onboardingGoalSubtitle": "Podrás cambiarlo cuando quieras.",
+  "onboardingGoalLoseFatTitle": "Perder grasa",
+  "onboardingGoalLoseFatSubtitle": "Déficit moderado, sin pasar hambre",
+  "onboardingGoalGainMuscleTitle": "Ganar músculo",
+  "onboardingGoalGainMuscleSubtitle": "Más proteína y superávit controlado",
+  "onboardingGoalMaintainTitle": "Mantener peso",
+  "onboardingGoalMaintainSubtitle": "Equilibrio y constancia",
+  "onboardingGoalEatHealthierTitle": "Comer más saludable",
+  "onboardingGoalEatHealthierSubtitle": "Sin foco en el peso",
+
+  "onboardingPersonalTitle": "Cuéntanos de ti",
+  "onboardingPersonalSubtitle": "Lo usamos sólo para calcular tus necesidades.",
+  "onboardingSexMale": "Hombre",
+  "onboardingSexFemale": "Mujer",
+  "onboardingSexOther": "Otro",
+  "onboardingAgeLabel": "Edad",
+  "onboardingAgeUnit": "años",
+  "onboardingHeightLabel": "Altura",
+  "onboardingHeightUnitMetric": "cm",
+  "onboardingHeightUnitImperial": "in",
+  "onboardingWeightLabel": "Peso actual",
+  "onboardingWeightUnitMetric": "kg",
+  "onboardingWeightUnitImperial": "lb",
+  "onboardingUnitsLabel": "Unidades",
+  "onboardingUnitsMetric": "Métrico",
+  "onboardingUnitsImperial": "Imperial",
+
+  "onboardingActivityTitle": "¿Qué tan activo eres?",
+  "onboardingActivitySubtitle": "Cuenta tu semana normal, no la ideal.",
+  "onboardingActivitySedentaryTitle": "Sedentario",
+  "onboardingActivitySedentarySubtitle": "Trabajo sentado, poco movimiento",
+  "onboardingActivityLightTitle": "Ligero",
+  "onboardingActivityLightSubtitle": "Camino a diario, 1–2 entrenos",
+  "onboardingActivityModerateTitle": "Moderado",
+  "onboardingActivityModerateSubtitle": "3–4 entrenos por semana",
+  "onboardingActivityHighTitle": "Alto",
+  "onboardingActivityHighSubtitle": "5–6 entrenos o trabajo físico",
+  "onboardingActivityAthleteTitle": "Atleta",
+  "onboardingActivityAthleteSubtitle": "Doble sesión casi a diario",
+  "onboardingActivityEstimateMessage": "Con “{level}” tu estimación ronda las {kcal} kcal diarias. La ajustaremos con tu progreso real.",
+  "@onboardingActivityEstimateMessage": {
+    "placeholders": { "level": { "type": "String" }, "kcal": { "type": "int" } }
+  },
+
+  "onboardingLikedFoodsTitle": "¿Qué te gusta comer?",
+  "onboardingLikedFoodsSubtitle": "Elige al menos 5. Tus recetas saldrán de aquí.",
+  "onboardingLikedFoodsCounter": "{selected} de {min} seleccionados",
+  "@onboardingLikedFoodsCounter": {
+    "placeholders": { "selected": { "type": "int" }, "min": { "type": "int" } }
+  },
+  "onboardingFoodChicken": "Pollo",
+  "onboardingFoodMeat": "Carne",
+  "onboardingFoodFish": "Pescado",
+  "onboardingFoodEggs": "Huevos",
+  "onboardingFoodAvocado": "Aguacate",
+  "onboardingFoodRice": "Arroz",
+  "onboardingFoodLegumes": "Legumbres",
+  "onboardingFoodPasta": "Pasta",
+  "onboardingFoodTofu": "Tofu",
+
+  "onboardingAllergiesTitle": "¿Algo que debamos evitar?",
+  "onboardingAllergiesSubtitle": "Nunca te propondremos estos alimentos.",
+  "onboardingAllergiesSearchHint": "Buscar alimento o alérgeno",
+  "onboardingAllergiesBanner": "Las alergias son el único dato que bloquea recetas por completo. Una intolerancia sólo reduce la frecuencia.",
+  "onboardingAllergiesNoneAction": "No tengo ninguna",
+  "onboardingAllergenLactose": "Lactosa",
+  "onboardingAllergenGluten": "Gluten",
+  "onboardingAllergenNuts": "Frutos secos",
+  "onboardingAllergenShellfish": "Marisco",
+  "onboardingAllergenEgg": "Huevo",
+  "onboardingAllergenSoy": "Soja",
+  "onboardingAllergenFish": "Pescado",
+  "onboardingAllergenSesame": "Sésamo",
+
+  "onboardingMealRhythmTitle": "¿Cómo es tu día?",
+  "onboardingMealRhythmSubtitle": "Ajustamos el plan a tus horarios reales.",
+  "onboardingMealsPerDayLabel": "Comidas al día",
+  "onboardingSchedulesLabel": "Horarios",
+  "onboardingMealSlotBreakfast": "Desayuno",
+  "onboardingMealSlotLunch": "Almuerzo",
+  "onboardingMealSlotAfternoonSnack": "Merienda",
+  "onboardingMealSlotDinner": "Cena",
+  "onboardingMealSlotMidMorningSnack": "Media mañana",
+  "onboardingMealSlotEveningSnack": "Colación nocturna",
+
+  "onboardingCookingTitle": "¿Cuánto quieres cocinar?",
+  "onboardingCookingSubtitle": "Un plan que no se cocina no sirve de nada.",
+  "onboardingCookingTimeLabel": "Tiempo por comida",
+  "onboardingCookingTimeQuick": "15 min o menos",
+  "onboardingCookingTimeMedium": "30 min",
+  "onboardingCookingTimeRelaxed": "Sin prisa",
+  "onboardingCookingSkillLabel": "Nivel en la cocina",
+  "onboardingCookingSkillBasic": "Básico",
+  "onboardingCookingSkillIntermediate": "Me defiendo",
+  "onboardingCookingSkillAdvanced": "Avanzado",
+  "onboardingBudgetLabel": "Presupuesto semanal",
+  "onboardingBudgetTight": "Ajustado",
+  "onboardingBudgetModerate": "Moderado",
+  "onboardingBudgetComfortable": "Cómodo",
+  "onboardingBudgetFlexible": "Amplio",
+  "onboardingBudgetRangeTight": "60–80 €/semana",
+  "onboardingBudgetRangeModerate": "80–120 €/semana",
+  "onboardingBudgetRangeComfortable": "120–160 €/semana",
+  "onboardingBudgetRangeFlexible": "Más de 160 €/semana",
+  "onboardingSubmitButton": "Crear mi plan",
+
+  "onboardingWheelPickerDoneAction": "Listo",
+
+  "bottomNavHomeLabel": "Home",
+  "bottomNavPlanLabel": "Plan",
+  "bottomNavAiLabel": "IA",
+  "bottomNavProfileLabel": "Perfil",
+
+  "profileTitle": "Perfil",
+
+  "homeGreetingMorning": "Buenos días",
+  "homeGreetingAfternoon": "Buenas tardes",
+  "homeGreetingEvening": "Buenas noches",
+  "homeGuestName": "Invitado",
+  "homeCaloriesAheadLabel": "kcal por delante",
+  "homeEmptyTitle": "Tu primer día empieza aquí",
+  "homeEmptySubtitle": "Registra el desayuno o hazle una foto y lo analizamos por ti.",
+  "homeEmptyCta": "Analizar mi comida",
+  "homeStartHereLabel": "Empieza por aquí",
+  "homePlanRowTitle": "Mira tu plan de hoy",
+  "homePlanRowSubtitle": "Arma tu plan del día con recetas listas para cocinar",
+  "homeGroceryRowTitle": "Genera tu lista de compra",
+  "homeGroceryRowSubtitle": "Con lo que necesitas esta semana",
+  "homeAiRowTitle": "Pregúntale algo a la IA",
+  "homeAiRowSubtitle": "“¿Qué ceno si llego tarde?”",
+
+  "cameraSheetTitle": "¿Qué quieres hacer?",
+  "cameraSheetAnalyzeMealTitle": "Analizar mi comida",
+  "cameraSheetAnalyzeMealSubtitle": "Foto del plato y calorías estimadas",
+  "cameraSheetIngredientsTitle": "Tengo ingredientes",
+  "cameraSheetIngredientsSubtitle": "Recetas con lo que hay en la nevera",
+  "cameraSheetLogManualTitle": "Registrar sin foto",
+  "cameraSheetLogManualSubtitle": "Buscar o escribir lo que comiste",
+
+  "comingSoonSnackbarMessage": "Muy pronto vas a poder hacer esto."
 }

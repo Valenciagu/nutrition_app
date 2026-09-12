@@ -20,6 +20,14 @@ final authStateChangesProvider = StreamProvider<AuthUser?>((ref) {
   return ref.watch(authRepositoryProvider).authStateChanges();
 });
 
+/// Modo invitado: true mientras el usuario navega "sin cuenta" (Welcome ·
+/// "Empezar" o SignUp · "Seguir sin cuenta"). Sin persistencia real todavía
+/// (Épicas 3/6) — solo existe para que el router distinga "invitado
+/// navegando" de "usuario sin sesión" (p. ej. justo después de cerrar
+/// sesión), casos que de otra forma se ven idénticos porque ambos tienen
+/// `authStateChangesProvider` en null.
+final guestModeProvider = StateProvider<bool>((ref) => false);
+
 /// Orquesta las acciones de login/registro/reset — el estado
 /// `AsyncValue<void>` le da a cada pantalla loading/error "gratis" vía
 /// `AsyncValue.guard`, sin manejar excepciones a mano en cada botón.
@@ -60,5 +68,6 @@ class AuthController extends AsyncNotifier<void> {
 
   Future<void> signOut() async {
     await _repository.signOut();
+    ref.read(guestModeProvider.notifier).state = false;
   }
 }

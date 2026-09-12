@@ -43,6 +43,13 @@ dependencies:
   # without bundling/licensing font files by hand.
   google_fonts: ^6.2.1
 
+  # Local draft persistence for Onboarding (Epic 3): the design's confirmed
+  # order is Onboarding -> Signup/Guest, so answers must survive an app
+  # restart before there's any Firebase user to own a Firestore doc.
+  # Flutter-team-maintained, minimal key-value store — no ORM/NoSQL engine
+  # needed for a single JSON blob.
+  shared_preferences: ^2.3.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

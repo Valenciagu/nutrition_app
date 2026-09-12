@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
@@ -7,16 +8,17 @@ import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../providers/auth_providers.dart';
 import '../widgets/legal_notice_text.dart';
 
-/// A2 · Welcome. "Empezar" lleva al onboarding (Épica 3, aún no existe —
-/// por ahora navega directo a Home como placeholder); "Ya tengo cuenta"
-/// lleva a Login.
-class WelcomePage extends StatelessWidget {
+/// A2 · Welcome. "Empezar" lleva al Onboarding conversacional (Épica 3),
+/// activando [guestModeProvider] para que el router lo deje entrar sin
+/// sesión; "Ya tengo cuenta" lleva a Login.
+class WelcomePage extends ConsumerWidget {
   const WelcomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final colors = context.colors;
 
@@ -59,7 +61,10 @@ class WelcomePage extends StatelessWidget {
                     AppButton(
                       label: l10n.authWelcomeStartButton,
                       fullWidth: true,
-                      onPressed: () => context.go(RoutePaths.root),
+                      onPressed: () {
+                        ref.read(guestModeProvider.notifier).state = true;
+                        context.go(RoutePaths.onboarding);
+                      },
                     ),
                     const SizedBox(height: AppSpacing.space12),
                     AppButton(

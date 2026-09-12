@@ -28,7 +28,7 @@ Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after b
 - [x] Scaffold: `features/authentication/{data,domain,presentation}`.
 - [x] Sign up / sign in / password reset (Firebase Auth email+password) — screens A1-A5 (Splash, Welcome, Login, SignUp, ForgotPassword).
 - [x] Session persistence (Firebase Auth handles this natively) + sign out (temporary button on the Home placeholder).
-- [x] Auth guard integrated into router (`redirect` + `GoRouterRefreshStream`).
+- [x] Auth guard integrated into router (`redirect` + `ref.listen(authStateChangesProvider, ...)` driving `refreshListenable` — see `documentation/authentication.md` for why a naive independent-subscription `GoRouterRefreshStream` caused a race condition and was replaced).
 - [ ] AUTH-101 — Account deletion entry point. Deferred to Epic 11 (Profile), where it has an actual home in the UI.
 - [ ] AUTH-102 — Email verification flow. Deferred (Instrucciones.md: "when appropriate", not MVP-critical).
 - [ ] AUTH-103 — Google/Apple social sign-in. Deferred: needs `google_sign_in`/`sign_in_with_apple` + OAuth/Apple Developer setup the user hasn't provided yet. **Ask the user before starting** this one (new deps + external console config).
@@ -39,16 +39,27 @@ Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after b
 - Depends on: Foundation (Epic 1), design for Fase 2 Block A (done, see `documentation/design_screens_auth.md`). Block B (Onboarding, B1-B9) of the same canvas file is intentionally not read yet — will be read when Epic 3 starts.
 
 ## Epic 3 — Onboarding
-- [ ] Data model for onboarding answers (age, sex, height, weight, activity level, goal, preferences, allergies, intolerances, meals/day, cooking ability/equipment, time, budget, country, health conditions).
-- [ ] Onboarding flow screens (Fase 2 design).
-- [ ] Persist profile to Firestore (`users/{userId}`).
-- Depends on: Epic 2 (needs an authenticated user), design.
+- [x] Data model for onboarding answers (`OnboardingAnswers`: goal, sex, age, height, weight, unit system, activity level, liked foods, avoid foods, meal slots/schedule, cooking time/skill, budget level).
+- [x] Onboarding flow screens B1-B7 (Fase 2 · Bloque B): objetivo, datos personales, actividad (con estimación de calorías en vivo), alimentos que gustan, alergias, ritmo de comidas, cocina+presupuesto.
+- [x] Local draft persistence (`shared_preferences`) — needed because registration happens AFTER onboarding (confirmed with the user 2026-09-12), so there's no `userId` yet to own a Firestore doc while answering.
+- [x] Migrate draft to Firestore (`users/{userId}`, merged) once a user actually signs in/up — wired in `app_router.dart`'s `ref.listen(authStateChangesProvider, ...)`.
+- [x] `SelectableChip` (component 03/10, previously deferred to this epic) — built in `core/widgets/`.
+- [x] Minimal Firestore security rules (`firestore.rules`, scoped to `users/{userId}` == own doc) — this is the app's first real Firestore write, so it couldn't ship with zero rules. Deployed 2026-09-12 (`firebase deploy --only firestore:rules`, run by the user; also created the project's Firestore database, added `.firebaserc` for the CLI's default project). Full review still deferred to Epic 15.
+- [x] End-to-end manual verification (2026-09-12): user ran Welcome → Onboarding (all 7 steps) → sign up, and confirmed in the Firebase console that `users/{uid}` lands with the complete draft.
+- [ ] ONBOARD-101 — B8 (generating, AI status) and B9 (plan ready, reveal with real macros/meals) are NOT built. They depend on real AI plan generation (Epic 5/6, not built yet) — faking that content would misrepresent what the AI actually produced. For now, completing B7 goes straight to `SignUpPage(hasPendingPlan: true)`. Revisit once Epic 6 exists.
+- [ ] ONBOARD-102 — Allergy vs. intolerance severity isn't distinguished (the design's B5 mock doesn't show a per-item severity control) — currently one flat `avoidFoods` exclusion list. Revisit if the AI/recipe engine needs the distinction.
+- [ ] ONBOARD-103 — Imperial unit display in B2 is a simple client-side conversion for display only; stored value is always metric (cm/kg). Fine for MVP, no known issue.
+- Depends on: Epic 2 (done). Design: Fase 2 · Bloque B (done, see `documentation/design_screens_onboarding.md`). Decision confirmed with the user 2026-09-12: Onboarding runs BEFORE Signup/Guest (matches the design's proposed funnel and the `hasPendingPlan` hook already built into `SignUpPage` in Epic 2).
 
 ## Epic 4 — Home
-- [ ] Daily nutrition summary.
-- [ ] Reusable `MealCard`.
-- [ ] Loading / error / empty states.
-- Depends on: Epic 3 (profile/goal exist), Epic 6 (daily plan data), design (Fase 3).
+- [x] Main app shell: 4 tabs + central camera (`StatefulShellRoute`) — navigation decision confirmed with the user 2026-09-12 (design's proposal over the original 5-tab brief; Progreso is no longer a tab, opens from Home's ring once Epic 6 exists).
+- [x] Home screen, empty state (design's C3 · "primer día") — greeting, dimmed calorie ring using the goal calculated in Onboarding, 3 quick-action rows.
+- [x] Loading state (C4, skeleton matching the real layout) and error state (`AppStateBlock.error`).
+- [x] `ProgressRing` and `BottomNavigation` (components 05/10 and 09/10 of the base fiche system, previously deferred to this epic).
+- [x] `QuickActionTile` (new component proposed by the design for this phase) — row variant only.
+- [ ] Daily nutrition summary populated with real data (C1/C2: ring with actual macros, next-meal `MealCard`, `AISuggestionCard`, streak) — needs Epic 6 (daily plan/food log), not built. Faking this data would misrepresent the app; deferred honestly rather than mocked.
+- [ ] `MealCard`, `MacroBar`, `AISuggestionCard` — deferred with the above, no real consumer yet.
+- Depends on: Epic 3 (done — profile/goal exist), design Fase 3 (done, see `documentation/design_screens_home.md`). The populated states additionally depend on Epic 6 (daily plan data).
 
 ## Epic 5 — AI Nutrition Assistant (backend)
 - [ ] Cloud Function(s) proxying OpenAI, with auth validation, structured-output parsing, safety validation layer.

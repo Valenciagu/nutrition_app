@@ -1,0 +1,37 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../features/home/presentation/widgets/camera_action_sheet.dart';
+import '../localization/app_localizations_ext.dart';
+import '../widgets/bottom_navigation.dart';
+
+/// Envuelve las 4 tabs del shell principal (Home, Plan, IA, Perfil) con la
+/// barra de navegación + botón de cámara central — un [StatefulShellBranch]
+/// por tab mantiene su propia pila de navegación independiente (`app_router.dart`
+/// arma las branches; este widget solo dibuja la chrome alrededor del
+/// `navigationShell` que GoRouter ya gestiona).
+class MainShell extends StatelessWidget {
+  const MainShell({super.key, required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return Scaffold(
+      body: navigationShell,
+      bottomNavigationBar: BottomNavigation(
+        currentIndex: navigationShell.currentIndex,
+        onTabSelected: (index) => navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
+        onCameraTap: () => showCameraActionSheet(context),
+        tabs: [
+          BottomNavTab(icon: Icons.home_rounded, label: l10n.bottomNavHomeLabel),
+          BottomNavTab(icon: Icons.calendar_today_rounded, label: l10n.bottomNavPlanLabel),
+          BottomNavTab(icon: Icons.auto_awesome_rounded, label: l10n.bottomNavAiLabel),
+          BottomNavTab(icon: Icons.person_rounded, label: l10n.bottomNavProfileLabel),
+        ],
+      ),
+    );
+  }
+}

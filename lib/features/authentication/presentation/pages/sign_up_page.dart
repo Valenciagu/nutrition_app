@@ -237,7 +237,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               const SizedBox(height: AppSpacing.space12),
               Center(
                 child: GestureDetector(
-                  onTap: () => context.go(RoutePaths.root),
+                  onTap: () {
+                    ref.read(guestModeProvider.notifier).state = true;
+                    context.go(RoutePaths.root);
+                  },
                   child: Text(
                     l10n.authSignUpGuestAction,
                     style: AppTypography.bodyM.copyWith(fontSize: 13, color: colors.textDisabled),

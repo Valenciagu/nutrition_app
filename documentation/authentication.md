@@ -14,7 +14,6 @@ Email/contraseña con Firebase Auth: splash con guarda de sesión, welcome, logi
 - `lib/features/authentication/presentation/auth_error_presentation.dart` — mapea códigos de Firebase a copy localizado, decidiendo a qué campo pertenece cada error.
 - `lib/features/authentication/presentation/pages/` — `splash_page.dart`, `welcome_page.dart`, `login_page.dart`, `sign_up_page.dart`, `forgot_password_page.dart`.
 - `lib/features/authentication/presentation/widgets/` — `AuthBackButton`, `LegalNoticeText`, `LegalAcceptanceCheckbox`, `PasswordStrengthIndicator` (específicos de esta feature, no forman parte de las 10 fichas base — ver `documentation/design_system.md`).
-- `lib/core/router/go_router_refresh_stream.dart` — adapta el stream de auth a `Listenable` para que GoRouter re-evalúe `redirect` sin recrear el router.
 - `lib/core/services/firebase_instances.dart` — provider crudo de `FirebaseAuth.instance`.
 - `lib/core/widgets/firebase_setup_required_page.dart` — pantalla de desarrollador cuando `Firebase.initializeApp()` falla.
 
@@ -28,10 +27,12 @@ Nota: `android/app/google-services.json` sí se generó; `ios/Runner/GoogleServi
 
 ## Notas de arquitectura
 
+- **Guarda de sesión del router sin condición de carrera**: `routerProvider` usa `ref.listen(authStateChangesProvider, ...)` para notificar a GoRouter (`refreshListenable`) — no una suscripción independiente a `.authStateChanges()`. Se intentó primero con un `GoRouterRefreshStream` genérico alimentado por una llamada nueva a `.authStateChanges()`, pero eso crea DOS suscripciones independientes al mismo stream de Firebase sin orden garantizado entre sí: el router podía "despertar" antes de que `authStateChangesProvider` ya tuviera el valor actualizado y, como nunca volvía a despertar, la app se quedaba pegada en Splash indefinidamente (bug real encontrado probando en el navegador). `ref.listen` sobre el propio provider garantiza que su caché ya está al día en el momento en que notifica.
 - **Sin `Either`/`dartz`**: los repositorios lanzan `Failure` (no lo retornan envuelto); los controllers usan `AsyncValue.guard`, que ya da loading/data/error "gratis" vía Riverpod sin añadir una dependencia funcional nueva.
 - **Sin codegen de Riverpod** en esta feature: `AuthController` usa la API manual de `AsyncNotifierProvider` en vez de `@riverpod` + `build_runner`. `riverpod_generator`/`freezed` siguen disponibles para cuando una entidad compleja los justifique.
 - **`core/` nunca importa `features/`**: `HomePlaceholderPage` (en `core/widgets/`) recibe `onSignOut` como callback desde `app_router.dart` (la capa de composición, que sí puede conocer features) en vez de leer `authControllerProvider` directamente.
 - **`AppTextField` se ajustó**: el toggle de contraseña ahora es texto ("Ver"/"Ocultar") en vez de ícono, porque la pantalla de Login real lo muestra así — más autoritativo que mi suposición inicial al construir el componente en la Épica 1.
+- **`root` es accesible sin sesión solo en modo invitado (temporal)**: `redirect` deja entrar a `RoutePaths.root` sin sesión únicamente si `guestModeProvider` (en `auth_providers.dart`) está en `true`. Ese provider se activa desde "Empezar" (Welcome) y "Seguir sin cuenta" (SignUp) justo antes de navegar, y se resetea a `false` en `AuthController.signOut()`. Es necesario distinguir así porque "invitado navegando" y "usuario recién deslogueado" son indistinguibles solo mirando `authStateChangesProvider` (ambos en `null`) — sin esta bandera, cualquiera de las dos rutas de bug real encontradas probando aparecía: primero "Empezar" no hacía nada (rebotaba a Welcome porque `root` no era accesible sin sesión), y al arreglar eso de forma ingenua (dejar `root` siempre accesible sin sesión) "Cerrar sesión" dejaba de devolver a Welcome. Cuando exista Onboarding/Plan real con persistencia de invitado (Épicas 3/6), esta bandera probablemente se reemplace por un estado más completo.
 
 ## Reusado vs. nuevo
 

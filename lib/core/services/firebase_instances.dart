@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,3 +10,5 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// `main.dart` (pendiente de FOUND-009 — ver PROJECT_CONTEXT.md); leer
 /// estos providers antes de eso lanza `[core/no-app]`.
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
+
+final firestoreProvider = Provider<FirebaseFirestore>((ref) => FirebaseFirestore.instance);
