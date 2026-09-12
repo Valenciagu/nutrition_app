@@ -6,17 +6,17 @@ import 'core/localization/generated/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/firebase_setup_required_page.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Sin `firebase_options.dart` (generado por `flutterfire configure`)
-    // esto lanza — ver TASKS.md > FOUND-009. Se atrapa abajo para no
-    // mostrar un crash críptico mientras esa tarea sigue pendiente.
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     runApp(const ProviderScope(child: NutritionApp()));
   } catch (error) {
+    // Ya no debería pasar (FOUND-009 resuelto, ver TASKS.md), pero se deja
+    // el manejo por si el proyecto de Firebase se desconecta o cambia.
     runApp(FirebaseSetupRequiredPage(error: error));
   }
 }

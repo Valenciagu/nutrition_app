@@ -4,7 +4,7 @@
 
 Email/contraseña con Firebase Auth: splash con guarda de sesión, welcome, login, registro y recuperar contraseña. El router redirige automáticamente según haya o no sesión activa.
 
-**Bloqueador de runtime, no de compilación:** esta feature compila y pasa `flutter analyze`/`flutter build`, pero **no puede probarse de extremo a extremo todavía** porque no hay un proyecto de Firebase conectado (`FOUND-009` en `TASKS.md`). Sin eso, `main.dart` muestra una pantalla de desarrollador ("Firebase no está configurado") en vez de la app — ver "Manejo del bloqueador" abajo.
+**Estado: conectado a un proyecto de Firebase real** (`nutritionapp-eee08`, `FOUND-009` resuelto el 2026-09-11). Compila y pasa `flutter analyze`/`flutter build`. Pendiente: probarlo corriendo la app de verdad (`flutter run`) e intentar registro/login — solo se validó por compilación hasta ahora.
 
 ## Archivos clave
 
@@ -20,9 +20,11 @@ Email/contraseña con Firebase Auth: splash con guarda de sesión, welcome, logi
 
 Diseño: `documentation/design_screens_auth.md` (specs completas de las 5 pantallas).
 
-## Manejo del bloqueador de Firebase
+## Configuración de Firebase (FOUND-009)
 
-`main.dart` llama `Firebase.initializeApp()` dentro de un `try/catch` antes de `runApp`. Si falla (no hay `firebase_options.dart`/config nativa todavía), se muestra `FirebaseSetupRequiredPage` en vez de crashear con un stack trace críptico. Esto es intencional y temporal: en cuanto se corra `flutterfire configure` (FOUND-009), este catch deja de activarse y la app entra al flujo real.
+`lib/firebase_options.dart` fue generado por `flutterfire configure` (proyecto `nutritionapp-eee08`, plataformas android/ios/web) y `main.dart` llama `Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)` dentro de un `try/catch`. Si esa llamada fallara (proyecto desconectado, credenciales revocadas), se muestra `FirebaseSetupRequiredPage` en vez de un crash críptico — ya no debería activarse en el uso normal, pero se deja como salvaguarda.
+
+Nota: `android/app/google-services.json` sí se generó; `ios/Runner/GoogleService-Info.plist` no (se corrió `flutterfire configure` desde Windows). No bloquea Auth — `firebase_options.dart` provee las opciones de iOS directamente en Dart — pero si más adelante se necesita el plist nativo (p. ej. para Crashlytics), hay que regenerarlo corriendo `flutterfire configure` desde una Mac.
 
 ## Notas de arquitectura
 

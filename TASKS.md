@@ -19,7 +19,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 - [x] FOUND-006 — Router skeleton: single `GoRouter` instance + centralized route name constants + temporary placeholder home page.
 - [x] FOUND-007 — Network client skeleton: single Dio instance + interceptor hook (auth header TODO, error logging without secrets).
 - [~] FOUND-008 — Core reusable widgets from "Fichas de componentes" (10 components, closed system). Built so far: `AppButton`, `AppTextField`, `AppCard`, `AppStateBlock` (empty/loading/error), `AppSkeletonBar`, `showAppBottomSheet`. Deferred (still core/widgets, not skipped): `SelectableChip` (→ Epic 3), `MealCard`/`ProgressRing`/`MacroBar` (→ Epic 4), `AIMessage` (→ Epic 5), `BottomNavigation` (→ once 2+ tab features exist). Rationale for deferral in `documentation/design_system.md`.
-- [ ] FOUND-009 — Firebase project wiring (`firebase_core` init, `flutterfire configure`). **Needs user action**: a Firebase project must exist and the user must run the FlutterFire CLI login interactively.
+- [x] FOUND-009 — Firebase project wiring. Done 2026-09-11: project `nutritionapp-eee08` created by the user, `flutterfire configure` run for android/ios/web, `lib/firebase_options.dart` generated, `main.dart` now calls `Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)`. Email/Password sign-in method enabled in the Firebase console by the user.
 - [x] FOUND-010 — App entry point (`main.dart`): `ProviderScope`, `MaterialApp.router`, light+dark theme, localization delegates wired together.
 
 Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after both the initial scaffold and the design-token rebuild. Not yet run on an Android/iOS device/emulator (none attached in this environment) or manually eyeballed in a browser.
@@ -35,7 +35,7 @@ Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after b
 - [ ] AUTH-104 — Real "open mail app" action on the password-reset-sent screen (needs `url_launcher`, not added yet).
 - [ ] AUTH-105 — Real Terms/Privacy Policy content + links (needs legal copy from the user).
 - [ ] AUTH-106 — Real guest-mode persistence once Onboarding/Plan (Epics 3/6) exist (currently "Seguir sin cuenta" just goes to Home with nothing saved).
-- **Hard runtime dependency: FOUND-009 (Firebase project).** The feature compiles and analyzes clean, but can't actually sign in/up until a real Firebase project is connected — `main.dart` shows a developer-facing "Firebase not configured" screen in the meantime (see `documentation/authentication.md`).
+- **FOUND-009 resolved 2026-09-11** — see above. Auth can now actually be exercised end-to-end; still not manually tested in a running app as of this note (analyze/build-only validation so far).
 - Depends on: Foundation (Epic 1), design for Fase 2 Block A (done, see `documentation/design_screens_auth.md`). Block B (Onboarding, B1-B9) of the same canvas file is intentionally not read yet — will be read when Epic 3 starts.
 
 ## Epic 3 — Onboarding
