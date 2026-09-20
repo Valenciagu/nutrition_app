@@ -1,0 +1,15 @@
+# Compiled output
+lib/
+
+# Dependencies
+node_modules/
+
+# Local secret overrides for the emulator (see README note in askNutritionAssistant.ts) —
+# never commit real OpenAI keys.
+.secret.local
+.env
+.env.*
+!.env.example
+
+# Firebase debug logs
+*-debug.log

@@ -46,17 +46,23 @@ class BottomNavigation extends StatelessWidget {
             child: Center(
               child: GestureDetector(
                 onTap: onCameraTap,
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  margin: const EdgeInsets.only(top: -26),
-                  decoration: BoxDecoration(
-                    color: colors.actionPrimary,
-                    shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: colors.actionPrimary.withValues(alpha: 0.35), blurRadius: 20, offset: const Offset(0, 8))],
+                // `Container.margin` no acepta valores negativos (lanza un
+                // assertion error) — el efecto "elevado sobre la barra" del
+                // diseño se logra desplazando el widget con `Transform`
+                // en vez de un margen negativo.
+                child: Transform.translate(
+                  offset: const Offset(0, -26),
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: colors.actionPrimary,
+                      shape: BoxShape.circle,
+                      boxShadow: [BoxShadow(color: colors.actionPrimary.withValues(alpha: 0.35), blurRadius: 20, offset: const Offset(0, 8))],
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(Icons.camera_alt_outlined, color: colors.onActionPrimary, size: 24),
                   ),
-                  alignment: Alignment.center,
-                  child: Icon(Icons.camera_alt_outlined, color: colors.onActionPrimary, size: 24),
                 ),
               ),
             ),

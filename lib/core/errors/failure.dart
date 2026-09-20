@@ -55,6 +55,13 @@ final class AiValidationFailure extends Failure {
   const AiValidationFailure({super.message, super.cause});
 }
 
+/// The user already used up their daily AI quota (free or premium tier).
+/// Server-enforced — see `functions/src/ai/quota.ts` and
+/// `documentation/ai_backend.md`.
+final class AiQuotaExceededFailure extends Failure {
+  const AiQuotaExceededFailure({super.message, super.cause});
+}
+
 /// Anything not classified above. Should be rare — prefer a specific
 /// [Failure] subtype so the UI can react appropriately.
 final class UnknownFailure extends Failure {

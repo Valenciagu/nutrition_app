@@ -62,10 +62,12 @@ Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after b
 - Depends on: Epic 3 (done — profile/goal exist), design Fase 3 (done, see `documentation/design_screens_home.md`). The populated states additionally depend on Epic 6 (daily plan data).
 
 ## Epic 5 — AI Nutrition Assistant (backend)
-- [ ] Cloud Function(s) proxying OpenAI, with auth validation, structured-output parsing, safety validation layer.
-- [ ] AI usage quota enforcement (free vs premium) server-side.
-- [ ] Client-side `AIService` abstraction (model-agnostic).
-- Depends on: Foundation, Firebase Functions project setup.
+- [x] AI5-001 — Cloud Functions project scaffold (`functions/`, Node 22 + TypeScript) + first real Cloud Function proxying OpenAI: `askNutritionAssistant` (free-text nutrition Q&A), with Firebase Auth validation, structured-output parsing (Responses API + `zod`/`zodTextFormat`), and a deterministic safety validation layer on top of the model's own flags. See `documentation/ai_backend.md`. Compiles clean (`tsc`); not deployed yet (needs the user to set the `OPENAI_API_KEY` secret and confirm `firebase deploy`).
+- [x] AI5-002 — AI usage quota enforcement (free vs premium) server-side. `functions/src/ai/quota.ts` — atomic Firestore transaction (`users/{uid}/aiUsage/{yyyy-mm-dd}`) consumed before every OpenAI call, refunded on OpenAI failure. Reads `users/{uid}.subscription.isPremium` (doesn't exist yet — Epic 13 — so everyone is free-tier today; wired through so Epic 13 only needs to start writing the flag). Limits (10/day free, 50/day premium) are MVP placeholders, centralized and easy to adjust. `firestore.rules` updated to document that `aiUsage` is intentionally unmatched (denied to the client by default). See `documentation/ai_backend.md`.
+- [x] AI5-003 — Client-side `AIService` abstraction (model-agnostic) in Flutter, calling `askNutritionAssistant` via `cloud_functions`. `lib/core/services/ai/` (`AIService` abstract contract, `FirebaseAiService` impl, `NutritionAssistantAnswer` entity), new `AiQuotaExceededFailure` in `core/errors/failure.dart`, new `firebaseFunctionsProvider`. `flutter analyze` clean. Deliberately no UI consumer yet (the "IA" tab stays `ComingSoonPage`) — building a screen wasn't in this task's scope and there's no confirmed product decision yet for where an AI chat UI belongs. See `documentation/ai_backend.md`.
+
+**Epic 5 complete** — all 3 tasks done. Backend not deployed yet (needs the user's explicit go-ahead, see below); no UI consumes `AIService` yet (separate future decision, not blocking).
+- Depends on: Foundation, Firebase Functions project setup (done, this task).
 
 ## Epic 6 — Meal Planning / Daily Plan
 - [ ] Daily plan domain model + Firestore schema (`users/{userId}/nutritionPlans/{planId}`).
@@ -121,8 +123,10 @@ Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after b
 ---
 
 ## Currently in progress
-Design is synced and the theme + first 5 core widgets are built. Epic 1 (Foundation) is essentially done except FOUND-009 (needs a Firebase project + interactive `flutterfire configure` from the user). Ready to start Epic 2 (Authentication) — it only needs `AppButton`/`AppTextField`/`AppStateBlock`, all of which now exist.
+Epics 0-5 complete (Epic 5 finished 2026-09-20: AI5-001/002/003 — Cloud Functions backend, usage quota, and the Dart `AIService` abstraction, see `documentation/ai_backend.md`). `flutter analyze` and `flutter build web --debug` both clean/succeed after Epic 5. Next epic not yet chosen/confirmed with the user — candidates are Epic 6 (Meal Planning, needs Fase 4 design read first) or addressing the pending bug list (still not delivered).
 
 ## Open questions / decisions needed from the user
-- Firebase project: does one already exist, or should we plan its creation together when we reach FOUND-009?
-- OpenAI backend: confirm Cloud Functions (Node/Python) as the runtime for Epic 5, or another backend if preferred.
+- Bug list from manual Home testing: mentioned by the user as forthcoming, still not delivered as of 2026-09-20. An uncommitted fix already sits in `lib/core/widgets/bottom_navigation.dart` (camera button crash from a negative `Container.margin`) — likely one of the bugs found.
+- Epic 5 deployment: `functions/` compiles locally but was never deployed — needs the user to run `firebase functions:secrets:set OPENAI_API_KEY` and explicitly confirm `firebase deploy --only functions` when ready (not done automatically — costs money, affects the shared Firebase project). `firestore.rules` also has a new comment (no rule-logic change) that would need `firebase deploy --only firestore:rules` to actually redeploy, though nothing currently depends on that redeploy since the rule behavior (deny by default) was already true before the comment.
+- Where does an AI chat UI eventually live? `AIService`/`askNutritionQuestion` is ready but has zero UI consumers — no epic in this backlog explicitly owns "general AI Q&A screen" (Epic 6/7/8/9 are about specific structured features: plans, recipes, food photos, ingredient photos). Worth deciding with the user whether the "IA" tab becomes a general chat, or whether `askNutritionQuestion` ends up embedded inside another screen instead.
+- Next epic order: proceed to Epic 6 (Meal Planning), or address the still-pending bug list first — same open question carried over from the Epic 5 kickoff, not yet resolved.

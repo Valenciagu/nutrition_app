@@ -9,6 +9,15 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // `aiUsage/{date}` (Épica 5, tarea 5.2 — cuota de IA) es deliberadamente
+      // NO matcheado aquí: sin una regla explícita, Firestore deniega por
+      // defecto, así que el cliente nunca puede leer ni escribir su propio
+      // contador de uso. Solo las Cloud Functions lo tocan (vía Admin SDK,
+      // que ignora estas reglas) — es el contador server-trusted, el cliente
+      // solo recibe `remainingToday` como parte de la respuesta de la función
+      // llamable. No agregar un `match /aiUsage/{date}` con `allow read` sin
+      // pensarlo dos veces.
     }
   }
 }

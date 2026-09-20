@@ -1,0 +1,27 @@
+{
+  "name": "nutrition-app-functions",
+  "description": "Secure backend (Firebase Cloud Functions) proxying OpenAI for the nutrition app. Never expose the OpenAI key or call OpenAI from the Flutter client — see Instrucciones.md sections 19-38, 75.",
+  "private": true,
+  "engines": {
+    "node": "22"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.4.0",
+    "firebase-functions": "^7.4.0",
+    "openai": "^7.19.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

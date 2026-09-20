@@ -2,7 +2,7 @@
 
 Always-current snapshot of what this app actually contains. Read this first when resuming work. Updated after every completed task/feature — see `.claude/skills/nutrition-app-workflow`. For the full spec, see `Instrucciones.md`; for task status, see `TASKS.md`; for per-feature detail, see `documentation/`.
 
-_Last updated: 2026-09-12 — after Epic 4 (Home)._
+_Last updated: 2026-09-20 — Epic 5 complete (AI5-001/002/003: Cloud Functions backend scaffold, first OpenAI-proxying function, server-side AI usage quota, and the Dart `AIService` abstraction)._
 
 ## What this app is
 
@@ -38,7 +38,8 @@ An AI-powered personal nutrition assistant (Flutter, iOS + Android, Spanish-firs
 - **Epic 3 (Onboarding) is built and confirmed working end-to-end** (2026-09-12) — see `documentation/onboarding.md` and `documentation/design_screens_onboarding.md`. The 7-step conversational flow (B1-B7: objetivo, datos personales, actividad, alimentos que gustan, alergias, ritmo de comidas, cocina+presupuesto), local draft persistence (`shared_preferences`, since registration happens AFTER onboarding), and migration of the completed draft to Firestore (`users/{userId}`) once the user actually signs in/up. The user ran the real flow (Welcome → Onboarding → sign up) and verified in the Firebase console that `users/{uid}` lands with the full completed draft. B8/B9 (AI plan generation/reveal) are NOT built — they depend on Epic 5/6.
 - `lib/features/` now has two features: `authentication/{data,domain,presentation}`, `onboarding/{data,domain,presentation}`. Home, nutrition, recipes, etc. don't exist yet.
 - **First real Firestore write in the app** (Onboarding's migration step) — added minimal `firestore.rules` (`users/{userId}` == own doc only) so it doesn't ship unprotected. Deployed 2026-09-12 (`firebase deploy --only firestore:rules`) — that run also created the project's Firestore database, which didn't exist yet. A `.firebaserc` (default project `nutritionapp-eee08`) was added so the Firebase CLI knows which project to target. Full rules review still deferred to Epic 15.
-- **Epic 4 (Home) is built** — see `documentation/home.md` and `documentation/design_screens_home.md`. Main app shell: 4 tabs + central camera (`StatefulShellRoute` — navigation decision confirmed with the user 2026-09-12, replacing the original 5-tab brief). Home shows the design's "primer día" empty state (dimmed calorie ring with the goal from Onboarding, 3 quick-action rows) plus loading/error states; Plan and IA tabs are `ComingSoonPage` placeholders (Epic 5/6 not built), Perfil hosts the sign-out button temporarily (Epic 11 not built). The populated Home states (real macros, next meal, AI suggestions, streak) are NOT built — they need Epic 6's daily plan data; faking that content was rejected as misleading, same call as Onboarding's B8/B9. `flutter analyze` clean, `flutter build web --debug` succeeds; not yet manually tested by the user.
+- **Epic 4 (Home) is built** — see `documentation/home.md` and `documentation/design_screens_home.md`. Main app shell: 4 tabs + central camera (`StatefulShellRoute` — navigation decision confirmed with the user 2026-09-12, replacing the original 5-tab brief). Home shows the design's "primer día" empty state (dimmed calorie ring with the goal from Onboarding, 3 quick-action rows) plus loading/error states; Plan and IA tabs are `ComingSoonPage` placeholders (Epic 5/6 not built), Perfil hosts the sign-out button temporarily (Epic 11 not built). The populated Home states (real macros, next meal, AI suggestions, streak) are NOT built — they need Epic 6's daily plan data; faking that content was rejected as misleading, same call as Onboarding's B8/B9. `flutter analyze` clean, `flutter build web --debug` succeeds; **still not manually tested by the user as of 2026-09-19** (a pending fix for a camera-button crash — negative `Container.margin` assertion, replaced with `Transform.translate` — sits uncommitted in `lib/core/widgets/bottom_navigation.dart`, likely found during that not-yet-completed manual pass). A bug list from the user is expected but not delivered yet (as of 2026-09-19); the user chose to proceed to Epic 5 first and address bugs later.
+- **Epic 5 (AI backend) is complete** — see `documentation/ai_backend.md`. New `functions/` subproject (first non-Dart code in the repo): Firebase Cloud Functions v2, Node 22 + TypeScript. First real function `askNutritionAssistant` (free-text nutrition Q&A) — Firebase-Auth-gated, reads `goal`/`avoidFoods`/`isPremium` server-side from `users/{uid}` (never trusts client-sent profile data), enforces a per-user daily AI usage quota (`users/{uid}/aiUsage/{yyyy-mm-dd}`, atomic Firestore transaction, refunded on OpenAI failure — `functions/src/ai/quota.ts`), calls OpenAI's Responses API with structured output (`zod`/`zodTextFormat`, model `gpt-5.6-luna` centralized in `functions/src/config/openai.ts`), and runs a deterministic safety layer (checks the model's own flags AND independently scans for the user's excluded foods / medication-change language) before ever returning a response. OpenAI key via Firebase Secret Manager (`defineSecret`), never in code. `firestore.rules` documents that `aiUsage` is intentionally left unmatched (denied to the client by default — only Cloud Functions touch it via the Admin SDK). `isPremium` reads `users/{uid}.subscription.isPremium`, a field nothing writes yet (Epic 13 doesn't exist) — safe default of `free` for everyone today, ready for Epic 13 to start writing it. On the Flutter side, `lib/core/services/ai/` now has an `AIService` abstract contract + `FirebaseAiService` implementation (calls the callable, maps `FirebaseFunctionsException` codes to the existing `Failure` hierarchy, adding one new `AiQuotaExceededFailure`) — deliberately with **no UI consumer yet** (the "IA" tab stays `ComingSoonPage`; no epic in the backlog explicitly owns a general AI chat screen, see "Open questions" in `TASKS.md`). Backend compiles clean (`tsc --noEmit`) but **not deployed** — needs the user to run `firebase functions:secrets:set OPENAI_API_KEY` and confirm `firebase deploy --only functions` (not run by Claude — cost/shared-project action). `flutter analyze` clean and `flutter build web --debug` succeeds (epic checkpoint, 2026-09-20).
 
 ## Known blockers
 
@@ -58,7 +59,7 @@ lib/
     localization/  l10n/{app_es.arb,app_en.arb}, generated/ (gitignored), app_localizations_ext.dart
     network/       dio_client.dart
     router/        app_router.dart, main_shell.dart (StatefulShellRoute chrome)
-    services/      firebase_instances.dart
+    services/      firebase_instances.dart, ai/{ai_service.dart, firebase_ai_service.dart, nutrition_assistant_answer.dart}
     theme/         app_color_tokens.dart, app_typography.dart, app_spacing.dart, app_radius.dart, app_elevation.dart, app_motion.dart, app_theme.dart
     utils/         validators.dart
     widgets/       app_button.dart, app_text_field.dart, app_card.dart, app_state_block.dart, app_skeleton.dart, app_bottom_sheet.dart, selectable_chip.dart, progress_ring.dart, quick_action_tile.dart, bottom_navigation.dart, coming_soon_page.dart (temporary), profile_placeholder_page.dart (temporary), firebase_setup_required_page.dart
@@ -85,6 +86,17 @@ lib/
         pages/     home_page.dart
         widgets/   camera_action_sheet.dart
   main.dart
+
+functions/                    (Firebase Cloud Functions v2, Node 22 + TypeScript — separate from the Dart tree)
+  src/
+    index.ts                  exports all functions, initializes firebase-admin
+    config/openai.ts          OpenAI secret + client + centralized model routing
+    ai/
+      askNutritionAssistant.ts  the onCall function
+      schema.ts                zod structured-output contract
+      safety.ts                deterministic post-validation safety layer
+      quota.ts                 per-user daily AI usage quota (Firestore transaction)
+      prompts/nutritionAssistantV1.ts  centralized, versioned system prompt
 ```
 
 ## Features implemented
@@ -92,6 +104,7 @@ lib/
 - **Authentication** (Epic 2) — see `documentation/authentication.md`. Email/password sign-in/up/reset, session-aware routing.
 - **Onboarding** (Epic 3) — see `documentation/onboarding.md`. 7-step conversational flow (B1-B7), local draft persistence, Firestore migration on signup/login. B8/B9 (AI plan generation/reveal) deferred to Epic 5/6.
 - **Home** (Epic 4) — see `documentation/home.md`. Main app shell (4 tabs + camera), Home's empty/loading/error states. Populated states deferred to Epic 6.
+- **AI backend** (Epic 5, complete) — see `documentation/ai_backend.md`. `askNutritionAssistant` Cloud Function: secure OpenAI proxy with auth validation, per-user daily quota, structured output, and a deterministic safety layer. Plus `AIService`/`FirebaseAiService` on the Flutter side. Not yet deployed; no UI screen calls `AIService` yet (deliberate — no epic owns that screen).
 
 Foundation-only docs: `documentation/foundation.md` and `documentation/design_system.md`.
 
