@@ -30,4 +30,14 @@ export function getOpenAiClient(): OpenAI {
  */
 export const AI_MODELS = {
   nutritionQa: "gpt-5.6-luna",
+  // Misma familia que `nutritionQa` hoy — clave propia para que un cambio de
+  // routing futuro (Instrucciones.md §78: "Recipe generation → appropriate
+  // general model") no obligue a tocar `generateRecipe.ts`.
+  recipeGeneration: "gpt-5.6-luna",
+  // `gpt-5.6-luna` ya es nativamente multimodal (acepta `input_image`,
+  // Instrucciones.md §78: "Image analysis → vision-capable model") — clave
+  // propia igual que `recipeGeneration`, no porque hoy sea un modelo
+  // distinto, sino para poder enrutar análisis de imagen a un modelo
+  // diferente en el futuro sin tocar `analyzeFoodPhoto.ts`.
+  foodPhotoAnalysis: "gpt-5.6-luna",
 } as const;

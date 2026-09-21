@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +13,12 @@ import '../../features/authentication/presentation/providers/auth_providers.dart
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/onboarding/presentation/providers/onboarding_providers.dart';
+import '../../features/food_analysis/presentation/pages/food_analysis_page.dart';
+import '../../features/grocery_list/presentation/pages/grocery_list_page.dart';
+import '../../features/plan/presentation/pages/plan_page.dart';
+import '../../features/recipes/domain/entities/recipe.dart';
+import '../../features/recipes/presentation/pages/cooking_mode_page.dart';
+import '../../features/recipes/presentation/pages/recipe_detail_page.dart';
 import '../constants/route_paths.dart';
 import '../widgets/coming_soon_page.dart';
 import '../widgets/profile_placeholder_page.dart';
@@ -95,6 +103,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: RoutePaths.splash, builder: (context, state) => const SplashPage()),
       GoRoute(path: RoutePaths.welcome, builder: (context, state) => const WelcomePage()),
       GoRoute(path: RoutePaths.onboarding, builder: (context, state) => const OnboardingPage()),
+      GoRoute(
+        path: RoutePaths.foodAnalysis,
+        builder: (context, state) => FoodAnalysisPage(imageBytes: state.extra! as Uint8List),
+      ),
       GoRoute(path: RoutePaths.login, builder: (context, state) => const LoginPage()),
       GoRoute(
         path: RoutePaths.signUp,
@@ -107,7 +119,37 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
         branches: [
           StatefulShellBranch(routes: [GoRoute(path: RoutePaths.root, builder: (context, state) => const HomePage())]),
-          StatefulShellBranch(routes: [GoRoute(path: RoutePaths.plan, builder: (context, state) => const ComingSoonPage())]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RoutePaths.plan,
+                builder: (context, state) => const PlanPage(),
+                routes: [
+                  GoRoute(
+                    path: RoutePaths.recipeDetailSegment,
+                    builder: (context, state) => RecipeDetailPage(
+                      date: state.pathParameters['date']!,
+                      mealId: state.pathParameters['mealId']!,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: RoutePaths.cookingModeSegment,
+                        builder: (context, state) => CookingModePage(
+                          recipe: state.extra! as Recipe,
+                          date: state.pathParameters['date']!,
+                          mealId: state.pathParameters['mealId']!,
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: RoutePaths.groceryListSegment,
+                    builder: (context, state) => const GroceryListPage(),
+                  ),
+                ],
+              ),
+            ],
+          ),
           StatefulShellBranch(routes: [GoRoute(path: RoutePaths.ai, builder: (context, state) => const ComingSoonPage())]),
           StatefulShellBranch(
             routes: [

@@ -152,7 +152,7 @@ class _SexOption extends StatelessWidget {
           style: AppTypography.label.copyWith(
             fontSize: 14.5,
             fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-            color: selected ? colors.actionPrimaryPressed : colors.textPrimary,
+            color: selected ? colors.onActionPrimarySurface : colors.textPrimary,
           ),
         ),
       ),

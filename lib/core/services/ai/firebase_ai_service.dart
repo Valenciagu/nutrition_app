@@ -2,6 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../errors/failure.dart';
+import '../../errors/firebase_functions_error_mapper.dart';
 import '../firebase_instances.dart';
 import 'ai_service.dart';
 import 'nutrition_assistant_answer.dart';
@@ -29,28 +30,12 @@ class FirebaseAiService implements AIService {
         remainingToday: data['remainingToday'] as int,
       );
     } on FirebaseFunctionsException catch (e) {
-      throw _mapException(e);
+      throw mapFirebaseFunctionsException(e);
     } on TypeError catch (e) {
       // La respuesta no tenía la forma esperada — nunca confiar en la salida
       // cruda de la función (Instrucciones.md §37-38), aunque ya venga
       // validada del lado del servidor.
       throw AiValidationFailure(message: 'askNutritionAssistant devolvió una respuesta con forma inesperada', cause: e);
-    }
-  }
-
-  Failure _mapException(FirebaseFunctionsException e) {
-    switch (e.code) {
-      case 'unauthenticated':
-        return AuthFailure(message: e.message, code: e.code, cause: e);
-      case 'invalid-argument':
-        return ValidationFailure(message: e.message, cause: e);
-      case 'resource-exhausted':
-        return AiQuotaExceededFailure(message: e.message, cause: e);
-      case 'unavailable':
-      case 'deadline-exceeded':
-        return NetworkFailure(message: e.message, cause: e);
-      default:
-        return ServerFailure(message: e.message, cause: e);
     }
   }
 }

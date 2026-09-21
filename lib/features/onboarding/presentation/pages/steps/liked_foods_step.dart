@@ -150,7 +150,7 @@ class _FoodTile extends StatelessWidget {
                   style: AppTypography.label.copyWith(
                     fontSize: 12.5,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                    color: selected ? colors.actionPrimaryPressed : colors.textPrimary,
+                    color: selected ? colors.onActionPrimarySurface : colors.textPrimary,
                   ),
                 ),
               ),

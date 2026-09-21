@@ -29,6 +29,7 @@ class AppStateBlock extends StatelessWidget {
     required this.message,
     this.actionLabel,
     this.onAction,
+    this.isActionLoading = false,
   })  : _mode = _AppStateBlockMode.empty,
         skeleton = null;
 
@@ -39,20 +40,27 @@ class AppStateBlock extends StatelessWidget {
     this.actionLabel,
     this.onAction,
   })  : _mode = _AppStateBlockMode.error,
-        skeleton = null;
+        skeleton = null,
+        isActionLoading = false;
 
   const AppStateBlock.loading({super.key, this.skeleton})
       : _mode = _AppStateBlockMode.loading,
         title = null,
         message = null,
         actionLabel = null,
-        onAction = null;
+        onAction = null,
+        isActionLoading = false;
 
   final _AppStateBlockMode _mode;
   final String? title;
   final String? message;
   final String? actionLabel;
   final VoidCallback? onAction;
+
+  /// Solo aplica a `.empty` — el botón de acción entra en estado de carga
+  /// (spinner de `AppButton`) mientras una operación asíncrona corre (p. ej.
+  /// "Generar plan", Épica 6). Ver `documentation/plan.md`.
+  final bool isActionLoading;
 
   /// Custom loading silhouette. Only meaningful with `.loading`.
   final Widget? skeleton;
@@ -152,7 +160,7 @@ class AppStateBlock extends StatelessWidget {
             ),
             if (onAction != null) ...[
               const SizedBox(height: AppSpacing.space12),
-              AppButton(label: resolvedLabel, onPressed: onAction, size: AppButtonSize.md),
+              AppButton(label: resolvedLabel, onPressed: onAction, size: AppButtonSize.md, isLoading: isActionLoading),
             ],
           ],
         ),

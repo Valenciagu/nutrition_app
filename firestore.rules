@@ -18,6 +18,40 @@ service cloud.firestore {
       // solo recibe `remainingToday` como parte de la respuesta de la función
       // llamable. No agregar un `match /aiUsage/{date}` con `allow read` sin
       // pensarlo dos veces.
+
+      // `nutritionPlans/{date}` (Épica 6, tarea PLAN-002) — el CONTENIDO del
+      // plan (comidas, calorías, macros) solo lo escribe `generateDailyPlan`
+      // vía Admin SDK; el cliente solo puede leer, nunca escribir el
+      // documento completo. La escritura granular de "comida registrada"
+      // (marcar una comida como consumida) queda para PLAN-003, que deberá
+      // decidir cómo permitir esa escritura puntual sin abrir la puerta a
+      // que el cliente reescriba el contenido generado por la IA.
+      match /nutritionPlans/{date} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+
+      // `recipes/{recipeId}` (Épica 7) — mismo criterio que `nutritionPlans`:
+      // el contenido (ingredientes, pasos, macros) solo lo escribe
+      // `generateRecipe` vía Admin SDK; el cliente solo puede leer sus
+      // propias recetas, nunca escribirlas.
+      match /recipes/{recipeId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+
+      // `shoppingLists/{weekKey}` (Épica 10) — a diferencia de
+      // `nutritionPlans`/`recipes` (contenido generado por la IA), esto es
+      // SOLO estado propio del usuario (qué ya marcó como comprado/en casa):
+      // el cliente escribe directo, no hay Cloud Function involucrada. Se
+      // valida la forma para no dejar guardar campos arbitrarios —
+      // `checkedItems` es la única clave permitida, siempre una lista.
+      match /shoppingLists/{weekKey} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && request.auth.uid == userId
+          && request.resource.data.keys().hasOnly(['checkedItems'])
+          && request.resource.data.checkedItems is list;
+      }
     }
   }
 }

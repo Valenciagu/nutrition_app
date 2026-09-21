@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/home/presentation/widgets/camera_action_sheet.dart';
@@ -10,13 +11,13 @@ import '../widgets/bottom_navigation.dart';
 /// por tab mantiene su propia pila de navegación independiente (`app_router.dart`
 /// arma las branches; este widget solo dibuja la chrome alrededor del
 /// `navigationShell` que GoRouter ya gestiona).
-class MainShell extends StatelessWidget {
+class MainShell extends ConsumerWidget {
   const MainShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
 
     return Scaffold(
@@ -24,7 +25,7 @@ class MainShell extends StatelessWidget {
       bottomNavigationBar: BottomNavigation(
         currentIndex: navigationShell.currentIndex,
         onTabSelected: (index) => navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
-        onCameraTap: () => showCameraActionSheet(context),
+        onCameraTap: () => showCameraActionSheet(context, ref),
         tabs: [
           BottomNavTab(icon: Icons.home_rounded, label: l10n.bottomNavHomeLabel),
           BottomNavTab(icon: Icons.calendar_today_rounded, label: l10n.bottomNavPlanLabel),

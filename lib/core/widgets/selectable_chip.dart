@@ -39,7 +39,7 @@ class SelectableChip extends StatelessWidget {
     if (selected) {
       borderColor = isNegative ? colors.error : colors.actionPrimary;
       backgroundColor = isNegative ? colors.errorSurface : colors.actionPrimarySurface;
-      textColor = isNegative ? colors.error : colors.actionPrimaryPressed;
+      textColor = isNegative ? colors.error : colors.onActionPrimarySurface;
     } else {
       borderColor = colors.border;
       backgroundColor = null;

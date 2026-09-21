@@ -20,6 +20,31 @@ abstract final class RoutePaths {
   static const String ai = '/ai';
   static const String profile = '/profile';
 
+  /// Épica 8 — nivel superior, no anidada bajo ningún tab: el botón de
+  /// cámara vive en `MainShell`, fuera de las 4 pilas de navegación de las
+  /// tabs. Los bytes de la foto ya capturada viajan por `extra` de
+  /// GoRouter (binario, no cabe en la URL).
+  static const String foodAnalysis = '/food-analysis';
+
+  /// D3 (Épica 7) — anidada bajo `plan` (no una tab propia) para que D3 y D5
+  /// vivan en la pila de navegación del tab Plan, con el back nativo
+  /// funcionando sin lógica extra. `recipe` toma `date`/`mealId`, no
+  /// `recipeId` — la Cloud Function decide server-side si genera una receta
+  /// nueva o reutiliza la existente (ver `documentation/recipes.md`).
+  static const String recipeDetailSegment = 'recipe/:date/:mealId';
+  static String recipeDetailPath(String date, String mealId) => '$plan/recipe/$date/$mealId';
+
+  /// Épica 10 — anidada bajo `plan` igual que D3/D5: se llega desde la fila
+  /// "Generar lista de compra" de D1.
+  static const String groceryListSegment = 'grocery-list';
+  static String groceryListPath() => '$plan/grocery-list';
+
+  /// D5 — anidada bajo D3; recibe la `Recipe` ya cargada vía `extra` de
+  /// GoRouter en vez de re-pedirla, para no depender de que el provider de
+  /// D3 siga vivo/cacheado al navegar.
+  static const String cookingModeSegment = 'cook';
+  static String cookingModePath(String date, String mealId) => '${recipeDetailPath(date, mealId)}/cook';
+
   /// Rutas donde un usuario sin sesión puede quedarse (no lo mandan a
   /// Welcome). `splash` NO va aquí a propósito: es una parada transitoria
   /// que siempre redirige hacia otro lado, nunca un destino final — ver el

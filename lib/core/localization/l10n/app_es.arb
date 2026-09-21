@@ -268,6 +268,117 @@
   "cameraSheetIngredientsSubtitle": "Recetas con lo que hay en la nevera",
   "cameraSheetLogManualTitle": "Registrar sin foto",
   "cameraSheetLogManualSubtitle": "Buscar o escribir lo que comiste",
+  "cameraSourceCameraOption": "Tomar foto",
+  "cameraSourceGalleryOption": "Elegir de la galería",
 
-  "comingSoonSnackbarMessage": "Muy pronto vas a poder hacer esto."
+  "comingSoonSnackbarMessage": "Muy pronto vas a poder hacer esto.",
+
+  "planTitle": "Tu plan",
+  "planWeekToggleLabel": "Semana",
+  "planDayToggleLabel": "Día",
+  "planMealsRegisteredCounter": "{registered} de {total} comidas registradas",
+  "@planMealsRegisteredCounter": {
+    "placeholders": { "registered": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "planCaloriesValue": "{calories} kcal",
+  "@planCaloriesValue": {
+    "placeholders": { "calories": { "type": "int" } }
+  },
+  "planMealOverlineRegistered": "{slot} · registrado",
+  "@planMealOverlineRegistered": {
+    "placeholders": { "slot": { "type": "String" } }
+  },
+  "planMealOverlineScheduled": "{slot} · {time}",
+  "@planMealOverlineScheduled": {
+    "placeholders": { "slot": { "type": "String" }, "time": { "type": "String" } }
+  },
+  "planMealDetailPending": "{calories} kcal · {protein} g proteína",
+  "@planMealDetailPending": {
+    "placeholders": { "calories": { "type": "int" }, "protein": { "type": "int" } }
+  },
+  "planGroceryRowTitle": "Generar lista de compra",
+  "planEmptyTitle": "Aún no tienes plan para este día",
+  "planEmptyMessage": "Genera un plan de comidas personalizado con IA en segundos.",
+  "planEmptyCta": "Generar plan",
+  "planGuestTitle": "Crea una cuenta para tu plan",
+  "planGuestMessage": "Necesitas una cuenta para generar y guardar tu plan de comidas.",
+  "planGuestCta": "Crear cuenta",
+
+  "planMealViewRecipeAction": "Ver receta",
+  "planMealMarkDoneAction": "Marcar como comido",
+  "planMealFindAlternativeAction": "Buscar otra opción",
+
+  "planReplaceMealTitle": "¿Qué prefieres en su lugar?",
+  "planReplaceMealSubtitle": "Mismos macros, con lo que ya tienes en casa.",
+  "planFilterFaster": "Más rápido",
+  "planFilterLighter": "Más ligera",
+  "planFilterAskAi": "Pedir otra a la IA",
+  "planReplaceMealCta": "Cambiar comida",
+
+  "planAdjustRowTitle": "Ajustar mi plan con IA",
+  "planAdjustTitle": "Ajusta tu plan",
+  "planAdjustSubtitle": "Cuéntale a la IA qué cambió — por ejemplo \"no tengo pollo\" o \"ya comí una hamburguesa\".",
+  "planAdjustHint": "Escribe tu ajuste…",
+  "planAdjustCta": "Ajustar plan",
+
+  "planWeekEmptyDay": "Sin plan",
+
+  "recipePrepTimeMinutes": "{minutes} min",
+  "@recipePrepTimeMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "recipeDifficultyEasy": "Fácil",
+  "recipeDifficultyMedium": "Media",
+  "recipeDifficultyHard": "Difícil",
+  "recipeInsightHighProtein": "Alta en proteína",
+  "recipeIngredientsSectionTitle": "Ingredientes · {servings, plural, one{1 ración} other{{servings} raciones}}",
+  "@recipeIngredientsSectionTitle": {
+    "placeholders": { "servings": { "type": "int" } }
+  },
+  "recipeSubstitutesLabel": "En vez de: {items}",
+  "@recipeSubstitutesLabel": {
+    "placeholders": { "items": { "type": "String" } }
+  },
+  "recipeMacroKcalLabel": "kcal",
+  "recipeMacroProteinLabel": "Proteína",
+  "recipeMacroCarbsLabel": "Carbos",
+  "recipeMacroFatLabel": "Grasas",
+  "recipeStartCookingCta": "Empezar a cocinar",
+  "recipeRegisterCta": "Registrar",
+
+  "cookingStepCounter": "{current}/{total}",
+  "@cookingStepCounter": {
+    "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "cookingStepLabel": "Paso {n}",
+  "@cookingStepLabel": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "cookingTimerStart": "Iniciar",
+  "cookingPreviousAction": "Anterior",
+  "cookingNextAction": "Siguiente paso",
+  "cookingFinishAction": "Terminar",
+
+  "foodAnalysisNotFoodTitle": "No reconocimos comida en la foto",
+  "foodAnalysisNotFoodMessage": "Intenta con otra foto, más de cerca y con buena luz.",
+  "foodAnalysisAllergenWarning": "Esta comida podría contener algo que evitas.",
+  "foodAnalysisConfidenceLow": "Confianza baja",
+  "foodAnalysisConfidenceMedium": "Confianza media",
+  "foodAnalysisConfidenceHigh": "Confianza alta",
+
+  "groceryListTitle": "Lista de compra",
+  "groceryCategoryProtein": "Proteína",
+  "groceryCategoryCarbs": "Carbohidratos",
+  "groceryCategoryFruit": "Frutas",
+  "groceryCategoryVegetable": "Verduras",
+  "groceryCategoryDairy": "Lácteos",
+  "groceryCategoryOther": "Otros",
+  "groceryEmptyTitle": "Nada que comprar todavía",
+  "groceryEmptyMessage": "Genera un plan y abre alguna receta para armar tu lista.",
+  "groceryMissingRecipesTitle": "Sin receta generada",
+  "groceryMissingRecipesHint": "Toca una comida para generar su receta y agregar sus ingredientes.",
+  "grocerySourceLabel": "{quantity} · {slot} · {weekday}",
+  "@grocerySourceLabel": {
+    "placeholders": { "quantity": { "type": "String" }, "slot": { "type": "String" }, "weekday": { "type": "String" } }
+  }
 }

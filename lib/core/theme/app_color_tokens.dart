@@ -16,6 +16,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     required this.actionPrimaryPressed,
     required this.actionPrimaryStrong,
     required this.actionPrimarySurface,
+    required this.onActionPrimarySurface,
     required this.onActionPrimary,
     required this.aiActionSurface,
     required this.onAiAction,
@@ -52,6 +53,21 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
 
   /// Primary 50 — secondary-button hover/pressed background, light accents.
   final Color actionPrimarySurface;
+
+  /// Text/icon color for content drawn ON TOP OF [actionPrimarySurface] —
+  /// the selected-state pattern (pill/chip/card: tinted background + this
+  /// as text color) used across `SelectableChip`, `OnboardingOptionCard`,
+  /// and similar widgets. Distinct on purpose from [actionPrimaryPressed]:
+  /// that token is the pressed/active state of a *solid* `actionPrimary`
+  /// button background, a different semantic that happens to want a
+  /// similarly dark green in light mode — but not in dark mode, where
+  /// reusing it here made this text render invisible (bug found via manual
+  /// testing 2026-09-20: dark `actionPrimaryPressed` and
+  /// `actionPrimarySurface` are the same placeholder hex, so text drawn in
+  /// one on a background of the other disappeared completely). Keep these
+  /// two tokens separate even if a future design sync gives them the same
+  /// value again — the call sites' intent differs.
+  final Color onActionPrimarySurface;
 
   final Color onActionPrimary;
 
@@ -91,6 +107,9 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     actionPrimaryPressed: Color(0xFF076B40),
     actionPrimaryStrong: Color(0xFF17A86A),
     actionPrimarySurface: Color(0xFFE9F7F0),
+    // Igual al valor de `actionPrimaryPressed` de arriba — mismo hex, cero
+    // cambio visual en modo claro, donde este patrón ya funcionaba bien.
+    onActionPrimarySurface: Color(0xFF076B40),
     onActionPrimary: Color(0xFFFFFFFF),
     aiActionSurface: Color(0xFFEEEDFB),
     onAiAction: Color(0xFF332D93),
@@ -115,17 +134,24 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     macroWater: Color(0xFF1A6FB8),
   );
 
-  // TODO(design-sync): dark-mode `actionPrimaryPressed`, and the *Surface
-  // (container) pairs for warning/error/info/macros, weren't given explicit
-  // dark values in Fase 1 (only foreground colors were). The values below
-  // are reasonable placeholders (primary container / same foreground with
-  // no dedicated background) — confirm against the canvas before shipping
-  // a real dark-mode screen.
+  // TODO(design-sync): dark-mode `actionPrimaryPressed`, `onActionPrimarySurface`,
+  // and the *Surface (container) pairs for warning/error/info/macros, weren't
+  // given explicit dark values in Fase 1 (only foreground colors were). The
+  // values below are reasonable placeholders — confirm against the canvas
+  // before shipping a real dark-mode screen. `onActionPrimarySurface` in
+  // particular is a value chosen by Claude (light mint, modeled on the
+  // confirmed `onAiAction`/`aiActionSurface` light-foreground-on-dark-tint
+  // relationship below), not something read off the canvas — it did NOT
+  // exist as a token before 2026-09-20; it was split out from
+  // `actionPrimaryPressed` specifically because that token's dark value
+  // was identical to `actionPrimarySurface`, making any text using it on
+  // that background invisible (see the doc-comment above).
   static const dark = AppColorTokens(
     actionPrimary: Color(0xFF3ED98C),
     actionPrimaryPressed: Color(0xFF1F6B48),
     actionPrimaryStrong: Color(0xFF3ED98C),
     actionPrimarySurface: Color(0xFF1F6B48),
+    onActionPrimarySurface: Color(0xFFB8F5D6),
     onActionPrimary: Color(0xFF06301D),
     aiActionSurface: Color(0xFF262163),
     onAiAction: Color(0xFFCFCCFA),
@@ -156,6 +182,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     Color? actionPrimaryPressed,
     Color? actionPrimaryStrong,
     Color? actionPrimarySurface,
+    Color? onActionPrimarySurface,
     Color? onActionPrimary,
     Color? aiActionSurface,
     Color? onAiAction,
@@ -184,6 +211,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
       actionPrimaryPressed: actionPrimaryPressed ?? this.actionPrimaryPressed,
       actionPrimaryStrong: actionPrimaryStrong ?? this.actionPrimaryStrong,
       actionPrimarySurface: actionPrimarySurface ?? this.actionPrimarySurface,
+      onActionPrimarySurface: onActionPrimarySurface ?? this.onActionPrimarySurface,
       onActionPrimary: onActionPrimary ?? this.onActionPrimary,
       aiActionSurface: aiActionSurface ?? this.aiActionSurface,
       onAiAction: onAiAction ?? this.onAiAction,
@@ -218,6 +246,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
       actionPrimaryPressed: l(actionPrimaryPressed, other.actionPrimaryPressed),
       actionPrimaryStrong: l(actionPrimaryStrong, other.actionPrimaryStrong),
       actionPrimarySurface: l(actionPrimarySurface, other.actionPrimarySurface),
+      onActionPrimarySurface: l(onActionPrimarySurface, other.onActionPrimarySurface),
       onActionPrimary: l(onActionPrimary, other.onActionPrimary),
       aiActionSurface: l(aiActionSurface, other.aiActionSurface),
       onAiAction: l(onAiAction, other.onAiAction),

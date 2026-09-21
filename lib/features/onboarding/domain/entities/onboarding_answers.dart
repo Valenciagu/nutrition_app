@@ -50,9 +50,15 @@ class OnboardingAnswers {
   const OnboardingAnswers({
     this.goal,
     this.sex,
-    this.age,
-    this.heightCm,
-    this.weightKg,
+    // Con valor por defecto (no null) a propósito: B2 ya MUESTRA estos tres
+    // campos prellenados (29 años / 170 cm / 70 kg) antes de que el usuario
+    // toque nada — si el estado real se quedaba en null hasta que abrieran
+    // cada selector de rueda, el botón "Continuar" se veía apagado con los
+    // tres campos aparentemente listos (bug reportado 2026-09-20). Ahora lo
+    // mostrado y lo guardado coinciden desde el primer render.
+    this.age = 29,
+    this.heightCm = 170,
+    this.weightKg = 70,
     this.unitSystem = UnitSystem.metric,
     this.activityLevel,
     this.likedFoods = const <String>{},

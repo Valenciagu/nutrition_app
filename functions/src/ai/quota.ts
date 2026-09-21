@@ -13,6 +13,22 @@ import { HttpsError } from "firebase-functions/v2/https";
  */
 const DAILY_LIMITS: Record<string, { free: number; premium: number }> = {
   nutritionQa: { free: 10, premium: 50 },
+  // Generar un día completo de plan es una llamada bastante más cara que
+  // una pregunta de texto libre (más tokens de salida, un esquema más
+  // grande) — límite más bajo a propósito. Ver `functions/src/plan/generateDailyPlan.ts`.
+  planGeneration: { free: 3, premium: 10 },
+  // Ajustar (PLAN-004) y sugerir alternativas (D4) tocan menos comidas que
+  // generar el día completo — límite intermedio.
+  planAdjustment: { free: 5, premium: 20 },
+  mealAlternatives: { free: 5, premium: 20 },
+  // Una receta completa (ingredientes + pasos) es una salida más grande que
+  // una comida del plan, pero `generateRecipe` es idempotente por comida
+  // (no vuelve a llamar a OpenAI si `PlannedMeal.recipeId` ya existe) — el
+  // límite diario protege sobre todo contra reintentos, no uso normal.
+  recipeGeneration: { free: 5, premium: 20 },
+  // Análisis de imagen (Épica 8) consume más tokens por llamada que texto
+  // plano — límite más bajo a propósito, igual criterio que `planGeneration`.
+  foodAnalysis: { free: 5, premium: 20 },
 };
 
 export interface QuotaCheckResult {

@@ -2,7 +2,7 @@
 
 Transcribed from the Claude Design canvas linked in `desing.md` (project `d3c0cd06-9d89-4ceb-b4b7-0f3f858d37c1`, files `Fase 1 - Fundamentos.dc.html` and `Fichas de componentes.dc.html`, read 2026-09-11). This is the source of truth for implementation — read this before `DesignSync`-fetching anything, and extend it when a new `Fase N` file gets read.
 
-Not yet transcribed: `Fase 2 - Auth y Onboarding` Block B (Onboarding, 9 steps — Block A/Auth is done, see `documentation/design_screens_auth.md`), `Fase 3 - Home`, `Fase 4 - Plan y Recetas`, `Fases 5-12 - Entrega final`, `ios-frame.jsx`, `support.js`, `uploads/desygn.md.md`. Fetch and add a section here (or a dedicated `design_screens_<feature>.md`, as done for Auth) when a feature needs one of those.
+Transcribed so far: Fase 1 (this file), Fichas de componentes (this file), Fase 2 Block A/Auth (`documentation/design_screens_auth.md`), Fase 2 Block B/Onboarding (`documentation/design_screens_onboarding.md`), Fase 3/Home (`documentation/design_screens_home.md`), Fase 4/Plan y Recetas (`documentation/design_screens_plan.md`, read 2026-09-20 at the start of Epic 6). Not yet transcribed: `Fases 5-12 - Entrega final`, `ios-frame.jsx`, `support.js`, `uploads/desygn.md.md`. Fetch and add a dedicated `design_screens_<feature>.md` (as done for the others) when a feature needs one of those.
 
 ## Product design direction
 
@@ -26,6 +26,7 @@ Implemented in `lib/core/theme/app_color_tokens.dart` as `AppColorTokens` (a `Th
 | `actionPrimaryPressed` | `#076B40` | `#1F6B48`* | Primary 700 / pressed |
 | `actionPrimaryStrong` | `#17A86A` | `#3ED98C`* | Primary 500 — fills without text, ring arcs, icons |
 | `actionPrimarySurface` | `#E9F7F0` | `#1F6B48`* | Primary 50 — secondary-button hover bg |
+| `onActionPrimarySurface` | `#076B40` | `#B8F5D6`** | Text/icon on top of `actionPrimarySurface` (selected pill/chip/card pattern) — NOT in the canvas, added 2026-09-20 after a dark-mode bug (see below) |
 | `onActionPrimary` | `#FFFFFF` | `#06301D` | |
 | `aiActionSurface` / `onAiAction` | `#EEEDFB` / `#332D93` | `#262163` / `#CFCCFA` | Lighter indigo "AI action" button fill |
 | `background` | `#F7F8F7` | `#0C110F` | |
@@ -45,6 +46,8 @@ Implemented in `lib/core/theme/app_color_tokens.dart` as `AppColorTokens` (a `Th
 | `macroWater` | `#1A6FB8` | `#6BB6F0` | |
 
 `*` = not explicitly given for dark in the canvas; a reasonable placeholder was chosen (see `// TODO(design-sync)` in `app_color_tokens.dart`) — confirm before shipping a real dark-mode screen.
+
+`**` = same as `*`, but this token itself doesn't exist in the canvas at all — it was split out of `actionPrimaryPressed` on 2026-09-20 after a real dark-mode bug (see `documentation/onboarding.md` "Bugs corregidos"): that token's dark value was identical to `actionPrimarySurface`, making text/icons drawn in one on a background of the other invisible. Confirm this value against the canvas too when possible.
 
 Semantic colors (macro, success/warning/error/info) always pair with a text label — color is never the only carrier of meaning.
 

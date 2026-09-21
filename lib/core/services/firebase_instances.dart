@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Instancias crudas de los SDKs de Firebase, para que cada feature
@@ -20,3 +21,5 @@ final firestoreProvider = Provider<FirebaseFirestore>((ref) => FirebaseFirestore
 /// otra región, pedir esa instancia con `FirebaseFunctions.instanceFor`
 /// en vez de cambiar este provider global.
 final firebaseFunctionsProvider = Provider<FirebaseFunctions>((ref) => FirebaseFunctions.instance);
+
+final firebaseStorageProvider = Provider<FirebaseStorage>((ref) => FirebaseStorage.instance);

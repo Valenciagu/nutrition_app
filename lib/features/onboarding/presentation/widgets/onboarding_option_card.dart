@@ -60,7 +60,7 @@ class OnboardingOptionCard extends StatelessWidget {
                       style: AppTypography.bodyL.copyWith(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: selected ? colors.actionPrimaryPressed : colors.textPrimary,
+                        color: selected ? colors.onActionPrimarySurface : colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),

@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// Primer uso real de Storage (Épica 8 — Food Photo Analysis). Mismo criterio
+// que `firestore.rules`: propiedad explícita por `userId`, y el CONTENIDO
+// generado/leído por la IA nunca lo escribe el cliente directamente en
+// Firestore — pero la FOTO en sí la sube el cliente (no hay forma de evitarlo,
+// los archivos son demasiado grandes para pasarlos por un callable), así que
+// aquí sí hay `allow write` real, acotado por tamaño y tipo.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{userId}/foodAnalyses/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // `analyzeFoodPhoto` (Cloud Function) lee este archivo vía Admin SDK,
+      // que ignora estas reglas — esto solo gobierna la subida del cliente.
+      // 10 MB debe coincidir con `MAX_IMAGE_BYTES` en
+      // `functions/src/foodAnalysis/analyzeFoodPhoto.ts`. Solo tipos de
+      // imagen reales (Instrucciones.md §68 "Validate file type").
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

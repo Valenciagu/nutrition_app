@@ -1,0 +1,20 @@
+import '../../../recipes/domain/entities/recipe.dart';
+
+abstract class GroceryListRepository {
+  /// Recetas ya generadas para los `recipeId` dados. Puede devolver MENOS
+  /// documentos que ids (un id sin documento no es un error, solo se omite)
+  /// — pasa cuando `PlannedMeal.recipeId` quedó apuntando a algo que ya no
+  /// existe, mismo caso raro que documenta `generateRecipe.ts`.
+  Future<List<Recipe>> getRecipesByIds({required String userId, required List<String> recipeIds});
+
+  /// Claves normalizadas (`GroceryItem.key`) marcadas como "ya tengo/compré"
+  /// para la semana `weekKey` (lunes de esa semana, YYYY-MM-DD).
+  Future<Set<String>> getCheckedItemKeys({required String userId, required String weekKey});
+
+  Future<void> setItemChecked({
+    required String userId,
+    required String weekKey,
+    required String itemKey,
+    required bool checked,
+  });
+}

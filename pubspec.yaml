@@ -50,6 +50,12 @@ dependencies:
   # needed for a single JSON blob.
   shared_preferences: ^2.3.3
 
+  # Camera/gallery capture for food photos (Epic 8) — Flutter-team-maintained,
+  # handles both `ImageSource.camera` and `.gallery` (Instrucciones.md §6:
+  # "take OR upload a photo") plus in-picker compression (`imageQuality`,
+  # `maxWidth`), so no separate image-compression package is needed.
+  image_picker: ^1.2.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

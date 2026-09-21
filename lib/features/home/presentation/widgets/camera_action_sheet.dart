@@ -1,25 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/constants/route_paths.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/quick_action_tile.dart';
+import '../../../authentication/presentation/providers/auth_providers.dart';
 
-/// C5 · Acción central (Fase 3 · Home). El botón de cámara no abre la
-/// cámara directamente — ofrece 3 caminos, cada uno hacia una épica que
-/// todavía no existe (Analizar/Ingredientes → Épica 8/9, Registrar sin foto
-/// → Épica 6). Por ahora cada opción confirma la intención con un snackbar
-/// en vez de fallar en silencio (la misma clase de bug que "Empezar" tenía
-/// en Welcome antes de la Épica 3 — un tap sin ningún feedback).
-Future<void> showCameraActionSheet(BuildContext context) {
+/// C5 · Acción central (Fase 3 · Home). "Analizar mi comida" (Épica 8) es la
+/// única de las 3 opciones conectada a algo real — las otras 2
+/// (Ingredientes → Épica 9, Registrar sin foto → sin épica dueña todavía)
+/// siguen confirmando la intención con un snackbar, mismo criterio que
+/// antes de la Épica 8 (ver `documentation/food_analysis.md`).
+Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
   final l10n = context.l10n;
   final colors = context.colors;
 
-  void handleOption(BuildContext sheetContext) {
+  void handleComingSoon(BuildContext sheetContext) {
     Navigator.of(sheetContext).pop();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.comingSoonSnackbarMessage)));
+  }
+
+  Future<void> handleAnalyzeMeal(BuildContext sheetContext) async {
+    Navigator.of(sheetContext).pop();
+
+    // Analizar una foto exige subirla a Storage y llamar a una Cloud
+    // Function autenticada (Instrucciones.md §70) — sin camino de invitado,
+    // mismo criterio que Plan (Épica 6). Se revisa la sesión ANTES de abrir
+    // la cámara/galería: pedirle una foto a un invitado para recién ahí
+    // decirle que necesita una cuenta sería peor UX que no pedírsela.
+    final uid = ref.read(authStateChangesProvider).valueOrNull?.uid;
+    if (uid == null) {
+      if (context.mounted) context.go(RoutePaths.signUp);
+      return;
+    }
+
+    final source = await _showImageSourceSheet(context);
+    if (source == null || !context.mounted) return;
+
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      // Compresión del lado del cliente (Instrucciones.md §68) — la
+      // validación real de tamaño/tipo la hace `storage.rules` server-side,
+      // esto es solo para no subir una foto de cámara sin comprimir.
+      imageQuality: 70,
+      maxWidth: 1600,
+    );
+    if (picked == null || !context.mounted) return;
+
+    final bytes = await picked.readAsBytes();
+    if (context.mounted) context.push(RoutePaths.foodAnalysis, extra: bytes);
   }
 
   return showAppBottomSheet(
@@ -33,21 +69,21 @@ Future<void> showCameraActionSheet(BuildContext context) {
             iconBackgroundColor: colors.actionPrimarySurface,
             title: l10n.cameraSheetAnalyzeMealTitle,
             subtitle: l10n.cameraSheetAnalyzeMealSubtitle,
-            onTap: () => handleOption(sheetContext),
+            onTap: () => handleAnalyzeMeal(sheetContext),
           ),
           const SizedBox(height: 10),
           _SheetOption(
             iconBackgroundColor: colors.actionPrimarySurface,
             title: l10n.cameraSheetIngredientsTitle,
             subtitle: l10n.cameraSheetIngredientsSubtitle,
-            onTap: () => handleOption(sheetContext),
+            onTap: () => handleComingSoon(sheetContext),
           ),
           const SizedBox(height: 10),
           _SheetOption(
             iconBackgroundColor: colors.background,
             title: l10n.cameraSheetLogManualTitle,
             subtitle: l10n.cameraSheetLogManualSubtitle,
-            onTap: () => handleOption(sheetContext),
+            onTap: () => handleComingSoon(sheetContext),
           ),
           const SizedBox(height: AppSpacing.space16),
           AppButton(
@@ -55,6 +91,38 @@ Future<void> showCameraActionSheet(BuildContext context) {
             variant: AppButtonVariant.neutral,
             fullWidth: true,
             onPressed: () => Navigator.of(sheetContext).pop(),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+/// "Tomar foto" / "Elegir de la galería" (Instrucciones.md §6: el usuario
+/// debe poder "tomar O subir" una foto de comida) — una segunda hoja, en vez
+/// de forzar la elección dentro de la primera, para no complicar las otras 2
+/// opciones que no la necesitan.
+Future<ImageSource?> _showImageSourceSheet(BuildContext context) {
+  final l10n = context.l10n;
+  final colors = context.colors;
+
+  return showAppBottomSheet<ImageSource>(
+    context,
+    title: l10n.cameraSheetAnalyzeMealTitle,
+    builder: (sheetContext) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          QuickActionTile(
+            title: l10n.cameraSourceCameraOption,
+            iconBackgroundColor: colors.actionPrimarySurface,
+            onTap: () => Navigator.of(sheetContext).pop(ImageSource.camera),
+          ),
+          const SizedBox(height: 8),
+          QuickActionTile(
+            title: l10n.cameraSourceGalleryOption,
+            iconBackgroundColor: colors.background,
+            onTap: () => Navigator.of(sheetContext).pop(ImageSource.gallery),
           ),
         ],
       );

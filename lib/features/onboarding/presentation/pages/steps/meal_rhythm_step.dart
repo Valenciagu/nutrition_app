@@ -121,7 +121,7 @@ class _CountOption extends StatelessWidget {
           style: AppTypography.bodyL.copyWith(
             fontSize: 17,
             fontWeight: FontWeight.w700,
-            color: selected ? colors.actionPrimaryPressed : colors.textPrimary,
+            color: selected ? colors.onActionPrimarySurface : colors.textPrimary,
           ),
         ),
       ),

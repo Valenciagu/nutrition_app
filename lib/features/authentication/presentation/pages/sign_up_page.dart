@@ -173,7 +173,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       Expanded(
                         child: Text(
                           l10n.authSignUpPlanReadyBanner,
-                          style: AppTypography.label.copyWith(fontSize: 13, color: colors.actionPrimaryPressed),
+                          style: AppTypography.label.copyWith(fontSize: 13, color: colors.onActionPrimarySurface),
                         ),
                       ),
                     ],

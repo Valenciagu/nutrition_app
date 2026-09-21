@@ -4,23 +4,25 @@ import '../theme/app_color_tokens.dart';
 import '../theme/app_typography.dart';
 
 /// QuickActionTile — uno de los dos componentes nuevos que propone Fase 3 ·
-/// Home (el otro, `AISuggestionCard`, se difiere junto con `MealCard` y
-/// `MacroBar` hasta que exista seguimiento real de plan/macros, Épica 6).
-/// Fila: icono + título + subtítulo + chevron. El diseño también muestra una
-/// variante en grid 2x2 sin subtítulo/chevron (Home · estado poblado) — no
-/// se construye todavía porque no tiene un segundo consumidor real que
-/// justifique la variante (ver `documentation/home.md`).
+/// Home (el otro, `AISuggestionCard`, se difiere junto con `MacroBar` hasta
+/// que exista seguimiento real de macros, Épica 6/7). Fila: icono + título +
+/// subtítulo opcional + chevron. El diseño también muestra una variante en
+/// grid 2x2 sin subtítulo/chevron (Home · estado poblado) — no se construye
+/// todavía porque no tiene un segundo consumidor real que la justifique (ver
+/// `documentation/home.md`). `subtitle` es opcional desde la Épica 6 — la
+/// fila "Generar lista de compra" de D1 (Plan) es de una sola línea, sin
+/// forzar un subtítulo vacío ni crear una fila casi-duplicada.
 class QuickActionTile extends StatelessWidget {
   const QuickActionTile({
     super.key,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.iconBackgroundColor,
     required this.onTap,
   });
 
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final Color iconBackgroundColor;
   final VoidCallback onTap;
 
@@ -47,14 +49,17 @@ class QuickActionTile extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title, style: AppTypography.bodyM.copyWith(fontSize: 14, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: AppTypography.bodyM.copyWith(fontSize: 12.5, color: colors.textSecondary),
-                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle!,
+                        style: AppTypography.bodyM.copyWith(fontSize: 12.5, color: colors.textSecondary),
+                      ),
+                    ],
                   ],
                 ),
               ),

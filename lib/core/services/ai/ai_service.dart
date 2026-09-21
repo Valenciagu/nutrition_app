@@ -7,10 +7,16 @@ import 'nutrition_assistant_answer.dart';
 /// para poder cambiar de implementación (o de modelo, en el backend) sin
 /// tocar el código que la consume.
 ///
-/// Un solo método hoy porque es la única función de IA desplegada
-/// (`askNutritionAssistant`, Épica 5). Cada Cloud Function de IA nueva que
-/// aterrice en Épicas 6-9 agrega su propio método aquí, no una interfaz
-/// separada.
+/// Un solo método — solo cabe aquí lo que es genérico de verdad (una
+/// pregunta de texto libre, sin tipo de retorno propio de ninguna feature).
+/// Una Cloud Function de IA cuyo resultado SÍ es específico de una feature
+/// (p. ej. `generateDailyPlan`, que devuelve un `NutritionPlan` — Épica 6)
+/// NO se agrega aquí: `core/` no puede importar tipos de `features/*`
+/// (violaría la separación de capas). Esas funciones tienen su propio
+/// repositorio dentro de la feature (ver `features/plan/data/repositories/`),
+/// llamando a `cloud_functions` directamente vía `firebaseFunctionsProvider`
+/// — mismo patrón, sin forzar esta interfaz a conocer tipos que no le
+/// corresponden.
 abstract class AIService {
   /// Responde una pregunta de nutrición en texto libre. Lanza un `Failure`
   /// de `core/errors` si la llamada falla (ver `FirebaseAiService`) —
