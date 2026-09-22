@@ -56,6 +56,15 @@ dependencies:
   # `maxWidth`), so no separate image-compression package is needed.
   image_picker: ^1.2.3
 
+  # Local reminders (Epic 12): meal/plan/shopping/hydration notifications are
+  # all driven by the user's own schedule (mealSlots) or a fixed cadence,
+  # never a server-triggered event — on-device scheduling, no FCM/push infra
+  # needed. `timezone`+`flutter_timezone` give `zonedSchedule` the device's
+  # real IANA zone so a "8:00 AM daily" reminder survives DST correctly.
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+  flutter_timezone: ^3.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

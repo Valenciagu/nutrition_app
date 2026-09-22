@@ -10,3 +10,4 @@ export { suggestMealAlternatives } from "./plan/suggestMealAlternatives";
 export { replaceMeal } from "./plan/replaceMeal";
 export { generateRecipe } from "./recipes/generateRecipe";
 export { analyzeFoodPhoto } from "./foodAnalysis/analyzeFoodPhoto";
+export { deleteAccount } from "./account/deleteAccount";

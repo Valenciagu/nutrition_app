@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/home/presentation/widgets/camera_action_sheet.dart';
+import '../../features/notifications/presentation/providers/notification_providers.dart';
 import '../localization/app_localizations_ext.dart';
 import '../widgets/bottom_navigation.dart';
 
@@ -19,6 +20,13 @@ class MainShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+
+    // Solo lectura del resultado: reprograma recordatorios locales una vez
+    // por sesión logueada (Épica 12) — mitiga que `zonedSchedule` no
+    // sobrevive un reinicio del dispositivo sin un receptor nativo de
+    // arranque (no construido en v1). Se ignora el estado a propósito: un
+    // fallo aquí no debe bloquear ni ensuciar la UI del shell principal.
+    ref.watch(notificationBootstrapProvider);
 
     return Scaffold(
       body: navigationShell,

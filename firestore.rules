@@ -40,6 +40,12 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // `notificationPreferences` (Épica 12) — es un campo más del documento
+      // `users/{userId}` (no una subcolección aparte), así que ya queda
+      // cubierto por el `allow read, write` de arriba sin ninguna regla
+      // nueva: mismo criterio que `onboarding`/`updateProfile` (Épica 3/11),
+      // preferencia propia del usuario, nunca contenido generado por IA.
+
       // `shoppingLists/{weekKey}` (Épica 10) — a diferencia de
       // `nutritionPlans`/`recipes` (contenido generado por la IA), esto es
       // SOLO estado propio del usuario (qué ya marcó como comprado/en casa):

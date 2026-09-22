@@ -1,4 +1,5 @@
 import '../../../core/localization/generated/app_localizations.dart';
+import '../domain/entities/onboarding_answers.dart';
 
 /// IDs estables del catálogo de alimentos (B4) y alérgenos (B5) — se
 /// guardan tal cual en [OnboardingAnswers], el texto mostrable sale de
@@ -70,6 +71,45 @@ String mealSlotLabel(AppLocalizations l10n, String labelKey) {
     default:
       return labelKey;
   }
+}
+
+/// Etiqueta corta (sin subtítulo) de un objetivo — B1 usa título+subtítulo
+/// propios (`goal_step.dart`, tarjetas grandes); Perfil (Épica 11) solo
+/// necesita el título para el resumen de cabecera y los chips de edición.
+String goalLabel(AppLocalizations l10n, NutritionGoal goal) {
+  return switch (goal) {
+    NutritionGoal.loseFat => l10n.onboardingGoalLoseFatTitle,
+    NutritionGoal.gainMuscle => l10n.onboardingGoalGainMuscleTitle,
+    NutritionGoal.maintainWeight => l10n.onboardingGoalMaintainTitle,
+    NutritionGoal.eatHealthier => l10n.onboardingGoalEatHealthierTitle,
+  };
+}
+
+String activityLevelLabel(AppLocalizations l10n, ActivityLevel level) {
+  return switch (level) {
+    ActivityLevel.sedentary => l10n.onboardingActivitySedentaryTitle,
+    ActivityLevel.light => l10n.onboardingActivityLightTitle,
+    ActivityLevel.moderate => l10n.onboardingActivityModerateTitle,
+    ActivityLevel.high => l10n.onboardingActivityHighTitle,
+    ActivityLevel.athlete => l10n.onboardingActivityAthleteTitle,
+  };
+}
+
+String cookingTimeLabel(AppLocalizations l10n, CookingTimePreference value) {
+  return switch (value) {
+    CookingTimePreference.quick => l10n.onboardingCookingTimeQuick,
+    CookingTimePreference.medium => l10n.onboardingCookingTimeMedium,
+    CookingTimePreference.relaxed => l10n.onboardingCookingTimeRelaxed,
+  };
+}
+
+String budgetLabel(AppLocalizations l10n, BudgetLevel value) {
+  return switch (value) {
+    BudgetLevel.tight => l10n.onboardingBudgetTight,
+    BudgetLevel.moderate => l10n.onboardingBudgetModerate,
+    BudgetLevel.comfortable => l10n.onboardingBudgetComfortable,
+    BudgetLevel.flexible => l10n.onboardingBudgetFlexible,
+  };
 }
 
 String allergenLabel(AppLocalizations l10n, String id) {

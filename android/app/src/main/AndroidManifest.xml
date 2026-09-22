@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Épica 12 — ya la trae el manifest propio de flutter_local_notifications
+         (merge automático de Gradle), declarada aquí explícita para que sea
+         visible sin tener que ir a buscar en el paquete del plugin. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:label="NutritionApp"
         android:name="${applicationName}"
@@ -30,6 +35,15 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Épica 12 (recordatorios locales, flutter_local_notifications):
+             sin este receiver el plugin agenda la alarma pero nunca la
+             entrega — no es opcional. Deliberadamente NO se agrega
+             ScheduledNotificationBootReceiver (sobrevivir un reinicio del
+             dispositivo) en v1: gap documentado en
+             documentation/notifications.md, mitigado reprogramando cada vez
+             que se abre la app (ver notificationBootstrapProvider). -->
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

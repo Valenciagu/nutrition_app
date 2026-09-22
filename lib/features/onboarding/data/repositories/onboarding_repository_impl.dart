@@ -25,4 +25,9 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     await _remote.saveProfile(userId, draft);
     await _local.clearDraft();
   }
+
+  @override
+  Future<void> updateProfile(String userId, OnboardingAnswers answers) {
+    return _remote.saveProfile(userId, answers);
+  }
 }

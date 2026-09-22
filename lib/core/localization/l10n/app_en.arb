@@ -341,5 +341,69 @@
   "grocerySourceLabel": "{quantity} · {slot} · {weekday}",
   "@grocerySourceLabel": {
     "placeholders": { "quantity": { "type": "String" }, "slot": { "type": "String" }, "weekday": { "type": "String" } }
-  }
+  },
+
+  "profileHeaderSubtitle": "{goal} · {calories} kcal",
+  "@profileHeaderSubtitle": {
+    "placeholders": { "goal": { "type": "String" }, "calories": { "type": "int" } }
+  },
+  "profileSectionFoodTitle": "My nutrition",
+  "profileRowGoalDataTitle": "Goal and data",
+  "profileRowPreferencesTitle": "Preferences and allergies",
+  "profileRowSavedRecipesTitle": "Saved recipes",
+  "profileSectionSettingsTitle": "Settings",
+  "profileRowRemindersTitle": "Reminders",
+  "profileRowRemindersActiveCount": "{count, plural, =0{Off} one{1 active} other{{count} active}}",
+  "@profileRowRemindersActiveCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "profileRowThemeTitle": "Theme",
+  "profileThemeAutomaticValue": "Automatic",
+  "profileRowLanguageTitle": "Language",
+  "profileRowPrivacyTitle": "Privacy and data",
+  "profilePremiumTitle": "Go Premium",
+  "profilePremiumSubtitle": "Unlimited analyses and full-month plans",
+  "profilePremiumCta": "View",
+  "profileGuestTitle": "Create an account for your profile",
+  "profileGuestMessage": "You need an account to view and edit your profile.",
+  "profileGuestCta": "Create account",
+
+  "profileEditGoalSectionTitle": "Goal",
+  "profileEditPersonalSectionTitle": "Personal data",
+  "profileEditActivitySectionTitle": "Activity level",
+  "profileEditLikedFoodsSectionTitle": "You like",
+  "profileEditAvoidFoodsSectionTitle": "You avoid or are allergic to",
+  "profileEditCookingTimeSectionTitle": "Cooking time",
+  "profileEditBudgetSectionTitle": "Budget",
+
+  "profilePrivacyIntro": "We store your nutrition profile (goal, personal data, preferences), the plans and recipes the AI generates for you, and the photos you analyze — all tied only to your account, never shared.",
+  "profilePrivacyDeleteAccountTitle": "Delete my account",
+  "profilePrivacyDeleteAccountSubtitle": "Deletes your profile, plans, recipes, analyzed photos, and signs you out. This can't be undone.",
+  "profilePrivacyDeleteConfirmTitle": "Delete your account?",
+  "profilePrivacyDeleteConfirmMessage": "All your content will be permanently deleted: profile, plans, generated recipes, analyzed photos, and your grocery list. This can't be undone.",
+  "profilePrivacyDeleteConfirmCta": "Yes, delete",
+
+  "notificationMasterToggleTitle": "Turn on reminders",
+  "notificationMasterToggleSubtitle": "Never turns on by itself: you decide when to enable it.",
+  "notificationMealTypeTitle": "Meals",
+  "notificationPlanTypeTitle": "Review tomorrow's plan",
+  "notificationShoppingTypeTitle": "Weekly shopping list",
+  "notificationHydrationTypeTitle": "Hydration",
+  "notificationQuietHoursSectionTitle": "Quiet hours",
+  "notificationQuietHoursSectionSubtitle": "No reminder sounds in this range, even if it's enabled.",
+  "notificationQuietHoursStartLabel": "From",
+  "notificationQuietHoursEndLabel": "Until",
+  "notificationPermissionDeniedMessage": "Saved. Enable them from your system notification settings so they can actually sound.",
+  "notificationWebUnsupportedNotice": "Your preferences are saved, but reminders only sound in the mobile app — open it on your phone to turn them on.",
+  "notificationMealReminderTitle": "Time to eat",
+  "notificationMealReminderBody": "Tap to see your {mealSlot}.",
+  "@notificationMealReminderBody": {
+    "placeholders": { "mealSlot": { "type": "String" } }
+  },
+  "notificationPlanReminderTitle": "Tomorrow's plan",
+  "notificationPlanReminderBody": "Take a look and adjust it if something's about to change.",
+  "notificationShoppingReminderTitle": "Shopping list",
+  "notificationShoppingReminderBody": "Check what you still need for the week.",
+  "notificationHydrationReminderTitle": "Remember to hydrate",
+  "notificationHydrationReminderBody": "A glass of water would do you good right now."
 }

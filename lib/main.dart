@@ -4,12 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/localization/generated/app_localizations.dart';
 import 'core/router/app_router.dart';
+import 'core/services/notifications/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/firebase_setup_required_page.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Registra el plugin de notificaciones locales (Épica 12) — no pide
+  // permiso todavía, solo lo deja listo para que `notificationServiceProvider`
+  // lo use; no-op en web (ver `NotificationService`).
+  await NotificationService().initializePlugin();
 
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

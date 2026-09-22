@@ -11,18 +11,23 @@ import '../theme/app_typography.dart';
 /// todavía porque no tiene un segundo consumidor real que la justifique (ver
 /// `documentation/home.md`). `subtitle` es opcional desde la Épica 6 — la
 /// fila "Generar lista de compra" de D1 (Plan) es de una sola línea, sin
-/// forzar un subtítulo vacío ni crear una fila casi-duplicada.
+/// forzar un subtítulo vacío ni crear una fila casi-duplicada. `trailingText`
+/// es opcional desde la Épica 11 (Perfil, J1): un valor actual a la derecha
+/// ("Automático", "Español") en vez del chevron — el mock nunca muestra
+/// ambos a la vez, uno reemplaza al otro.
 class QuickActionTile extends StatelessWidget {
   const QuickActionTile({
     super.key,
     required this.title,
     this.subtitle,
+    this.trailingText,
     required this.iconBackgroundColor,
     required this.onTap,
   });
 
   final String title;
   final String? subtitle;
+  final String? trailingText;
   final Color iconBackgroundColor;
   final VoidCallback onTap;
 
@@ -63,7 +68,10 @@ class QuickActionTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: colors.textDisabled),
+              if (trailingText != null)
+                Text(trailingText!, style: AppTypography.bodyM.copyWith(fontSize: 13, color: colors.textDisabled))
+              else
+                Icon(Icons.chevron_right, color: colors.textDisabled),
             ],
           ),
         ),

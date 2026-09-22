@@ -10,3 +10,17 @@ import 'generated/app_localizations.dart';
 extension AppLocalizationsX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
 }
+
+/// Resuelve `AppLocalizations` sin un `BuildContext` — necesario para textos
+/// de notificaciones locales (Épica 12), que se programan desde un
+/// `Provider`/al arrancar la app, no desde un `build()`. Usa el idioma del
+/// dispositivo (lo mismo que ve el usuario hoy: Perfil todavía no permite
+/// cambiar el idioma dentro de la app, ver `documentation/profile.md`), con
+/// `es` como respaldo si el dispositivo tiene un idioma no soportado.
+AppLocalizations resolveDeviceLocalizations() {
+  final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+  for (final supported in AppLocalizations.supportedLocales) {
+    if (supported.languageCode == deviceLocale.languageCode) return lookupAppLocalizations(supported);
+  }
+  return lookupAppLocalizations(AppLocalizations.supportedLocales.first);
+}

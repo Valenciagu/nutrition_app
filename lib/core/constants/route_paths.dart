@@ -10,10 +10,11 @@ abstract final class RoutePaths {
   static const String forgotPassword = '/forgot-password';
   static const String onboarding = '/onboarding';
 
-  /// Tabs del shell principal (Épica 4) — `root` es Home. Plan/IA/Perfil son
-  /// placeholders (`ComingSoonPage`/`ProfilePlaceholderPage`) hasta que sus
-  /// épicas (6/5/11) existan. No hay tab de "Progreso" ni de cámara: la
-  /// cámara es el botón central del shell, no una ruta con tab propia (ver
+  /// Tabs del shell principal (Épica 4) — `root` es Home, Plan (Épica 6) y
+  /// Perfil (Épica 11) son reales. `ai` sigue con `ComingSoonPage` (sin
+  /// epic dueña de una pantalla de chat todavía, ver "Open questions" en
+  /// `TASKS.md`). No hay tab de "Progreso" ni de cámara: la cámara es el
+  /// botón central del shell, no una ruta con tab propia (ver
   /// `documentation/home.md` y la decisión de navegación confirmada
   /// 2026-09-12).
   static const String plan = '/plan';
@@ -38,6 +39,20 @@ abstract final class RoutePaths {
   /// "Generar lista de compra" de D1.
   static const String groceryListSegment = 'grocery-list';
   static String groceryListPath() => '$plan/grocery-list';
+
+  /// Épica 11 — anidadas bajo `profile`, mismo criterio que D3/D5/lista de
+  /// compra bajo `plan`: el back nativo funciona sin lógica extra.
+  static const String profileEditGoalSegment = 'edit-goal';
+  static String profileEditGoalPath() => '$profile/edit-goal';
+
+  static const String profileEditPreferencesSegment = 'edit-preferences';
+  static String profileEditPreferencesPath() => '$profile/edit-preferences';
+
+  static const String profilePrivacySegment = 'privacy';
+  static String profilePrivacyPath() => '$profile/privacy';
+
+  static const String profileNotificationsSegment = 'notifications';
+  static String profileNotificationsPath() => '$profile/notifications';
 
   /// D5 — anidada bajo D3; recibe la `Recipe` ya cargada vía `extra` de
   /// GoRouter en vez de re-pedirla, para no depender de que el provider de

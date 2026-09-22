@@ -15,13 +15,17 @@ import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/onboarding/presentation/providers/onboarding_providers.dart';
 import '../../features/food_analysis/presentation/pages/food_analysis_page.dart';
 import '../../features/grocery_list/presentation/pages/grocery_list_page.dart';
+import '../../features/notifications/presentation/pages/notification_settings_page.dart';
 import '../../features/plan/presentation/pages/plan_page.dart';
+import '../../features/profile/presentation/pages/edit_goal_biometrics_page.dart';
+import '../../features/profile/presentation/pages/edit_preferences_page.dart';
+import '../../features/profile/presentation/pages/privacy_data_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/recipes/domain/entities/recipe.dart';
 import '../../features/recipes/presentation/pages/cooking_mode_page.dart';
 import '../../features/recipes/presentation/pages/recipe_detail_page.dart';
 import '../constants/route_paths.dart';
 import '../widgets/coming_soon_page.dart';
-import '../widgets/profile_placeholder_page.dart';
 import 'main_shell.dart';
 
 /// El único [GoRouter] de la app. No crear otros routers ni navegar con
@@ -156,8 +160,26 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RoutePaths.profile,
                 builder: (context, state) {
-                  return ProfilePlaceholderPage(onSignOut: () => ref.read(authControllerProvider.notifier).signOut());
+                  return ProfilePage(onSignOut: () => ref.read(authControllerProvider.notifier).signOut());
                 },
+                routes: [
+                  GoRoute(
+                    path: RoutePaths.profileEditGoalSegment,
+                    builder: (context, state) => const EditGoalBiometricsPage(),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.profileEditPreferencesSegment,
+                    builder: (context, state) => const EditPreferencesPage(),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.profilePrivacySegment,
+                    builder: (context, state) => const PrivacyDataPage(),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.profileNotificationsSegment,
+                    builder: (context, state) => const NotificationSettingsPage(),
+                  ),
+                ],
               ),
             ],
           ),

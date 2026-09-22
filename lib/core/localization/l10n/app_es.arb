@@ -380,5 +380,69 @@
   "grocerySourceLabel": "{quantity} · {slot} · {weekday}",
   "@grocerySourceLabel": {
     "placeholders": { "quantity": { "type": "String" }, "slot": { "type": "String" }, "weekday": { "type": "String" } }
-  }
+  },
+
+  "profileHeaderSubtitle": "{goal} · {calories} kcal",
+  "@profileHeaderSubtitle": {
+    "placeholders": { "goal": { "type": "String" }, "calories": { "type": "int" } }
+  },
+  "profileSectionFoodTitle": "Mi alimentación",
+  "profileRowGoalDataTitle": "Objetivo y datos",
+  "profileRowPreferencesTitle": "Preferencias y alergias",
+  "profileRowSavedRecipesTitle": "Recetas guardadas",
+  "profileSectionSettingsTitle": "Ajustes",
+  "profileRowRemindersTitle": "Recordatorios",
+  "profileRowRemindersActiveCount": "{count, plural, =0{Desactivados} one{1 activo} other{{count} activos}}",
+  "@profileRowRemindersActiveCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "profileRowThemeTitle": "Tema",
+  "profileThemeAutomaticValue": "Automático",
+  "profileRowLanguageTitle": "Idioma",
+  "profileRowPrivacyTitle": "Privacidad y datos",
+  "profilePremiumTitle": "Hazte Premium",
+  "profilePremiumSubtitle": "Análisis ilimitados y planes de todo el mes",
+  "profilePremiumCta": "Ver",
+  "profileGuestTitle": "Crea una cuenta para tu perfil",
+  "profileGuestMessage": "Necesitas una cuenta para ver y editar tu perfil.",
+  "profileGuestCta": "Crear cuenta",
+
+  "profileEditGoalSectionTitle": "Objetivo",
+  "profileEditPersonalSectionTitle": "Datos personales",
+  "profileEditActivitySectionTitle": "Nivel de actividad",
+  "profileEditLikedFoodsSectionTitle": "Te gusta",
+  "profileEditAvoidFoodsSectionTitle": "Evitas o eres alérgico",
+  "profileEditCookingTimeSectionTitle": "Tiempo de cocina",
+  "profileEditBudgetSectionTitle": "Presupuesto",
+
+  "profilePrivacyIntro": "Guardamos tu perfil nutricional (objetivo, datos personales, preferencias), los planes y recetas que la IA genera para ti, y las fotos que analizas — todo asociado solo a tu cuenta, nunca compartido.",
+  "profilePrivacyDeleteAccountTitle": "Eliminar mi cuenta",
+  "profilePrivacyDeleteAccountSubtitle": "Borra tu perfil, planes, recetas, fotos analizadas y cierra tu sesión. No se puede deshacer.",
+  "profilePrivacyDeleteConfirmTitle": "¿Eliminar tu cuenta?",
+  "profilePrivacyDeleteConfirmMessage": "Se borrará todo tu contenido de forma permanente: perfil, planes, recetas generadas, fotos analizadas y tu lista de compra. Esta acción no se puede deshacer.",
+  "profilePrivacyDeleteConfirmCta": "Sí, eliminar",
+
+  "notificationMasterToggleTitle": "Activar recordatorios",
+  "notificationMasterToggleSubtitle": "Nunca se activan solos: tú decides cuándo encenderlos.",
+  "notificationMealTypeTitle": "Comidas",
+  "notificationPlanTypeTitle": "Revisar el plan de mañana",
+  "notificationShoppingTypeTitle": "Lista de compra semanal",
+  "notificationHydrationTypeTitle": "Hidratación",
+  "notificationQuietHoursSectionTitle": "Horas de silencio",
+  "notificationQuietHoursSectionSubtitle": "Ningún recordatorio suena en este rango, aunque esté activado.",
+  "notificationQuietHoursStartLabel": "Desde",
+  "notificationQuietHoursEndLabel": "Hasta",
+  "notificationPermissionDeniedMessage": "Guardado. Actívalos desde los ajustes de notificaciones del sistema para que suenen.",
+  "notificationWebUnsupportedNotice": "Tus preferencias se guardan, pero los recordatorios solo suenan en la app móvil — ábrela en tu teléfono para activarlos.",
+  "notificationMealReminderTitle": "Hora de comer",
+  "notificationMealReminderBody": "Toca para ver tu {mealSlot}.",
+  "@notificationMealReminderBody": {
+    "placeholders": { "mealSlot": { "type": "String" } }
+  },
+  "notificationPlanReminderTitle": "Tu plan de mañana",
+  "notificationPlanReminderBody": "Échale un vistazo y ajústalo si algo va a cambiar.",
+  "notificationShoppingReminderTitle": "Lista de compra",
+  "notificationShoppingReminderBody": "Revisa qué te falta para la semana.",
+  "notificationHydrationReminderTitle": "Recuerda hidratarte",
+  "notificationHydrationReminderBody": "Un vaso de agua ahora te sienta bien."
 }
