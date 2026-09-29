@@ -17,10 +17,16 @@ class FirebaseAiService implements AIService {
   final FirebaseFunctions _functions;
 
   @override
-  Future<NutritionAssistantAnswer> askNutritionQuestion(String question) async {
+  Future<NutritionAssistantAnswer> askNutritionQuestion(String question, {List<ChatTurn> history = const []}) async {
     try {
       final callable = _functions.httpsCallable('askNutritionAssistant');
-      final result = await callable.call<Object?>({'question': question});
+      final result = await callable.call<Object?>({
+        'question': question,
+        if (history.isNotEmpty)
+          'history': [
+            for (final turn in history) {'question': turn.question, 'answer': turn.answer},
+          ],
+      });
       final data = Map<String, dynamic>.from(result.data as Map);
 
       return NutritionAssistantAnswer(

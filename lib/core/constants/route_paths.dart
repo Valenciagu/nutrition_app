@@ -10,13 +10,12 @@ abstract final class RoutePaths {
   static const String forgotPassword = '/forgot-password';
   static const String onboarding = '/onboarding';
 
-  /// Tabs del shell principal (Épica 4) — `root` es Home, Plan (Épica 6) y
-  /// Perfil (Épica 11) son reales. `ai` sigue con `ComingSoonPage` (sin
-  /// epic dueña de una pantalla de chat todavía, ver "Open questions" en
-  /// `TASKS.md`). No hay tab de "Progreso" ni de cámara: la cámara es el
-  /// botón central del shell, no una ruta con tab propia (ver
-  /// `documentation/home.md` y la decisión de navegación confirmada
-  /// 2026-09-12).
+  /// Tabs del shell principal (Épica 4) — `root` es Home, Plan (Épica 6),
+  /// Perfil (Épica 11) y `ai` (Épica 5's `AIService`, finalmente con un
+  /// consumidor real — ver `features/ai_assistant/`) son reales. No hay tab
+  /// de "Progreso" ni de cámara: la cámara es el botón central del shell,
+  /// no una ruta con tab propia (ver `documentation/home.md` y la decisión
+  /// de navegación confirmada 2026-09-12).
   static const String plan = '/plan';
   static const String ai = '/ai';
   static const String profile = '/profile';

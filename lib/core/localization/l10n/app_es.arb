@@ -4,14 +4,6 @@
   "@appTitle": {
     "description": "Nombre provisional de la app (pendiente de branding definitivo). Se usa igual en todos los idiomas por ahora."
   },
-  "comingSoonTitle": "Muy pronto",
-  "@comingSoonTitle": {
-    "description": "Generic placeholder title for a tab/section that isn't built yet."
-  },
-  "comingSoonMessage": "Esta sección todavía se está construyendo.",
-  "@comingSoonMessage": {
-    "description": "Generic placeholder body text for a tab/section that isn't built yet."
-  },
   "genericErrorTitle": "Algo salió mal",
   "@genericErrorTitle": {
     "description": "Generic error state title used across the app when a specific message isn't available."
@@ -444,5 +436,23 @@
   "notificationShoppingReminderTitle": "Lista de compra",
   "notificationShoppingReminderBody": "Revisa qué te falta para la semana.",
   "notificationHydrationReminderTitle": "Recuerda hidratarte",
-  "notificationHydrationReminderBody": "Un vaso de agua ahora te sienta bien."
+  "notificationHydrationReminderBody": "Un vaso de agua ahora te sienta bien.",
+
+  "aiGuestTitle": "Crea una cuenta para hablar con tu asistente",
+  "aiGuestMessage": "Necesitas una cuenta para usar el asistente de nutrición.",
+  "aiGuestCta": "Crear cuenta",
+  "aiChatTitle": "Tu asistente",
+  "aiChatSubtitle": "Pregúntale sobre nutrición",
+  "aiChatEmptyStateMessage": "Pregúntale lo que quieras sobre nutrición, alimentación o hábitos alimenticios.",
+  "aiChatInputPlaceholder": "Escribe lo que necesites…",
+  "aiChatQuotaExceededMessage": "Alcanzaste tu límite diario de consultas. Vuelve a intentarlo mañana.",
+  "aiChatProfessionalConsultNote": "Puede convenir consultar a un profesional de la salud.",
+  "aiChatSafetyFallbackNote": "Respuesta limitada por seguridad.",
+  "aiChatRemainingToday": "{count, plural, =0{Sin consultas restantes hoy} one{Queda 1 consulta hoy} other{Quedan {count} consultas hoy}}",
+  "@aiChatRemainingToday": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "aiSuggestionDinner": "¿Qué ceno?",
+  "aiSuggestionMoreProtein": "Más proteína",
+  "aiSuggestionNoDairy": "Sin lactosa"
 }

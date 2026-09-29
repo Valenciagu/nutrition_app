@@ -1,8 +1,6 @@
 {
   "@@locale": "en",
   "appTitle": "NutritionApp",
-  "comingSoonTitle": "Coming soon",
-  "comingSoonMessage": "This section is still being built.",
   "genericErrorTitle": "Something went wrong",
   "genericErrorMessage": "We couldn't complete this action. Please try again.",
   "retryButtonLabel": "Retry",
@@ -405,5 +403,23 @@
   "notificationShoppingReminderTitle": "Shopping list",
   "notificationShoppingReminderBody": "Check what you still need for the week.",
   "notificationHydrationReminderTitle": "Remember to hydrate",
-  "notificationHydrationReminderBody": "A glass of water would do you good right now."
+  "notificationHydrationReminderBody": "A glass of water would do you good right now.",
+
+  "aiGuestTitle": "Create an account to talk to your assistant",
+  "aiGuestMessage": "You need an account to use the nutrition assistant.",
+  "aiGuestCta": "Create account",
+  "aiChatTitle": "Your assistant",
+  "aiChatSubtitle": "Ask about nutrition",
+  "aiChatEmptyStateMessage": "Ask anything about nutrition, food, or eating habits.",
+  "aiChatInputPlaceholder": "Type what you need…",
+  "aiChatQuotaExceededMessage": "You've reached your daily question limit. Try again tomorrow.",
+  "aiChatProfessionalConsultNote": "It may be worth consulting a healthcare professional.",
+  "aiChatSafetyFallbackNote": "Response limited for safety.",
+  "aiChatRemainingToday": "{count, plural, =0{No questions left today} one{1 question left today} other{{count} questions left today}}",
+  "@aiChatRemainingToday": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "aiSuggestionDinner": "What should I have for dinner?",
+  "aiSuggestionMoreProtein": "More protein",
+  "aiSuggestionNoDairy": "Dairy-free"
 }

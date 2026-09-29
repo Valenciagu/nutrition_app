@@ -22,5 +22,16 @@ abstract class AIService {
   /// de `core/errors` si la llamada falla (ver `FirebaseAiService`) —
   /// incluyendo `AiQuotaExceededFailure` si el usuario ya agotó su cupo
   /// diario.
-  Future<NutritionAssistantAnswer> askNutritionQuestion(String question);
+  ///
+  /// [history] (opcional) le da continuidad a una conversación — turnos
+  /// previos de la MISMA sesión de chat, más recientes al final. El
+  /// servidor no guarda estado de conversación (ver
+  /// `functions/src/ai/askNutritionAssistant.ts`); es responsabilidad del
+  /// llamador reenviar el contexto que quiera que el modelo tenga.
+  Future<NutritionAssistantAnswer> askNutritionQuestion(String question, {List<ChatTurn> history = const []});
 }
+
+/// Un turno de conversación ya resuelto (pregunta + respuesta), para
+/// reenviar como contexto en la siguiente llamada. `record`, no una clase —
+/// no necesita identidad ni comportamiento propio.
+typedef ChatTurn = ({String question, String answer});

@@ -10,6 +10,7 @@ import '../../features/authentication/presentation/pages/sign_up_page.dart';
 import '../../features/authentication/presentation/pages/splash_page.dart';
 import '../../features/authentication/presentation/pages/welcome_page.dart';
 import '../../features/authentication/presentation/providers/auth_providers.dart';
+import '../../features/ai_assistant/presentation/pages/ai_chat_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/onboarding/presentation/providers/onboarding_providers.dart';
@@ -25,7 +26,6 @@ import '../../features/recipes/domain/entities/recipe.dart';
 import '../../features/recipes/presentation/pages/cooking_mode_page.dart';
 import '../../features/recipes/presentation/pages/recipe_detail_page.dart';
 import '../constants/route_paths.dart';
-import '../widgets/coming_soon_page.dart';
 import 'main_shell.dart';
 
 /// El único [GoRouter] de la app. No crear otros routers ni navegar con
@@ -154,7 +154,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          StatefulShellBranch(routes: [GoRoute(path: RoutePaths.ai, builder: (context, state) => const ComingSoonPage())]),
+          StatefulShellBranch(routes: [GoRoute(path: RoutePaths.ai, builder: (context, state) => const AiChatPage())]),
           StatefulShellBranch(
             routes: [
               GoRoute(
