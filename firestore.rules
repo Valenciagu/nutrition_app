@@ -1,14 +1,47 @@
 rules_version = '2';
 
-// Reglas mínimas para lo que existe hoy (Épica 3: Onboarding). Revisión de
-// seguridad completa diferida a la Épica 15 (Instrucciones.md §80) — esto
-// solo evita que `users/{userId}` quede sin protección (modo prueba/bloqueo
-// por defecto de un proyecto de Firebase nuevo) ahora que hay una escritura
-// real desde el cliente.
+// Épica 15 (Instrucciones.md §80) — primera revisión completa de estas
+// reglas desde su versión mínima de la Épica 3.
+//
+// HALLAZGO Y FIX REAL de esta revisión: el `allow read, write` original de
+// `users/{userId}` (sin restricción de campos) permitía al cliente escribir
+// CUALQUIER campo del documento — incluyendo uno que las Cloud Functions
+// leen como fuente de verdad server-trusted: `subscription.isPremium`
+// (`fetchMinimalProfile`/`fetchOnboardingProfile` en `functions/src/ai/` y
+// `functions/src/plan/`, Instrucciones.md §70 "DO NOT TRUST CLIENT-SIDE
+// PREMIUM STATUS"). Aunque hoy ningún código del cliente escribe ese campo,
+// las reglas de Firestore son la única barrera real contra un cliente
+// manipulado que sí lo intente directo (Firestore SDK/REST, sin pasar por
+// la app) — la ausencia de un `hasOnly()` era el hueco. Épica 13
+// (Suscripciones) escribirá `subscription` vía Admin SDK; estas reglas
+// están listas para eso sin necesitar otro cambio.
+//
+// Los únicos campos que el cliente escribe hoy sobre `users/{userId}` (ver
+// `onboarding_remote_data_source.dart`/`firebase_notification_preferences_repository.dart`):
+// `onboarding`, `onboardingCompletedAt`, `notificationPreferences`. El
+// allowlist usa `diff(resource.data).affectedKeys()` en vez de
+// `request.resource.data.keys()` — la diferencia importa con
+// `SetOptions(merge: true)`: `.keys()` refleja el documento COMPLETO
+// resultante (incluyendo campos ya existentes que la escritura ni toca,
+// como un futuro `subscription`), así que un `hasOnly` sobre `.keys()` se
+// rompería en cuanto exista cualquier campo server-side — `diff().affectedKeys()`
+// en cambio solo mira lo que ESTA escritura realmente cambia.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      allow create: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['onboarding', 'onboardingCompletedAt', 'notificationPreferences']);
+
+      allow update: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['onboarding', 'onboardingCompletedAt', 'notificationPreferences']);
+
+      // El cliente nunca borra su propio documento directo — `deleteAccount`
+      // (Épica 11, Admin SDK) es el único camino, y el Admin SDK ignora
+      // estas reglas de todos modos.
+      allow delete: if false;
 
       // `aiUsage/{date}` (Épica 5, tarea 5.2 — cuota de IA) es deliberadamente
       // NO matcheado aquí: sin una regla explícita, Firestore deniega por
