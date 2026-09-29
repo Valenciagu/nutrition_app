@@ -282,6 +282,19 @@
 
   "planWeekEmptyDay": "No plan",
 
+  "planWeekRepeatMessage": "You're repeating {count} meals on {day} this week. Want to switch it up?",
+  "@planWeekRepeatMessage": {
+    "placeholders": { "day": { "type": "String" }, "count": { "type": "int" } }
+  },
+  "planWeekRepeatCta": "Refresh {day}",
+  "@planWeekRepeatCta": {
+    "placeholders": { "day": { "type": "String" } }
+  },
+  "planWeekRepeatAdjustMessage": "Change this day's meals so they don't repeat these I already have on other days this week: {meals}.",
+  "@planWeekRepeatAdjustMessage": {
+    "placeholders": { "meals": { "type": "String" } }
+  },
+
   "recipePrepTimeMinutes": "{minutes} min",
   "@recipePrepTimeMinutes": {
     "placeholders": { "minutes": { "type": "int" } }

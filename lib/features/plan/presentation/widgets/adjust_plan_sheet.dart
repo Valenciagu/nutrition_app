@@ -15,23 +15,30 @@ import '../providers/plan_providers.dart';
 /// no mock-ea esta interacción); es la superficie mínima honesta para
 /// exponer una capacidad de backend real (`adjustDailyPlan`) sin inventar
 /// una UI de chat completa — ver `documentation/plan.md`.
-Future<void> showAdjustPlanSheet(BuildContext context) {
+/// [initialMessage] precarga el campo de texto (editable, no se envía sin
+/// que el usuario confirme) — lo usa D2 al tocar "Renovar el {día}" para
+/// proponer un ajuste concreto sin fingir una acción de un solo toque que
+/// esta función nunca soportó: sigue siendo el mismo mensaje libre de
+/// siempre, solo que ya no empieza en blanco.
+Future<void> showAdjustPlanSheet(BuildContext context, {String? initialMessage}) {
   return showAppBottomSheet<void>(
     context,
     title: context.l10n.planAdjustTitle,
-    builder: (sheetContext) => const _AdjustPlanSheetContent(),
+    builder: (sheetContext) => _AdjustPlanSheetContent(initialMessage: initialMessage),
   );
 }
 
 class _AdjustPlanSheetContent extends ConsumerStatefulWidget {
-  const _AdjustPlanSheetContent();
+  const _AdjustPlanSheetContent({this.initialMessage});
+
+  final String? initialMessage;
 
   @override
   ConsumerState<_AdjustPlanSheetContent> createState() => _AdjustPlanSheetContentState();
 }
 
 class _AdjustPlanSheetContentState extends ConsumerState<_AdjustPlanSheetContent> {
-  final _controller = TextEditingController();
+  late final _controller = TextEditingController(text: widget.initialMessage);
 
   @override
   void dispose() {
