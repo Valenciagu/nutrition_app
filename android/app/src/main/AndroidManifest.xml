@@ -3,6 +3,9 @@
          (merge automático de Gradle), declarada aquí explícita para que sea
          visible sin tener que ir a buscar en el paquete del plugin. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Épica 12 — permite que ScheduledNotificationBootReceiver (abajo) se
+         despierte tras un reinicio del dispositivo. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:label="NutritionApp"
@@ -38,12 +41,20 @@
 
         <!-- Épica 12 (recordatorios locales, flutter_local_notifications):
              sin este receiver el plugin agenda la alarma pero nunca la
-             entrega — no es opcional. Deliberadamente NO se agrega
-             ScheduledNotificationBootReceiver (sobrevivir un reinicio del
-             dispositivo) en v1: gap documentado en
-             documentation/notifications.md, mitigado reprogramando cada vez
-             que se abre la app (ver notificationBootstrapProvider). -->
+             entrega — no es opcional. -->
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <!-- Épica 12 — sobrevive un reinicio del dispositivo: el plugin
+             reprograma sus propias alarmas persistidas al recibir
+             BOOT_COMPLETED/MY_PACKAGE_REPLACED, sin depender de que el
+             usuario abra la app (antes solo se mitigaba con
+             notificationBootstrapProvider en cada apertura). -->
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

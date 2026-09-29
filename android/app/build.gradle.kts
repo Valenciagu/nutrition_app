@@ -17,6 +17,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // Épica 12 — flutter_local_notifications usa APIs de java.time que
+        // Android solo soporta de forma nativa desde API 26; desugaring las
+        // hace disponibles también en dispositivos más viejos.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -45,4 +49,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Misma versión que ya declara flutter_local_notifications en su propio
+    // build.gradle (ver pub-cache) — evita una versión distinta que Gradle
+    // tendría que resolver/descargar aparte.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 }
