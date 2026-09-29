@@ -12,7 +12,10 @@ abstract class OnboardingRepository {
   /// Si hay un borrador local completo, lo escribe en
   /// `users/{userId}` de Firestore y borra el borrador local. No hace nada
   /// si no hay borrador (usuario que se registra sin haber hecho onboarding).
-  Future<void> migrateDraftToProfile(String userId);
+  /// Devuelve `true` solo si de verdad migró un borrador — lo usa
+  /// `app_router.dart` para no reportar `onboardingCompleted` en un login
+  /// normal sin borrador pendiente.
+  Future<bool> migrateDraftToProfile(String userId);
 
   /// Escribe cambios sobre un perfil YA existente (Perfil, Épica 11) — sin
   /// tocar el borrador local ni su ciclo de vida de migración; el usuario ya

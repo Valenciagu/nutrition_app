@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/services/analytics/firebase_analytics_service.dart';
 import '../../../../core/services/firebase_instances.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
 import '../../data/repositories/firebase_food_analysis_repository.dart';
@@ -35,5 +36,9 @@ class FoodAnalysisController extends AsyncNotifier<FoodAnalysisResult?> {
     state = await AsyncValue.guard(() {
       return ref.read(foodAnalysisRepositoryProvider).analyzePhoto(userId: uid, imageBytes: imageBytes);
     });
+    final result = state.valueOrNull;
+    if (result != null) {
+      ref.read(analyticsServiceProvider).logFoodPhotoAnalyzed(isFoodPhoto: result.isFoodPhoto);
+    }
   }
 }

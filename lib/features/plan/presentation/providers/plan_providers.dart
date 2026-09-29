@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/services/analytics/firebase_analytics_service.dart';
 import '../../../../core/services/firebase_instances.dart';
 import '../../../../core/utils/date_key.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
@@ -59,6 +60,7 @@ class GeneratePlanController extends AsyncNotifier<void> {
     });
     if (!state.hasError) {
       ref.invalidate(planForDateProvider);
+      ref.read(analyticsServiceProvider).logPlanGenerated();
     }
   }
 }
@@ -102,6 +104,7 @@ class AdjustPlanController extends AsyncNotifier<void> {
     });
     if (!state.hasError) {
       ref.invalidate(planForDateProvider);
+      ref.read(analyticsServiceProvider).logPlanAdjusted();
     }
   }
 }
@@ -128,6 +131,9 @@ class MealRegistrationController extends AsyncNotifier<void> {
     });
     if (!state.hasError) {
       ref.invalidate(planForDateProvider);
+      // Solo se reporta al registrar, no al deshacer — el evento representa
+      // "el usuario comió esto", no cada toggle del switch.
+      if (registered) ref.read(analyticsServiceProvider).logMealRegistered();
     }
   }
 }
@@ -170,6 +176,7 @@ class MealAlternativesController extends AsyncNotifier<List<MealAlternative>?> {
     });
     if (!state.hasError) {
       ref.invalidate(planForDateProvider);
+      ref.read(analyticsServiceProvider).logMealReplaced();
     }
   }
 

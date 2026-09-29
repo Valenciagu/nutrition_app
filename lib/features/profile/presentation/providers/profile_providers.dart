@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/services/analytics/firebase_analytics_service.dart';
 import '../../../../core/services/firebase_instances.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
 import '../../../onboarding/domain/entities/onboarding_answers.dart';
@@ -102,6 +103,7 @@ class DeleteAccountController extends AutoDisposeAsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => ref.read(accountRepositoryProvider).deleteAccount());
     if (!state.hasError) {
+      ref.read(analyticsServiceProvider).logAccountDeleted();
       // El usuario de Firebase Auth ya no existe server-side tras
       // `deleteAccount` (Admin SDK) — se cierra sesión local explícitamente
       // en vez de esperar a que el SDK de cliente note el token inválido en

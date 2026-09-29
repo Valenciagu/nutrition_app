@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/app_localizations_ext.dart';
+import '../../../../core/services/analytics/firebase_analytics_service.dart';
 import '../../../../core/services/firebase_instances.dart';
 import '../../../../core/services/notifications/notification_service.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
@@ -101,6 +102,7 @@ class NotificationSettingsSaveController extends AutoDisposeAsyncNotifier<bool> 
         final profile = await ref.read(userProfileProvider.future);
         final specs = buildReminderSpecs(prefs: prefs, mealSlots: profile.mealSlots, l10n: resolveDeviceLocalizations());
         await service.scheduleAll(specs);
+        ref.read(analyticsServiceProvider).logRemindersEnabled(activeTypeCount: prefs.activeTypeCount);
       } else {
         await service.cancelAll();
       }

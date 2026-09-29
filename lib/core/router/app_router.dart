@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,8 @@ import '../../features/recipes/domain/entities/recipe.dart';
 import '../../features/recipes/presentation/pages/cooking_mode_page.dart';
 import '../../features/recipes/presentation/pages/recipe_detail_page.dart';
 import '../constants/route_paths.dart';
+import '../services/analytics/firebase_analytics_service.dart';
+import '../services/firebase_instances.dart';
 import 'main_shell.dart';
 
 /// El único [GoRouter] de la app. No crear otros routers ni navegar con
@@ -62,7 +65,9 @@ final routerProvider = Provider<GoRouter>((ref) {
     // login normal con un borrador local viejo de una sesión anterior.
     final userId = next.valueOrNull?.uid;
     if (previous?.valueOrNull == null && userId != null) {
-      ref.read(onboardingRepositoryProvider).migrateDraftToProfile(userId);
+      ref.read(onboardingRepositoryProvider).migrateDraftToProfile(userId).then((migrated) {
+        if (migrated) ref.read(analyticsServiceProvider).logOnboardingCompleted();
+      });
     }
   });
   ref.listen(guestModeProvider, (previous, next) => refreshNotifier.notify());
@@ -70,6 +75,11 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: RoutePaths.splash,
     refreshListenable: refreshNotifier,
+    // Épica 14 — cierra el gap documentado de screen-view tracking: ya
+    // existe un `name:` explícito por ruta (antes ninguna lo tenía, por
+    // eso se había dejado sin construir), así que `FirebaseAnalyticsObserver`
+    // reporta un `screen_name` real y estable en vez de uno vacío/nulo.
+    observers: [FirebaseAnalyticsObserver(analytics: ref.read(firebaseAnalyticsProvider))],
     redirect: (context, state) {
       final authState = ref.read(authStateChangesProvider);
       final location = state.matchedLocation;
@@ -104,32 +114,42 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: RoutePaths.splash, builder: (context, state) => const SplashPage()),
-      GoRoute(path: RoutePaths.welcome, builder: (context, state) => const WelcomePage()),
-      GoRoute(path: RoutePaths.onboarding, builder: (context, state) => const OnboardingPage()),
+      GoRoute(name: 'splash', path: RoutePaths.splash, builder: (context, state) => const SplashPage()),
+      GoRoute(name: 'welcome', path: RoutePaths.welcome, builder: (context, state) => const WelcomePage()),
+      GoRoute(name: 'onboarding', path: RoutePaths.onboarding, builder: (context, state) => const OnboardingPage()),
       GoRoute(
+        name: 'food_analysis',
         path: RoutePaths.foodAnalysis,
         builder: (context, state) => FoodAnalysisPage(imageBytes: state.extra! as Uint8List),
       ),
-      GoRoute(path: RoutePaths.login, builder: (context, state) => const LoginPage()),
+      GoRoute(name: 'login', path: RoutePaths.login, builder: (context, state) => const LoginPage()),
       GoRoute(
+        name: 'sign_up',
         path: RoutePaths.signUp,
         builder: (context, state) {
           return SignUpPage(hasPendingPlan: ref.read(onboardingControllerProvider).isComplete);
         },
       ),
-      GoRoute(path: RoutePaths.forgotPassword, builder: (context, state) => const ForgotPasswordPage()),
+      GoRoute(
+        name: 'forgot_password',
+        path: RoutePaths.forgotPassword,
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
         branches: [
-          StatefulShellBranch(routes: [GoRoute(path: RoutePaths.root, builder: (context, state) => const HomePage())]),
+          StatefulShellBranch(
+            routes: [GoRoute(name: 'home', path: RoutePaths.root, builder: (context, state) => const HomePage())],
+          ),
           StatefulShellBranch(
             routes: [
               GoRoute(
+                name: 'plan',
                 path: RoutePaths.plan,
                 builder: (context, state) => const PlanPage(),
                 routes: [
                   GoRoute(
+                    name: 'recipe_detail',
                     path: RoutePaths.recipeDetailSegment,
                     builder: (context, state) => RecipeDetailPage(
                       date: state.pathParameters['date']!,
@@ -137,6 +157,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ),
                     routes: [
                       GoRoute(
+                        name: 'cooking_mode',
                         path: RoutePaths.cookingModeSegment,
                         builder: (context, state) => CookingModePage(
                           recipe: state.extra! as Recipe,
@@ -147,6 +168,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ],
                   ),
                   GoRoute(
+                    name: 'grocery_list',
                     path: RoutePaths.groceryListSegment,
                     builder: (context, state) => const GroceryListPage(),
                   ),
@@ -154,28 +176,35 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          StatefulShellBranch(routes: [GoRoute(path: RoutePaths.ai, builder: (context, state) => const AiChatPage())]),
+          StatefulShellBranch(
+            routes: [GoRoute(name: 'ai_chat', path: RoutePaths.ai, builder: (context, state) => const AiChatPage())],
+          ),
           StatefulShellBranch(
             routes: [
               GoRoute(
+                name: 'profile',
                 path: RoutePaths.profile,
                 builder: (context, state) {
                   return ProfilePage(onSignOut: () => ref.read(authControllerProvider.notifier).signOut());
                 },
                 routes: [
                   GoRoute(
+                    name: 'profile_edit_goal',
                     path: RoutePaths.profileEditGoalSegment,
                     builder: (context, state) => const EditGoalBiometricsPage(),
                   ),
                   GoRoute(
+                    name: 'profile_edit_preferences',
                     path: RoutePaths.profileEditPreferencesSegment,
                     builder: (context, state) => const EditPreferencesPage(),
                   ),
                   GoRoute(
+                    name: 'profile_privacy',
                     path: RoutePaths.profilePrivacySegment,
                     builder: (context, state) => const PrivacyDataPage(),
                   ),
                   GoRoute(
+                    name: 'profile_notifications',
                     path: RoutePaths.profileNotificationsSegment,
                     builder: (context, state) => const NotificationSettingsPage(),
                   ),

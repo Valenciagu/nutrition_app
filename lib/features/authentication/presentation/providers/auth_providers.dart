@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/services/analytics/firebase_analytics_service.dart';
 import '../../../../core/services/firebase_instances.dart';
 import '../../data/datasources/firebase_auth_data_source.dart';
 import '../../data/repositories/auth_repository_impl.dart';
@@ -44,6 +45,7 @@ class AuthController extends AsyncNotifier<void> {
     state = await AsyncValue.guard(
       () => _repository.signInWithEmailAndPassword(email: email, password: password),
     );
+    if (!state.hasError) ref.read(analyticsServiceProvider).logLogin();
   }
 
   Future<void> signUp({
@@ -59,6 +61,7 @@ class AuthController extends AsyncNotifier<void> {
         displayName: displayName,
       ),
     );
+    if (!state.hasError) ref.read(analyticsServiceProvider).logSignUp();
   }
 
   Future<void> sendPasswordResetEmail({required String email}) async {
@@ -69,5 +72,6 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> signOut() async {
     await _repository.signOut();
     ref.read(guestModeProvider.notifier).state = false;
+    ref.read(analyticsServiceProvider).logSignOut();
   }
 }

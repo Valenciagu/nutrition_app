@@ -19,11 +19,12 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   Future<void> clearDraft() => _local.clearDraft();
 
   @override
-  Future<void> migrateDraftToProfile(String userId) async {
+  Future<bool> migrateDraftToProfile(String userId) async {
     final draft = await _local.loadDraft();
-    if (draft == null || !draft.isComplete) return;
+    if (draft == null || !draft.isComplete) return false;
     await _remote.saveProfile(userId, draft);
     await _local.clearDraft();
+    return true;
   }
 
   @override
