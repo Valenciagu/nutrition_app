@@ -60,7 +60,7 @@ class _ActivityLevelStepState extends ConsumerState<ActivityLevelStep> {
     final answers = ref.watch(onboardingControllerProvider);
     final selected = _pendingSelection ?? answers.activityLevel;
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

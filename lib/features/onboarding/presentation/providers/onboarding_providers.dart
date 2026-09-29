@@ -74,9 +74,23 @@ class OnboardingController extends Notifier<OnboardingAnswers> {
 
   void setMealsPerDay(int count) => _update((s) => s.copyWith(mealSlots: defaultMealSlotsFor(count)));
 
+  /// Defensivo a propósito: `meal_rhythm_step.dart` (B6) muestra 4 filas por
+  /// defecto (`defaultMealSlotsFor(4)`) ANTES de que el usuario toque
+  /// ningún chip de "comidas por día" — solo un valor de pantalla, nunca
+  /// guardado en `state.mealSlots` (que sigue en `[]` hasta que se llama
+  /// `setMealsPerDay`). Tocar el horario de una de esas filas sin haber
+  /// tocado un chip antes indexaba sobre esa lista vacía y lanzaba
+  /// `RangeError` (crash real reportado por el usuario 2026-09-29) — mismo
+  /// bug que ONBOARD-104 arregló en B2 (lo mostrado y lo guardado deben
+  /// coincidir), aquí no se puede resolver con un valor por defecto
+  /// constante en el constructor porque `defaultMealSlotsFor` es una lista
+  /// computada, así que se resuelve aquí: si el estado real está vacío, se
+  /// siembra con el mismo fallback de 4 que ya usa la pantalla antes de
+  /// aplicar el cambio.
   void setMealSlotTime(int index, {required int hour, required int minute}) {
     _update((s) {
-      final updated = [...s.mealSlots];
+      final base = s.mealSlots.isEmpty ? defaultMealSlotsFor(4) : s.mealSlots;
+      final updated = [...base];
       updated[index] = updated[index].copyWith(hour: hour, minute: minute);
       return s.copyWith(mealSlots: updated);
     });

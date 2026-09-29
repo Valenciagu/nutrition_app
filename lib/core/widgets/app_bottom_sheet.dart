@@ -34,7 +34,16 @@ Future<T?> showAppBottomSheet<T>(
     ),
     builder: (context) {
       final mediaQuery = MediaQuery.of(context);
-      final content = Padding(
+      // `SingleChildScrollView`, no `Padding`: con `isScrollControlled:
+      // false` (altura `.auto`) el modal no da más alto del que cabe en
+      // pantalla, y la reserva de `mediaQuery.padding.bottom` de más abajo
+      // varía por dispositivo (barra de navegación de 3 botones vs. gestos)
+      // — un contenido que cabía justo en un dispositivo podía desbordar
+      // por unos pocos píxeles en otro con más barra de sistema (bug real
+      // reportado 2026-09-29, hoja de "Analizar mi comida"). Scroll en vez
+      // de overflow es correcto en cualquier dispositivo, sin necesitar
+      // ajustar cada hoja individualmente.
+      final content = SingleChildScrollView(
         padding: EdgeInsets.only(
           left: AppSpacing.space20,
           right: AppSpacing.space20,

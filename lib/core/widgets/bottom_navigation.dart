@@ -34,42 +34,52 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return Container(
-      height: 84,
-      decoration: BoxDecoration(color: colors.surface, border: Border(top: BorderSide(color: colors.border))),
-      padding: const EdgeInsets.only(top: 10),
-      child: Row(
-        children: [
-          _tab(context, 0),
-          _tab(context, 1),
-          Expanded(
-            child: Center(
-              child: GestureDetector(
-                onTap: onCameraTap,
-                // `Container.margin` no acepta valores negativos (lanza un
-                // assertion error) — el efecto "elevado sobre la barra" del
-                // diseño se logra desplazando el widget con `Transform`
-                // en vez de un margen negativo.
-                child: Transform.translate(
-                  offset: const Offset(0, -26),
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: colors.actionPrimary,
-                      shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: colors.actionPrimary.withValues(alpha: 0.35), blurRadius: 20, offset: const Offset(0, 8))],
+    // `SafeArea` (bottom-only, `top: false`): sin esto, en un dispositivo
+    // con barra de navegación de 3 botones (no gestos) el sistema dibuja
+    // "atrás/inicio/recientes" encima de los propios íconos/labels de esta
+    // barra — bug real reportado 2026-09-29 (el usuario probó en un
+    // dispositivo con navegación de botones). `Container` no reserva
+    // espacio de sistema por sí solo, a diferencia de un
+    // `BottomNavigationBar`/`NavigationBar` de Material.
+    return SafeArea(
+      top: false,
+      child: Container(
+        height: 84,
+        decoration: BoxDecoration(color: colors.surface, border: Border(top: BorderSide(color: colors.border))),
+        padding: const EdgeInsets.only(top: 10),
+        child: Row(
+          children: [
+            _tab(context, 0),
+            _tab(context, 1),
+            Expanded(
+              child: Center(
+                child: GestureDetector(
+                  onTap: onCameraTap,
+                  // `Container.margin` no acepta valores negativos (lanza un
+                  // assertion error) — el efecto "elevado sobre la barra" del
+                  // diseño se logra desplazando el widget con `Transform`
+                  // en vez de un margen negativo.
+                  child: Transform.translate(
+                    offset: const Offset(0, -26),
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: colors.actionPrimary,
+                        shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: colors.actionPrimary.withValues(alpha: 0.35), blurRadius: 20, offset: const Offset(0, 8))],
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(Icons.camera_alt_outlined, color: colors.onActionPrimary, size: 24),
                     ),
-                    alignment: Alignment.center,
-                    child: Icon(Icons.camera_alt_outlined, color: colors.onActionPrimary, size: 24),
                   ),
                 ),
               ),
             ),
-          ),
-          _tab(context, 2),
-          _tab(context, 3),
-        ],
+            _tab(context, 2),
+            _tab(context, 3),
+          ],
+        ),
       ),
     );
   }
