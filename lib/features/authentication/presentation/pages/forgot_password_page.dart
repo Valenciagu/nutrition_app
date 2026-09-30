@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
@@ -172,6 +173,16 @@ class _SentConfirmationState extends State<_SentConfirmation> {
     super.dispose();
   }
 
+  /// `mailto:` sin destinatario abre el cliente de correo por defecto del
+  /// dispositivo (o el selector, si hay varios) — no compone un mensaje, solo
+  /// abre la app. Si ninguna app maneja el esquema (p. ej. escritorio/web sin
+  /// cliente configurado), simplemente vuelve a la pantalla anterior, el
+  /// mismo comportamiento que tenía este botón antes de existir de verdad.
+  Future<void> _openMailApp(BuildContext context) async {
+    final launched = await launchUrl(Uri(scheme: 'mailto'));
+    if (!launched && context.mounted) Navigator.of(context).maybePop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -214,9 +225,7 @@ class _SentConfirmationState extends State<_SentConfirmation> {
         AppButton(
           label: l10n.authForgotPasswordOpenMailButton,
           fullWidth: true,
-          // TODO: abrir la app de correo real requiere `url_launcher`
-          // (no agregado todavía — ver documentation/authentication.md).
-          onPressed: () => Navigator.of(context).maybePop(),
+          onPressed: () => _openMailApp(context),
         ),
         const SizedBox(height: AppSpacing.space12),
         Center(

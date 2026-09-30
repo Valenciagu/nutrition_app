@@ -66,5 +66,14 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Requerido por `url_launcher` para poder abrir la app de correo
+             (esquema mailto:) desde A5 · Recuperar contraseña — sin esto,
+             Android 11+ oculta los paquetes instalados por defecto
+             (package visibility) y `launchUrl` no encuentra ningún manejador
+             aunque sí haya una app de correo instalada. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="mailto"/>
+        </intent>
     </queries>
 </manifest>
