@@ -53,6 +53,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<bool> signInWithGoogle() async {
+    try {
+      return await _dataSource.signInWithGoogle();
+    } on AuthException catch (e) {
+      throw AuthFailure(message: e.message, code: e.code, cause: e.cause);
+    }
+  }
+
+  @override
   Future<void> signOut() => _dataSource.signOut();
 
   /// Traduce [AuthException] (capa de datos) a [AuthFailure] (dominio /

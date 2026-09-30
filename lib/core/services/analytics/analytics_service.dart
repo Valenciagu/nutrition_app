@@ -9,8 +9,11 @@
 /// ningún parámetro — Instrucciones.md: "Never expose secrets through
 /// analytics" / "Do not log sensitive information" (§20, §48).
 abstract class AnalyticsService {
-  Future<void> logSignUp();
-  Future<void> logLogin();
+  /// [method] es un identificador fijo ("email"/"google"), nunca texto
+  /// libre — permite separar el embudo de registro/login por método sin
+  /// violar la regla de "nada de PII/texto libre en parámetros" (§20/§48).
+  Future<void> logSignUp({String method = 'email'});
+  Future<void> logLogin({String method = 'email'});
   Future<void> logSignOut();
   Future<void> logAccountDeleted();
 

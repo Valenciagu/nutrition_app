@@ -72,6 +72,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         );
   }
 
+  Future<void> _signInWithGoogle() async {
+    await ref.read(authControllerProvider.notifier).signInWithGoogle();
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -164,6 +168,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 fullWidth: true,
                 isLoading: isLoading,
                 onPressed: _submit,
+              ),
+              const SizedBox(height: AppSpacing.space20),
+              Row(
+                children: [
+                  Expanded(child: Divider(color: colors.border)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
+                    child: Text(l10n.authLoginOrDivider, style: AppTypography.bodyM.copyWith(color: colors.textSecondary)),
+                  ),
+                  Expanded(child: Divider(color: colors.border)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space20),
+              // Solo Google — el canvas también muestra un botón "Apple",
+              // deliberadamente no construido: requiere una cuenta de Apple
+              // Developer de pago (Épica 13 la necesita igual, ver
+              // TASKS.md), a diferencia de Google, que no necesita pagar
+              // nada. Se agrega cuando esa cuenta exista.
+              AppButton(
+                label: l10n.authLoginGoogleButton,
+                variant: AppButtonVariant.neutral,
+                fullWidth: true,
+                isLoading: isLoading,
+                onPressed: _signInWithGoogle,
               ),
               const SizedBox(height: AppSpacing.space24),
               Center(

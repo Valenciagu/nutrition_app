@@ -37,6 +37,8 @@
   "authLoginSubmitButton": "Sign in",
   "authLoginSignUpPrompt": "New here? ",
   "authLoginSignUpAction": "Create an account",
+  "authLoginOrDivider": "or",
+  "authLoginGoogleButton": "Continue with Google",
 
   "authSignUpTitle": "Create your account",
   "authSignUpPlanReadyBanner": "Your plan is ready. Save it so you don't lose it.",

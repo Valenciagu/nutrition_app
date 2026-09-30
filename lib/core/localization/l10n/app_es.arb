@@ -64,6 +64,8 @@
   "authLoginSubmitButton": "Entrar",
   "authLoginSignUpPrompt": "¿Nuevo por aquí? ",
   "authLoginSignUpAction": "Crea tu cuenta",
+  "authLoginOrDivider": "o",
+  "authLoginGoogleButton": "Continuar con Google",
 
   "authSignUpTitle": "Crea tu cuenta",
   "authSignUpPlanReadyBanner": "Tu plan ya está calculado. Guárdalo para no perderlo.",

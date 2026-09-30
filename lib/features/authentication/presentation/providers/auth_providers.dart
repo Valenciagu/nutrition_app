@@ -10,7 +10,7 @@ import '../../domain/entities/auth_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final dataSource = FirebaseAuthDataSource(ref.watch(firebaseAuthProvider));
+  final dataSource = FirebaseAuthDataSource(ref.watch(firebaseAuthProvider), ref.watch(googleSignInProvider));
   return AuthRepositoryImpl(dataSource);
 });
 
@@ -67,6 +67,20 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> sendPasswordResetEmail({required String email}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => _repository.sendPasswordResetEmail(email: email));
+  }
+
+  /// A diferencia de `signIn`/`signUp`, no hay forma de saber de antemano si
+  /// esto termina en un login (cuenta de Google ya vinculada a un usuario
+  /// existente) o un registro (primera vez) — Firebase lo decide
+  /// internamente. Se reporta como login por default; ver el comentario en
+  /// el botón de la UI para el porqué de esa elección.
+  Future<void> signInWithGoogle() async {
+    state = const AsyncLoading();
+    bool signedIn = false;
+    state = await AsyncValue.guard(() async {
+      signedIn = await _repository.signInWithGoogle();
+    });
+    if (!state.hasError && signedIn) ref.read(analyticsServiceProvider).logLogin(method: 'google');
   }
 
   Future<void> signOut() async {

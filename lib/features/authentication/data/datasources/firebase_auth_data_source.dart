@@ -1,14 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/errors/app_exception.dart';
 
 /// Envuelve `firebase_auth` y traduce sus excepciones a [AuthException] —
 /// ningún otro archivo del proyecto debe importar `package:firebase_auth`
 /// directamente (ver skill `nutrition-app-architecture`, separación de capas).
+/// También envuelve `google_sign_in` por la misma razón — es el único
+/// archivo que conoce ese paquete.
 class FirebaseAuthDataSource {
-  FirebaseAuthDataSource(this._firebaseAuth);
+  FirebaseAuthDataSource(this._firebaseAuth, this._googleSignIn);
 
   final fb.FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn;
 
   Stream<fb.User?> authStateChanges() => _firebaseAuth.authStateChanges();
 
@@ -49,5 +53,29 @@ class FirebaseAuthDataSource {
     }
   }
 
-  Future<void> signOut() => _firebaseAuth.signOut();
+  /// Devuelve `false` (sin lanzar excepción) si el usuario cierra el
+  /// selector de cuentas de Google sin elegir una — no es un error, es una
+  /// cancelación explícita del usuario, igual de válida que no tocar el
+  /// botón "Entrar".
+  Future<bool> signInWithGoogle() async {
+    try {
+      final account = await _googleSignIn.signIn();
+      if (account == null) return false;
+
+      final googleAuth = await account.authentication;
+      final credential = fb.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await _firebaseAuth.signInWithCredential(credential);
+      return true;
+    } on fb.FirebaseAuthException catch (e) {
+      throw AuthException(e.message ?? e.code, code: e.code, cause: e);
+    }
+  }
+
+  Future<void> signOut() async {
+    await _googleSignIn.signOut();
+    await _firebaseAuth.signOut();
+  }
 }

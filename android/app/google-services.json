@@ -12,7 +12,20 @@
           "package_name": "com.example.nutrition_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "231974163983-afjuvjsc8ntu41rukjs6c3quuhehu21g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nutrition_app",
+            "certificate_hash": "301aef9548b4b9b9aff5255fe30674f91434c13b"
+          }
+        },
+        {
+          "client_id": "231974163983-5flbf4hkt2gujmb73v4f3gada9klrjr8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDT3m6zbS9I5UcT6aCpYTM7oV54YfTboPc"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "231974163983-5flbf4hkt2gujmb73v4f3gada9klrjr8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "231974163983-ld6193f25cg4e3t6teg9o75se1j51p8l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.nutritionApp"
+              }
+            }
+          ]
         }
       }
     }

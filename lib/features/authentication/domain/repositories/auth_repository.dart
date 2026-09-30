@@ -26,5 +26,9 @@ abstract class AuthRepository {
   /// skill `nutrition-app-security` e Instrucciones.md §33).
   Future<void> sendPasswordResetEmail({required String email});
 
+  /// Devuelve `false` si el usuario canceló el selector de cuentas de
+  /// Google (no es un error) — `true` si quedó autenticado.
+  Future<bool> signInWithGoogle();
+
   Future<void> signOut();
 }

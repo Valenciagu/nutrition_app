@@ -16,10 +16,10 @@ class FirebaseAnalyticsService implements AnalyticsService {
   final FirebaseAnalytics _analytics;
 
   @override
-  Future<void> logSignUp() => _analytics.logSignUp(signUpMethod: 'email');
+  Future<void> logSignUp({String method = 'email'}) => _analytics.logSignUp(signUpMethod: method);
 
   @override
-  Future<void> logLogin() => _analytics.logLogin(loginMethod: 'email');
+  Future<void> logLogin({String method = 'email'}) => _analytics.logLogin(loginMethod: method);
 
   @override
   Future<void> logSignOut() => _analytics.logEvent(name: AnalyticsEvents.signOut);
