@@ -72,14 +72,12 @@ interface GenerateDailyPlanResponse {
  * Firestore, a propósito, para que un futuro repositorio Dart pueda hacer
  * `NutritionPlan.fromJson(doc.data())` directo, sin un mapper aparte.
  *
- * NO incluido todavía (ver `documentation/plan.md`):
- * - `enforceAppCheck` (Épica 15, igual que el resto de funciones de IA).
- * - Repositorio/reglas de lectura desde Flutter (PLAN-003) — hoy esta
- *   función escribe el plan pero nada en `lib/` todavía lo lee.
- * - Ajustes adaptativos ("no tengo pollo") — PLAN-004.
+ * `enforceAppCheck: true` añadido en la Épica 15 (2026-09-30) — ver
+ * `main.dart` (proveedor de depuración por ahora) y
+ * `documentation/security_review.md`.
  */
 export const generateDailyPlan = onCall<GenerateDailyPlanRequest, Promise<GenerateDailyPlanResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para generar un plan.");

@@ -26,7 +26,7 @@ interface ReplaceMealResponse {
  * por `suggestMealAlternatives`) y solo hay que elegir cuál.
  */
 export const replaceMeal = onCall<ReplaceMealRequest, Promise<ReplaceMealResponse>>(
-  { region: "us-central1", invoker: "public" },
+  { region: "us-central1", invoker: "public", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión.");

@@ -62,7 +62,7 @@ interface AnalyzeFoodPhotoResponse {
  * documentado, ver `documentation/food_analysis.md`).
  */
 export const analyzeFoodPhoto = onCall<AnalyzeFoodPhotoRequest, Promise<AnalyzeFoodPhotoResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para analizar una foto.");

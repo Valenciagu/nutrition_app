@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -22,6 +23,7 @@ Future<void> main() async {
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     await _setupCrashlytics();
+    await _setupAppCheck();
     runApp(const ProviderScope(child: NutritionApp()));
   } catch (error) {
     // Ya no debería pasar (FOUND-009 resuelto, ver TASKS.md), pero se deja
@@ -43,6 +45,24 @@ Future<void> _setupCrashlytics() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
+}
+
+/// Épica 15 (Instrucciones.md §80): activa App Check con el proveedor de
+/// **depuración** — a diferencia de Play Integrity/App Attest, no necesita
+/// que la app ya esté publicada en Play Console/tenga cuenta de Apple
+/// Developer, así que puede cerrarse ahora en vez de esperar a la Épica 17
+/// (release). Cada instalación de debug (`flutter run`) imprime un token
+/// nuevo en la consola/logcat la primera vez — hay que registrarlo a mano en
+/// Firebase Console > App Check > (app) > "Manage debug tokens" para que esa
+/// instalación pase la verificación. Los proveedores de producción (Play
+/// Integrity/App Attest) quedan para la Épica 17, junto con el cambio de
+/// package name (`android/app/build.gradle.kts` sigue en el
+/// `com.example.nutrition_app` por defecto de Flutter). Sin implementación
+/// web todavía (requiere reCAPTCHA + un flag JS aparte, sin consumidor real
+/// hoy — mismo criterio que `NotificationService`/Crashlytics).
+Future<void> _setupAppCheck() async {
+  if (kIsWeb) return;
+  await FirebaseAppCheck.instance.activate(androidProvider: AndroidProvider.debug, appleProvider: AppleProvider.debug);
 }
 
 class NutritionApp extends ConsumerWidget {

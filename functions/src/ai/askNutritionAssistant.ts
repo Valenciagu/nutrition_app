@@ -51,15 +51,13 @@ interface AskNutritionAssistantResponse {
  * ninguna colección de Firestore para historial de chat (v1, ver
  * `documentation/ai_assistant.md`).
  *
- * Deliberadamente NO incluido todavía (tareas separadas, no asumir que esto
- * ya cubre todo):
- * - `enforceAppCheck: true` — diferido a la Épica 15 hasta que el cliente
- *   Flutter integre `firebase_app_check` con proveedores reales; activarlo
- *   antes rechazaría todas las llamadas del cliente actual (ver
- *   `documentation/security_review.md`).
+ * `enforceAppCheck: true` (Épica 15, 2026-09-30) — el cliente Flutter ya
+ * activa `firebase_app_check` (proveedor de depuración por ahora, ver
+ * `main.dart`); los proveedores de producción (Play Integrity/App Attest)
+ * quedan para la Épica 17. Ver `documentation/security_review.md`.
  */
 export const askNutritionAssistant = onCall<AskNutritionAssistantRequest, Promise<AskNutritionAssistantResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para usar el asistente de nutrición.");

@@ -31,7 +31,7 @@ const USER_SUBCOLLECTIONS = ["nutritionPlans", "recipes", "aiUsage", "shoppingLi
  * con la misma sesión).
  */
 export const deleteAccount = onCall<void, Promise<{ deleted: true }>>(
-  { region: "us-central1", invoker: "public" },
+  { region: "us-central1", invoker: "public", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para eliminar tu cuenta.");

@@ -45,7 +45,7 @@ interface AdjustDailyPlanResponse {
  * nunca se tocan.
  */
 export const adjustDailyPlan = onCall<AdjustDailyPlanRequest, Promise<AdjustDailyPlanResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para ajustar tu plan.");

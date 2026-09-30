@@ -64,7 +64,7 @@ interface StoredMeal {
  * `schema.ts` para el resto de esta decisión.
  */
 export const generateRecipe = onCall<GenerateRecipeRequest, Promise<RecipeResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para ver una receta.");
