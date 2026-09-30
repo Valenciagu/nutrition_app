@@ -65,12 +65,11 @@ Proyecto Node/TypeScript en `functions/` (Firebase Cloud Functions v2) que expon
 
 ## Reusado vs. nuevo
 
-Reusado: proyecto Firebase `nutritionapp-eee08` ya conectado, esquema `users/{uid}.onboarding` de la Épica 3, `cloud_functions`/`firebase_app_check` (ya en `pubspec.yaml` desde la Épica 1, sin usar hasta ahora), el patrón contrato-abstracto + implementación de `authentication`/`onboarding`, y los tipos `Failure`/`AppException` de `core/errors` (`AiValidationFailure` ya existía, pensado para esto desde la Épica 1). Nuevo: todo `functions/` (subproyecto Node/TS independiente del árbol Dart) — es la primera vez que el repo tiene código fuera de Flutter; `lib/core/services/ai/` (`AIService`, `FirebaseAiService`, `NutritionAssistantAnswer`); `AiQuotaExceededFailure` en `core/errors/failure.dart`.
+Reusado: proyecto Firebase `nutritionapp-eee08` ya conectado, esquema `users/{uid}.onboarding` de la Épica 3, `cloud_functions`/`firebase_app_check` (declarados en `pubspec.yaml` desde la Épica 1; `firebase_app_check` activado en la Épica 15, ver `documentation/security_review.md`), el patrón contrato-abstracto + implementación de `authentication`/`onboarding`, y los tipos `Failure`/`AppException` de `core/errors` (`AiValidationFailure` ya existía, pensado para esto desde la Épica 1). Nuevo: todo `functions/` (subproyecto Node/TS independiente del árbol Dart) — es la primera vez que el repo tiene código fuera de Flutter; `lib/core/services/ai/` (`AIService`, `FirebaseAiService`, `NutritionAssistantAnswer`); `AiQuotaExceededFailure` en `core/errors/failure.dart`.
 
 ## Known gaps (señalados, no decididos en silencio)
 
-- **Nada en la UI usa `AIService` todavía** — no hay pantalla que llame a `askNutritionQuestion` ni que muestre `remainingToday`; ver "Decisión de alcance" arriba. La primera feature real que lo necesite decide dónde vive esa UI.
 - **Límites de `DAILY_LIMITS` son placeholders de producto** — 10/50 por día no vienen de `Instrucciones.md`; ajustar libremente cuando haya datos reales de uso/costo.
-- **Sin `enforceAppCheck`** — Épica 15, ver arriba.
 - **Sin tests** — diferido a la Épica 16 por pedido explícito del usuario.
-- **No desplegado todavía** — código listo y compilado localmente (`tsc` limpio), pero no se corrió `firebase deploy` ni se configuró el secret real; eso requiere acción explícita del usuario.
+
+Resueltos desde que se escribió esta nota: la UI sí usa `AIService` (`AiChatPage`, ver `documentation/ai_assistant.md`, AI5-004); `enforceAppCheck: true` está activo en las 9 funciones callable (Épica 15, 2026-09-30); el backend está desplegado a producción (2026-09-29, secret `OPENAI_API_KEY` configurado) — ver `documentation/security_review.md`.

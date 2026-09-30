@@ -89,7 +89,6 @@ Reusado: el patrón de entidad inmutable de `OnboardingAnswers`, el vocabulario 
 ## Known gaps (señalados, no decididos en silencio)
 
 - **Capa de seguridad sin chequeo ingrediente-por-ingrediente** — ver arriba; necesita `Recipe` (Épica 7).
-- **Sin lista de compra** — Épica 10.
-- **Sin `enforceAppCheck`** en ninguna función de esta épica — mismo gap ya documentado para Épica 5, se resuelve junto en la Épica 15.
-- **Backend no desplegado** — `functions/` compila limpio (`tsc`/`npm run build`) pero nada de `functions/src/plan/` está en producción; requiere que el usuario confirme `firebase deploy --only functions` y tenga configurado `OPENAI_API_KEY`.
+- **Sin lista de compra** — cubierto por la Épica 10 (v1 scope), ver `documentation/grocery_list.md`.
+- **Backend desplegado a producción** (2026-09-29) con `enforceAppCheck: true` en las 9 funciones callable (Épica 15, 2026-09-30) — ver `documentation/security_review.md`.
 - **Sin tests** — diferido a la Épica 16 por pedido explícito del usuario.
