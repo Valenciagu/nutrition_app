@@ -59,7 +59,7 @@ interface AskNutritionAssistantResponse {
  *   `documentation/security_review.md`).
  */
 export const askNutritionAssistant = onCall<AskNutritionAssistantRequest, Promise<AskNutritionAssistantResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para usar el asistente de nutrición.");

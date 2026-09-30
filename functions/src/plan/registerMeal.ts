@@ -24,7 +24,7 @@ interface RegisterMealResponse {
  * (`functions/src/ai/quota.ts`) — es una operación determinística y barata.
  */
 export const registerMeal = onCall<RegisterMealRequest, Promise<RegisterMealResponse>>(
-  { region: "us-central1" },
+  { region: "us-central1", invoker: "public" },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión.");

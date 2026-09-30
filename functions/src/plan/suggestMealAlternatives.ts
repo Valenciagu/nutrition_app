@@ -38,7 +38,7 @@ interface SuggestMealAlternativesResponse {
  * `replaceMeal.ts`).
  */
 export const suggestMealAlternatives = onCall<SuggestMealAlternativesRequest, Promise<SuggestMealAlternativesResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión.");

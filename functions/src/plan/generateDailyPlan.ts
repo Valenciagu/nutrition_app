@@ -79,7 +79,7 @@ interface GenerateDailyPlanResponse {
  * - Ajustes adaptativos ("no tengo pollo") — PLAN-004.
  */
 export const generateDailyPlan = onCall<GenerateDailyPlanRequest, Promise<GenerateDailyPlanResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para generar un plan.");

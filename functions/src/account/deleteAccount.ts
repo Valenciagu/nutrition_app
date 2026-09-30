@@ -30,35 +30,38 @@ const USER_SUBCOLLECTIONS = ["nutritionPlans", "recipes", "aiUsage", "shoppingLi
  * Auth (al final: si algo antes falla, el usuario todavía puede reintentar
  * con la misma sesión).
  */
-export const deleteAccount = onCall<void, Promise<{ deleted: true }>>({ region: "us-central1" }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Debes iniciar sesión para eliminar tu cuenta.");
-  }
-  const uid = request.auth.uid;
-
-  try {
-    const db = getFirestore();
-    const userRef = db.collection("users").doc(uid);
-
-    for (const subcollection of USER_SUBCOLLECTIONS) {
-      await deleteCollection(userRef.collection(subcollection));
+export const deleteAccount = onCall<void, Promise<{ deleted: true }>>(
+  { region: "us-central1", invoker: "public" },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión para eliminar tu cuenta.");
     }
-    await userRef.delete();
+    const uid = request.auth.uid;
 
     try {
-      await getStorage().bucket().deleteFiles({ prefix: `users/${uid}/` });
+      const db = getFirestore();
+      const userRef = db.collection("users").doc(uid);
+
+      for (const subcollection of USER_SUBCOLLECTIONS) {
+        await deleteCollection(userRef.collection(subcollection));
+      }
+      await userRef.delete();
+
+      try {
+        await getStorage().bucket().deleteFiles({ prefix: `users/${uid}/` });
+      } catch (error) {
+        logger.warn("deleteAccount: Storage cleanup failed, continuing", { uid, message: (error as Error).message });
+      }
+
+      await getAuth().deleteUser(uid);
+
+      return { deleted: true };
     } catch (error) {
-      logger.warn("deleteAccount: Storage cleanup failed, continuing", { uid, message: (error as Error).message });
+      logger.error("deleteAccount: failed", { uid, message: (error as Error).message });
+      throw new HttpsError("internal", "No se pudo eliminar la cuenta en este momento. Intenta de nuevo.");
     }
-
-    await getAuth().deleteUser(uid);
-
-    return { deleted: true };
-  } catch (error) {
-    logger.error("deleteAccount: failed", { uid, message: (error as Error).message });
-    throw new HttpsError("internal", "No se pudo eliminar la cuenta en este momento. Intenta de nuevo.");
-  }
-});
+  },
+);
 
 /** Patrón estándar de borrado recursivo por lotes (Firestore Admin SDK no tiene un `deleteCollection` nativo). */
 async function deleteCollection(collectionRef: CollectionReference, batchSize = 200): Promise<void> {

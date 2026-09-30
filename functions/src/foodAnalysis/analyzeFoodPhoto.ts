@@ -62,7 +62,7 @@ interface AnalyzeFoodPhotoResponse {
  * documentado, ver `documentation/food_analysis.md`).
  */
 export const analyzeFoodPhoto = onCall<AnalyzeFoodPhotoRequest, Promise<AnalyzeFoodPhotoResponse>>(
-  { secrets: [openAiApiKey], region: "us-central1" },
+  { secrets: [openAiApiKey], region: "us-central1", invoker: "public" },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Debes iniciar sesión para analizar una foto.");
@@ -164,7 +164,10 @@ export const analyzeFoodPhoto = onCall<AnalyzeFoodPhotoRequest, Promise<AnalyzeF
     } catch (error) {
       if (error instanceof HttpsError) throw error;
       await refundAiQuota(request.auth.uid, QUOTA_FEATURE);
-      logger.error("analyzeFoodPhoto: OpenAI call failed", { message: (error as Error).message });
+      const err = error as { message?: string; status?: number; code?: string; type?: string; name?: string };
+      logger.error(
+        `analyzeFoodPhoto: OpenAI call failed :: name=${err.name} status=${err.status} code=${err.code} type=${err.type} message=${err.message}`,
+      );
       throw new HttpsError("internal", "No se pudo analizar la foto en este momento. Intenta de nuevo.");
     }
   },
