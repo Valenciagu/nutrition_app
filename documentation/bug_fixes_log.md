@@ -35,7 +35,7 @@ Los 3 bugs siguientes se encontraron el 2026-09-20 probando el flujo B1-B7 manua
   - `lib/core/theme/app_color_tokens.dart` (token nuevo + doc-comment explicando la separación).
   - Los 7 sitios que hacían el mal uso, migrados al token nuevo: `lib/core/widgets/selectable_chip.dart`, `lib/features/onboarding/presentation/widgets/onboarding_option_card.dart` (B1/B3), `lib/features/onboarding/presentation/pages/steps/personal_data_step.dart` (selector de sexo, B2), `lib/features/onboarding/presentation/pages/steps/meal_rhythm_step.dart` (B6), `lib/features/onboarding/presentation/pages/steps/liked_foods_step.dart` (B4), `lib/features/home/presentation/pages/home_page.dart` (avatar con inicial), `lib/features/authentication/presentation/pages/sign_up_page.dart` (banner "tu plan ya está calculado") — estos dos últimos no fueron reportados por el usuario pero tenían exactamente la misma causa raíz, así que se corrigieron a la vez.
   - `documentation/design_system.md` (tabla de tokens actualizada).
-- **Estado**: corregido, `flutter analyze` limpio. Pendiente de commit.
+- **Estado**: corregido y **commiteado** (`676af41 "epica 10"`).
 
 ### BUG-O02 — Texto invisible en la tarjeta de actividad seleccionada (B3)
 
@@ -48,7 +48,7 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 - **Fix**: `OnboardingAnswers` ahora inicializa `age`, `heightCm`, `weightKg` con esos mismos valores por defecto directamente en el constructor (`age = 29`, `heightCm = 170`, `weightKg = 70`) en vez de dejarlos en `null`. Lo mostrado y lo guardado coinciden desde el primer render — el botón ahora solo espera que se elija el sexo (el único de los 4 campos que correctamente no tiene un valor por defecto, porque no hay uno razonable que adivinar).
 - **Nota de compatibilidad**: un borrador de Onboarding guardado localmente por una versión de la app anterior a este fix podría tener `age: null` explícito en su JSON persistido (`shared_preferences`). Es un caso de datos legacy pre-lanzamiento (sin usuarios reales todavía) que se degrada con gracia: el fallback visual `?? 29` lo sigue mostrando bien, solo pediría tocar ese campo una vez más de lo necesario.
 - **Archivo**: `lib/features/onboarding/domain/entities/onboarding_answers.dart`.
-- **Estado**: corregido, `flutter analyze` limpio. Pendiente de commit.
+- **Estado**: corregido y **commiteado** (`676af41 "epica 10"`).
 
 ### BUG-O04 — Overflow (rayas amarillas/negras) en B3, contenido cortado
 
@@ -56,7 +56,7 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 - **Causa raíz**: `activity_level_step.dart` envolvía título + subtítulo + 5 tarjetas de opción + la caja de estimación de calorías (aparece dinámicamente al seleccionar una opción) en un `Padding` + `Column` sin ningún widget de scroll — a diferencia de otros pasos compuestos (`meal_rhythm_step.dart`, `liked_foods_step.dart`, `cooking_budget_step.dart`) que sí usan `SingleChildScrollView`. El contenido total supera el alto disponible en una pantalla real.
 - **Fix**: se envolvió el contenido en `SingleChildScrollView`, mismo patrón que los pasos hermanos.
 - **Archivo**: `lib/features/onboarding/presentation/pages/steps/activity_level_step.dart`.
-- **Estado**: corregido, `flutter analyze` limpio. Pendiente de commit.
+- **Estado**: corregido y **commiteado** (`ccb7306 "fix(ui): fix 4 bugs found in real-device testing"`).
 
 ### BUG-O05 — Crash (`RangeError`) al tocar el horario de una comida en B6 sin haber elegido "comidas por día"
 
@@ -64,7 +64,7 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 - **Causa raíz real**: `meal_rhythm_step.dart` muestra 4 filas de horario por defecto (`defaultMealSlotsFor(4)`) como valor SOLO de pantalla mientras `answers.mealSlots` sigue vacío — nada obligaba al usuario a tocar antes uno de los chips 3/4/5/6, así que era posible abrir directamente el selector de hora de una de esas 4 filas "fantasma". `setMealSlotTime` indexaba sobre `state.mealSlots`, que seguía en `[]` porque ese valor por defecto nunca se había guardado — mismo tipo de bug que BUG-O03 (lo mostrado y lo guardado divergen), pero no se había extendido a B6 en su momento. A diferencia de BUG-O03, aquí no se pudo resolver con un valor por defecto en el constructor de `OnboardingAnswers`, porque `defaultMealSlotsFor` es una lista computada, no una constante de compilación.
 - **Fix**: `setMealSlotTime` ahora es defensivo — si `state.mealSlots` está vacío al momento de aplicar el cambio, se siembra primero con el mismo `defaultMealSlotsFor(4)` que la pantalla ya usaba para mostrar esas 4 filas, y recién ahí aplica el horario elegido. Corrige tanto sesiones nuevas como un borrador ya guardado en el dispositivo del usuario con `mealSlots: []`.
 - **Archivo**: `lib/features/onboarding/presentation/providers/onboarding_providers.dart`.
-- **Estado**: corregido, `flutter analyze` limpio. Pendiente de commit.
+- **Estado**: corregido y **commiteado** (`ccb7306 "fix(ui): fix 4 bugs found in real-device testing"`).
 
 ### BUG-O06 — Overflow en la hoja "Analizar mi comida" en un dispositivo con más barra de sistema
 
@@ -72,7 +72,7 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 - **Causa raíz**: `showAppBottomSheet` (altura `.auto`, no scrollable) ya reservaba `mediaQuery.padding.bottom` como padding extra para no invadir la zona de gestos/barra de sistema — pero ese padding varía por dispositivo (una barra de navegación de 3 botones reserva más espacio que la de gestos). Contenido que cabía justo en otros dispositivos podía superar por unos pocos píxeles el alto máximo que el modal permite en este, porque el padding reservado creció pero el contenido (título + 3 opciones + botón "Cancelar") no se achicó ni se volvió scrollable.
 - **Fix**: se cambió el `Padding` de `showAppBottomSheet` por un `SingleChildScrollView` con el mismo `padding` — corrige la causa de raíz para TODAS las hojas del sistema (no solo la de cámara), de una sola vez, en el componente compartido en vez de parchar cada hoja por separado.
 - **Archivo**: `lib/core/widgets/app_bottom_sheet.dart`.
-- **Estado**: corregido, `flutter analyze` limpio. Pendiente de commit.
+- **Estado**: corregido y **commiteado** (`ccb7306 "fix(ui): fix 4 bugs found in real-device testing"`).
 
 ### BUG-O07 — Los botones de navegación del sistema (atrás/inicio) se superponen a la barra de tabs de la app
 
@@ -80,7 +80,31 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 - **Causa raíz**: `BottomNavigation` (la barra de tabs de 4 ítems + botón de cámara) es un `Container` con altura fija (`84`) sin ningún `SafeArea` — a diferencia de un `BottomNavigationBar`/`NavigationBar` de Material (que sí reservan el inset del sistema automáticamente), un `Container` a medida no lo hace solo. `Scaffold.bottomNavigationBar` tampoco lo agrega por sí mismo para un widget custom.
 - **Fix**: se envolvió en `SafeArea(top: false, child: ...)` — reserva el alto exacto que el sistema necesita en cada dispositivo (0 en gestos, ~48dp en navegación de 3 botones) sin tocar el resto del diseño.
 - **Archivo**: `lib/core/widgets/bottom_navigation.dart`.
-- **Estado**: corregido, `flutter analyze` limpio. Pendiente de commit.
+- **Estado**: corregido y **commiteado** (`ccb7306 "fix(ui): fix 4 bugs found in real-device testing"`).
+
+---
+
+## Épica 15 / Deployment — Backend
+
+### BUG-D01 — Todas las Cloud Functions devolvían 403 al cliente real pese a un deploy "exitoso"
+
+- **Reportado**: después de desplegar por primera vez a producción (2026-09-29), "Analizar mi comida" fallaba con "Algo salió mal" en el dispositivo real. `firebase functions:log` mostró `The request was not authorized to invoke this service. The access token could not be verified.` — un rechazo de plataforma (Cloud Run), no un error de la función.
+- **Causa raíz real**: leyendo el propio código fuente de `firebase-tools` (`lib/deploy/functions/release/fabricator.js`), se confirmó que la herramienta solo otorga el permiso público de invocación (`roles/run.invoker` a `allUsers`) cuando una función callable (`onCall`) se **crea** por primera vez — `updateV2Function` no tiene ninguna rama para triggers callable (sí para HTTP, tareas programadas, etc.), así que un redeploy de una función que ya existe NUNCA vuelve a tocar ese permiso, sin importar cuántas veces se redespliegue. Como contribuyente adicional (no la causa raíz, pero sí bloqueó el diagnóstico): `compute.googleapis.com` nunca había sido habilitada en el proyecto, lo que hacía fallar silenciosamente un paso no relacionado del deploy (búsqueda de la cuenta de servicio por defecto) con `SERVICE_DISABLED`.
+- **Fix real**: se agregó `invoker: "public"` explícito a las 9 funciones `onCall(...)` (defensivo, documentado en `firebase-functions`, pero confirmado por curl que esto solo no alcanza para una función que ya existe) y se borró + redesplegó cada una de las 9 funciones para forzar a `firebase-tools` a pasar por su rama de creación (`isCallableTriggered`), que sí otorga el permiso público. Verificado con curl: las 9 pasaron de un bloqueo 403 de plataforma (página HTML de Google Frontend) a un `401 unauthenticated` correcto (rechazo real de la función, por falta de token de Firebase Auth en la prueba).
+- **Archivos**: los 9 archivos bajo `functions/src/**/*.ts` con `onCall(...)`.
+- **Estado**: corregido y **commiteado** (`d0ac80e "fix(functions): grant public invoker to all callable functions"`). Confirmado funcionando en producción por el usuario 2026-09-30.
+
+---
+
+## Épica 14 — Analytics
+
+### BUG-A01 — Crash al analizar una foto de comida (`_AssertionError` en `firebase_analytics`)
+
+- **Reportado**: después de resolver BUG-D01 (arriba) y recargar crédito de OpenAI, analizar una foto sí funcionaba pero la app crasheaba justo después, con `_AssertionError`: `'value is String || value is num': 'string' OR 'number' must be set as the value of the parameter: is_food_photo. true found instead`.
+- **Causa raíz**: `FirebaseAnalyticsService.logFoodPhotoAnalyzed` pasaba el parámetro `isFoodPhoto` (un `bool` de Dart) directo como valor de un parámetro de evento — el plugin `firebase_analytics` solo acepta `String` o `num` como tipo de valor, nunca `bool`, y lo valida con un `assert` que revienta en tiempo de ejecución.
+- **Fix**: se codificó como `1`/`0` (`isFoodPhoto ? 1 : 0`), la misma convención GA4 ya usada implícitamente en otros parámetros booleanos del proyecto.
+- **Archivo**: `lib/core/services/analytics/firebase_analytics_service.dart`.
+- **Estado**: corregido y **commiteado** (`335ac7a "fix(analytics): stop crashing on food_photo_analyzed event"`).
 
 ---
 
@@ -89,12 +113,14 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 | ID | Épica | Bug | Causa raíz | Estado |
 |---|---|---|---|---|
 | BUG-H01 | Home | Crash al tocar botón de cámara | `Container.margin` negativo (no permitido por Flutter) | Corregido y commiteado |
-| BUG-O01 | Onboarding | Texto invisible al seleccionar (B2, y otros) | `actionPrimaryPressed` == `actionPrimarySurface` en modo oscuro | Corregido, pendiente de commit |
-| BUG-O02 | Onboarding | Texto invisible en tarjeta de actividad (B3) | Mismo que BUG-O01 | Corregido, pendiente de commit |
-| BUG-O03 | Onboarding | Botón "Continuar" apagado con campos ya llenos (B2) | Estado real en `null` pese al fallback visual | Corregido, pendiente de commit |
-| BUG-O04 | Onboarding | Overflow visual en B3 (nivel de actividad) | Sin `SingleChildScrollView`, a diferencia de pasos hermanos | Corregido, pendiente de commit |
-| BUG-O05 | Onboarding | Crash `RangeError` al elegir hora en B6 sin elegir conteo antes | Estado real (`mealSlots: []`) diverge del fallback visual de 4 filas | Corregido, pendiente de commit |
-| BUG-O06 | Home (hoja de cámara) | Overflow en "Analizar mi comida" | `showAppBottomSheet` sin scroll, padding de safe-area varía por dispositivo | Corregido, pendiente de commit |
-| BUG-O07 | Shell principal | Botones del sistema se superponen a la barra de tabs | `BottomNavigation` sin `SafeArea` | Corregido, pendiente de commit |
+| BUG-O01 | Onboarding | Texto invisible al seleccionar (B2, y otros) | `actionPrimaryPressed` == `actionPrimarySurface` en modo oscuro | Corregido y commiteado |
+| BUG-O02 | Onboarding | Texto invisible en tarjeta de actividad (B3) | Mismo que BUG-O01 | Corregido y commiteado |
+| BUG-O03 | Onboarding | Botón "Continuar" apagado con campos ya llenos (B2) | Estado real en `null` pese al fallback visual | Corregido y commiteado |
+| BUG-O04 | Onboarding | Overflow visual en B3 (nivel de actividad) | Sin `SingleChildScrollView`, a diferencia de pasos hermanos | Corregido y commiteado |
+| BUG-O05 | Onboarding | Crash `RangeError` al elegir hora en B6 sin elegir conteo antes | Estado real (`mealSlots: []`) diverge del fallback visual de 4 filas | Corregido y commiteado |
+| BUG-O06 | Home (hoja de cámara) | Overflow en "Analizar mi comida" | `showAppBottomSheet` sin scroll, padding de safe-area varía por dispositivo | Corregido y commiteado |
+| BUG-O07 | Shell principal | Botones del sistema se superponen a la barra de tabs | `BottomNavigation` sin `SafeArea` | Corregido y commiteado |
+| BUG-D01 | Backend/Deployment | Todas las funciones devolvían 403 pese a deploy exitoso | `firebase-tools` nunca re-aplica el invoker público en un `update`, solo en `create` | Corregido y commiteado, confirmado en producción |
+| BUG-A01 | Analytics | Crash tras analizar foto (`_AssertionError`) | `bool` pasado como valor de parámetro de evento (solo acepta `String`/`num`) | Corregido y commiteado |
 
-**Bugs BUG-H01/O01-O03 confirmados resueltos por el usuario 2026-09-20.** BUG-O04-O07 encontrados 2026-09-29 en la primera prueba manual en un dispositivo Android real (hasta entonces solo se había validado `flutter analyze`/`flutter build web --debug`, que no ejercitan overflow real de pantalla, safe-area de dispositivo, ni el flujo táctil completo) — corregidos, pendientes de que el usuario confirme en el dispositivo.
+**Bugs BUG-H01/O01-O07 confirmados resueltos por el usuario y todos commiteados.** BUG-D01/A01 encontrados y corregidos 2026-09-30 durante el primer ciclo de pruebas end-to-end en producción — ambos confirmados funcionando por el usuario.
