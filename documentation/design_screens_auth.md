@@ -44,4 +44,5 @@ El formulario de *pedir* el correo (antes de este estado) no está pixel-especif
 
 - **SignUp accesible antes del onboarding**: ver arriba. Cuando exista la Épica 3, `hasPendingPlan` debe pasar a depender de si hay un plan generado sin guardar.
 - **Formulario de solicitud de reset**: no estaba en el canvas (solo el estado "enviado"), se construyó por consistencia visual.
-- **Botones Google/Apple**: el canvas los muestra en Login. No se implementaron (ver `documentation/authentication.md` "Known gaps") — decisión señalada al usuario, no tomada en silencio.
+- **Botón Google**: el canvas lo muestra en Login — construido 2026-09-30 (ver `documentation/authentication.md`), sin logo de marca (no hay asset de Google en el sistema de diseño sincronizado, se prefirió texto plano a inventar uno).
+- **Botón Apple**: el canvas también lo muestra en Login. No se implementó — necesita una cuenta de pago de Apple Developer, parqueado junto con la Épica 13 (ver `documentation/authentication.md`), decisión señalada al usuario, no tomada en silencio.
