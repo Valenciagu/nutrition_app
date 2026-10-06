@@ -94,8 +94,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       // el estado de sesión, siempre se sale de ahí hacia Home o Welcome.
       // (Antes esto faltaba y, al no estar logueado, `/splash` calificaba
       // como "ruta pública" y el router se quedaba ahí para siempre.)
+      // AUTH-106: si no hay sesión pero sí un borrador local de Onboarding
+      // (invitado que ya había "Empezado" o terminado y eligió "Seguir sin
+      // cuenta"), `guestResumeRouteProvider` manda directo a `/onboarding`
+      // o a Home en vez de Welcome — reabrir la app ya no resetea el modo
+      // invitado.
       if (location == RoutePaths.splash) {
-        return isLoggedIn ? RoutePaths.root : RoutePaths.welcome;
+        if (isLoggedIn) return RoutePaths.root;
+        return ref.read(guestResumeRouteProvider) ?? RoutePaths.welcome;
       }
 
       final isPublicRoute = RoutePaths.publicRoutes.contains(location);

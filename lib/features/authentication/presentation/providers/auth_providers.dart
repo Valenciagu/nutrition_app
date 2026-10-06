@@ -22,12 +22,26 @@ final authStateChangesProvider = StreamProvider<AuthUser?>((ref) {
 });
 
 /// Modo invitado: true mientras el usuario navega "sin cuenta" (Welcome ·
-/// "Empezar" o SignUp · "Seguir sin cuenta"). Sin persistencia real todavía
-/// (Épicas 3/6) — solo existe para que el router distinga "invitado
+/// "Empezar" o SignUp · "Seguir sin cuenta") — distingue "invitado
 /// navegando" de "usuario sin sesión" (p. ej. justo después de cerrar
 /// sesión), casos que de otra forma se ven idénticos porque ambos tienen
-/// `authStateChangesProvider` en null.
+/// `authStateChangesProvider` en null. Su valor inicial real (en frío, al
+/// abrir la app) no es `false` a secas: `main.dart` lo sobreescribe antes de
+/// `runApp` según si ya existe un borrador local de Onboarding (AUTH-106) —
+/// ver [guestResumeRouteProvider].
 final guestModeProvider = StateProvider<bool>((ref) => false);
+
+/// Ruta a la que un invitado debe volver al reabrir la app en frío (sin
+/// sesión), calculada UNA sola vez en `main()` a partir del borrador local
+/// de Onboarding (`OnboardingLocalDataSource`) antes de construir el árbol
+/// de widgets — nunca en caliente, para no competir con la carga asíncrona
+/// de ese mismo borrador dentro de `onboardingControllerProvider`. `null`
+/// significa "no hay borrador local" (dispositivo nuevo o ya migrado a una
+/// cuenta real vía `migrateDraftToProfile`, que borra el borrador). Lo
+/// consume solo el `redirect` de `splash` en `app_router.dart` — resuelve
+/// AUTH-106 (antes, un invitado que cerraba la app perdía su sesión de
+/// invitado y volvía a Welcome aunque sus respuestas sí sobrevivían).
+final guestResumeRouteProvider = Provider<String?>((ref) => null);
 
 /// Orquesta las acciones de login/registro/reset — el estado
 /// `AsyncValue<void>` le da a cada pantalla loading/error "gratis" vía

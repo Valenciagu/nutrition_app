@@ -105,6 +105,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
         );
   }
 
+  Future<void> _signInWithGoogle() async {
+    await ref.read(authControllerProvider.notifier).signInWithGoogle();
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -233,6 +237,34 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                 fullWidth: true,
                 isLoading: isLoading,
                 onPressed: _submit,
+              ),
+              const SizedBox(height: AppSpacing.space20),
+              Row(
+                children: [
+                  Expanded(child: Divider(color: colors.border)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
+                    child: Text(l10n.authLoginOrDivider, style: AppTypography.bodyM.copyWith(color: colors.textSecondary)),
+                  ),
+                  Expanded(child: Divider(color: colors.border)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space20),
+              // Desviación deliberada del canvas (A4 no muestra este botón,
+              // solo A3/Login lo tiene) — confirmada con el usuario
+              // 2026-10-05: `signInWithGoogle()` ya resuelve login vs.
+              // registro server-side (Firebase decide según si el correo ya
+              // tiene cuenta), así que tenerlo también aquí no agrega
+              // trabajo nuevo y evita que alguien recién salido del
+              // onboarding tenga que retroceder hasta Login para usarlo.
+              // Solo Google, mismo motivo que en Login: Apple sigue
+              // parqueado con la Épica 13 (cuenta de pago pendiente).
+              AppButton(
+                label: l10n.authLoginGoogleButton,
+                variant: AppButtonVariant.neutral,
+                fullWidth: true,
+                isLoading: isLoading,
+                onPressed: _signInWithGoogle,
               ),
               const SizedBox(height: AppSpacing.space12),
               Center(

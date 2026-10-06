@@ -5,11 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/constants/route_paths.dart';
 import 'core/localization/generated/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/services/notifications/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/firebase_setup_required_page.dart';
+import 'features/authentication/presentation/providers/auth_providers.dart';
+import 'features/onboarding/data/datasources/onboarding_local_data_source.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -20,11 +23,24 @@ Future<void> main() async {
   // lo use; no-op en web (ver `NotificationService`).
   await NotificationService().initializePlugin();
 
+  // AUTH-106: se resuelve UNA sola vez, antes de `runApp`, para que el
+  // router no compita con la carga asíncrona del mismo borrador dentro de
+  // `onboardingControllerProvider` (ver `guestResumeRouteProvider`).
+  final guestDraft = await OnboardingLocalDataSource().loadDraft();
+  final guestResumeRoute =
+      guestDraft == null ? null : (guestDraft.isComplete ? RoutePaths.root : RoutePaths.onboarding);
+
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     await _setupCrashlytics();
     await _setupAppCheck();
-    runApp(const ProviderScope(child: NutritionApp()));
+    runApp(ProviderScope(
+      overrides: [
+        guestModeProvider.overrideWith((ref) => guestResumeRoute != null),
+        guestResumeRouteProvider.overrideWithValue(guestResumeRoute),
+      ],
+      child: const NutritionApp(),
+    ));
   } catch (error) {
     // Ya no debería pasar (FOUND-009 resuelto, ver TASKS.md), pero se deja
     // el manejo por si el proyecto de Firebase se desconecta o cambia.
