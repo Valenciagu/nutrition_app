@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../onboarding/presentation/providers/onboarding_providers.dart';
 import '../auth_error_presentation.dart';
 import '../providers/auth_providers.dart';
 import '../widgets/auth_back_button.dart';
@@ -171,7 +173,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         height: 38,
                         decoration: BoxDecoration(color: colors.actionPrimary, shape: BoxShape.circle),
                         alignment: Alignment.center,
-                        child: Icon(Icons.check, size: 18, color: colors.onActionPrimary),
+                        child: Icon(AppIcons.check, size: 18, color: colors.onActionPrimary),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -269,9 +271,16 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               const SizedBox(height: AppSpacing.space12),
               Center(
                 child: GestureDetector(
-                  onTap: () {
-                    ref.read(guestModeProvider.notifier).state = true;
-                    context.go(RoutePaths.root);
+                  onTap: () async {
+                    // Si venía de B9 ya hay una sesión anónima (con el plan
+                    // ya en Firestore bajo ese `uid`) — `ensureAnonymousSession`
+                    // no hace nada en ese caso. Si llegó aquí directo desde
+                    // Login sin pasar por Onboarding, esto le da una sesión
+                    // real igual, para que Plan/IA funcionen como invitado
+                    // también por ese camino.
+                    await ref.read(authControllerProvider.notifier).ensureAnonymousSession();
+                    await ref.read(onboardingRepositoryProvider).clearDraft();
+                    if (context.mounted) context.go(RoutePaths.root);
                   },
                   child: Text(
                     l10n.authSignUpGuestAction,

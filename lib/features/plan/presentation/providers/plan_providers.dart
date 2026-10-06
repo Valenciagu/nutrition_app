@@ -28,10 +28,12 @@ final planRepositoryProvider = Provider<PlanRepository>((ref) {
 final selectedPlanDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 /// El plan del día seleccionado — `null` si el usuario no tiene sesión
-/// (Plan requiere una cuenta real, a diferencia de Home: no hay ningún
-/// camino de invitado porque tanto `generateDailyPlan` como las reglas de
-/// Firestore exigen `request.auth`) o si todavía no generó un plan para
-/// ese día (ambos casos se distinguen en la UI, ver `PlanPage`).
+/// (desde ONBOARD-101, 2026-10-05, un invitado SÍ tiene una vía real: la
+/// sesión anónima que B8 crea antes de generar el primer plan — ver
+/// `features/onboarding/presentation/providers/plan_generation_providers.dart`
+/// — así que esto solo es `null` para alguien que nunca pasó por Onboarding
+/// ni tiene cuenta) o si todavía no generó un plan para ese día (ambos
+/// casos se distinguen en la UI, ver `PlanPage`).
 final planForDateProvider = FutureProvider.autoDispose<NutritionPlan?>((ref) async {
   final uid = ref.watch(authStateChangesProvider).valueOrNull?.uid;
   if (uid == null) return null;

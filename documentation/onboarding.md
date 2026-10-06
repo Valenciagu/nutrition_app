@@ -2,11 +2,28 @@
 
 ## Qué hace
 
-Flujo conversacional de 7 pasos (B1-B7) que recoge objetivo, datos personales, nivel de actividad, alimentos que le gustan al usuario, alergias/intolerancias, ritmo de comidas y preferencias de cocina/presupuesto. Se activa desde Welcome ("Empezar"), vive en una sola ruta (`/onboarding`) con navegación interna entre pasos, y termina llevando a `SignUpPage(hasPendingPlan: true)`.
+Flujo conversacional de 7 pasos (B1-B7) que recoge objetivo, datos personales, nivel de actividad, alimentos que le gustan al usuario, alergias/intolerancias, ritmo de comidas y preferencias de cocina/presupuesto, seguido de B8 (generando el plan real) y B9 (revelación del plan) antes de pedir cuenta. Se activa desde Welcome ("Empezar"), vive en una sola ruta (`/onboarding`) para B1-B7 con navegación interna entre pasos, y dos rutas propias para B8/B9 (`/onboarding/generating`, `/onboarding/plan-ready`) — no son pasos más del stepper, son estados de ancho completo sin el header de progreso/volver, tal como los especifica el canvas.
 
 **Decisión de producto confirmada con el usuario (2026-09-12): el registro ocurre DESPUÉS del onboarding**, como propone el diseño (B9 → A4). Por eso las respuestas se guardan localmente mientras se completan (no hay `userId` todavía) y se migran a Firestore recién cuando el usuario se registra o inicia sesión.
 
-**Estado: B1-B7 construidos y confirmados funcionando de punta a punta** (2026-09-12) — el usuario completó el flujo real (Welcome → Onboarding → registro) y verificó en la consola de Firebase que `users/{uid}` queda con el borrador completo (`isComplete: true`, todas las respuestas). `firestore.rules` desplegadas (`firebase deploy --only firestore:rules`) — esa misma corrida creó la base de datos de Firestore del proyecto (no existía todavía). B8 (generando) y B9 (plan listo) del diseño NO están implementados — dependen de generación real de un plan por IA (Épica 5/6, no construida); ver `documentation/design_screens_onboarding.md`.
+**Estado: B1-B9 completos (ONBOARD-101 cerrado 2026-10-05)**. B1-B7 confirmados funcionando de punta a punta desde 2026-09-12. B8/B9 se construyeron una vez que una sesión con el MCP `claude_design` real pudo leer el canvas (`Fase 2 - Auth y Onboarding.dc.html`) — ver "B8/B9: autenticación anónima" abajo para la decisión de arquitectura que esto requirió.
+
+## B8/B9: autenticación anónima (ONBOARD-101, 2026-10-05)
+
+El propio canvas aclara el orden real del flujo con una frase explícita en B9: **"Recompensa antes que la cuenta"** — el usuario ve su plan de verdad ANTES de que se le pida un email, no después (el diagrama de flujo del encabezado del archivo simplifica el orden de las cajas, pero el texto de B9 y el banner de A4 — "tu plan ya está calculado" — solo tienen sentido si el plan ya existe cuando se llega al registro).
+
+Eso significa generar el plan (`generateDailyPlan`, Cloud Function de la Épica 6) **antes** de que exista una cuenta — y esa función, como todas las que llaman a OpenAI, exige `request.auth` real (Instrucciones.md: nunca confiar en un cliente sin autenticar). La solución, confirmada con el usuario antes de tocar código: **autenticación anónima de Firebase**.
+
+- `AuthController.ensureAnonymousSession()` (nuevo) llama `signInAnonymously()` si no hay ninguna sesión — se invoca al entrar a B8. Da un `uid` real: las reglas de Firestore y `generateDailyPlan` funcionan exactamente igual que con una cuenta real, porque `request.auth.uid` no distingue el tipo de proveedor.
+- `PlanGenerationController` (`features/onboarding/presentation/providers/plan_generation_providers.dart`) orquesta B8: asegura la sesión anónima, sube el borrador YA completo a Firestore con `OnboardingRepository.updateProfile(uid, answers)` (**no** `migrateDraftToProfile` — ese borra el borrador local, y A4 todavía lo necesita vivo para `hasPendingPlan`), y genera el plan reusando `PlanRepository.generatePlan` (el mismo método que ya usa el botón "Generar" del tab Plan — ningún Cloud Function nuevo).
+- Si el usuario completa el registro (A4) o usa Google desde ahí, `FirebaseAuthDataSource.signUpWithEmailAndPassword`/`signInWithGoogle` **ascienden** la misma sesión anónima con `linkWithCredential` en vez de crear una cuenta nueva — se conserva el `uid`, y con él, el perfil y el plan ya escritos en Firestore. Si el email/cuenta de Google ya pertenece a otra cuenta real, se cae a un login normal sobre esa cuenta existente (recomendación oficial de Firebase para ese conflicto) — el único caso donde el plan generado en la sesión anónima se abandona.
+- Si el usuario elige "Seguir sin cuenta" (en A4, o directo desde Login sin haber onboardeado), la sesión anónima se mantiene — no hace falta "convertir" nada.
+- `app_router.dart`: la regla "logueado en ruta pública → Home" ahora excluye sesiones anónimas (deben poder seguir llegando a `/sign-up` desde B9); el listener que migra el borrador a Firestore al pasar de "sin sesión" a "con sesión" ahora solo dispara para una cuenta REAL (`isAnonymous == false`), no para la transición a anónimo de B8.
+- `AuthUser.isAnonymous` (nuevo campo) es lo único que distingue ambos casos en el resto de la app.
+
+**Requiere un paso manual en Firebase Console** (mismo patrón que habilitar el proveedor "Google", Épica 2): activar el método de inicio de sesión **"Anónimo"** en Authentication → Sign-in method — no existe comando de `firebase-tools` para esto. Sin ese paso, `signInAnonymously()` falla con `operation-not-allowed` y B8 muestra el estado de error con "Reintentar".
+
+**Datos reales mostrados en B9, nada inventado**: solo calorías totales y proteína total (suma de `meals.calories`/`proteinGrams`) — carbohidratos/grasa no existen todavía a esta altura (solo se calculan por receta, Épica 7, generada bajo demanda); mostrar barras para ellos habría sido fabricar un dato que el backend no devolvió. El saludo del mock ("Listo, Juan.") se dejó sin nombre — a esta altura del flujo todavía no se pidió ninguno (se pide en A4, que viene después). El checklist de 4 pasos y el avance del anillo de B8 son una coreografía fija por tiempo (nunca llega a 100% antes de que la llamada real termine), documentada como tal — no hay progreso intermedio real que reportar desde una única llamada atómica a `generateDailyPlan`.
 
 ## Archivos clave
 
@@ -16,8 +33,10 @@ Flujo conversacional de 7 pasos (B1-B7) que recoge objetivo, datos personales, n
 - `lib/features/onboarding/data/` — `OnboardingLocalDataSource` (única clase que importa `shared_preferences`, guarda un blob JSON), `OnboardingRemoteDataSource` (única clase que escribe en Firestore, `users/{userId}` con `merge: true`), `OnboardingRepositoryImpl`.
 - `lib/features/onboarding/presentation/providers/onboarding_providers.dart` — `onboardingControllerProvider` (`Notifier<OnboardingAnswers>`, un `setXxx` por campo + `complete()`), `onboardingStepIndexProvider` (navegación entre pasos, separado de las respuestas).
 - `lib/features/onboarding/presentation/onboarding_catalog.dart` — IDs estables + lookup de labels localizados para el catálogo de alimentos (B4) y alérgenos (B5).
-- `lib/features/onboarding/presentation/pages/onboarding_page.dart` — shell del wizard: `StepHeader` + el paso actual, navegación interna vía `onboardingStepIndexProvider`.
+- `lib/features/onboarding/presentation/pages/onboarding_page.dart` — shell del wizard B1-B7: `StepHeader` + el paso actual, navegación interna vía `onboardingStepIndexProvider`. Al terminar B7, navega a `/onboarding/generating` (B8).
 - `lib/features/onboarding/presentation/pages/steps/` — un archivo por paso (`goal_step.dart`, `personal_data_step.dart`, `activity_level_step.dart`, `liked_foods_step.dart`, `allergies_step.dart`, `meal_rhythm_step.dart`, `cooking_budget_step.dart`).
+- `lib/features/onboarding/presentation/pages/onboarding_generating_page.dart` (B8) / `onboarding_plan_ready_page.dart` (B9) — rutas propias, ver sección de autenticación anónima arriba.
+- `lib/features/onboarding/presentation/providers/plan_generation_providers.dart` — `PlanGenerationController`, orquesta B8.
 - `lib/features/onboarding/presentation/widgets/` — `StepHeader`, `OnboardingOptionCard` (tarjeta de opción única con/sin foto, B1/B3), `WheelValueField` + `showIntWheelPicker`/`showDoubleWheelPicker` (selector de rueda para B2/B6, sin dependencias nuevas — usa `CupertinoPicker` del SDK).
 - `lib/core/widgets/selectable_chip.dart` — componente 03/10 de las fichas base (`SelectableChip`), diferido desde la Épica 1 hasta esta épica; variante `negative` para el caso de exclusión de B5.
 - `lib/core/router/app_router.dart` — ruta `/onboarding`; `ref.listen(authStateChangesProvider, ...)` dispara `migrateDraftToProfile` al pasar de "sin sesión" a "con sesión" (login o signup, sin importar cuál).
@@ -53,7 +72,7 @@ Reusado: `AppButton`, tokens de tema, `context.l10n`. Nuevo en `core/widgets/` (
 
 ## Known gaps (señalados, no decididos en silencio)
 
-- **B8/B9 no implementados** — dependen de la generación real de un plan por IA (Épica 5/6). Completar B7 hoy lleva directo a `SignUpPage(hasPendingPlan: true)`, saltándose el estado de carga y la revelación del plan que muestra el diseño. Se implementará cuando exista el backend de IA.
+- **B8/B9 implementados (2026-10-05)** — ver la sección de autenticación anónima arriba. Pendiente puramente manual: activar el proveedor "Anónimo" en Firebase Console antes de poder probarlo de punta a punta.
 - **Alergia vs. intolerancia no distinguidas por severidad** — el mock del diseño (B5) no muestra un control por ítem para marcar cuál es cuál; se guarda todo en una sola lista `avoidFoods` de exclusión. Revisar si el motor de recetas (Épica 5/6/7) necesita la distinción real.
 - **Horarios por defecto para 3/5/6 comidas/día son una interpolación propia** — el diseño solo especifica el caso de 4 comidas. Ver `defaultMealSlotsFor` en `onboarding_answers.dart`.
 - **Presupuesto semanal es un nivel discreto (4 posiciones), no un monto libre** — el diseño muestra un slider con una sola etiqueta+rango por posición, no un campo de moneda; no hay requisito de localización de precio en `Instrucciones.md`.

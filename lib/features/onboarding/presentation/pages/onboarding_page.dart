@@ -22,11 +22,10 @@ import 'steps/personal_data_step.dart';
 /// rutas separadas, porque es un único flujo lineal sin deep-linking a un
 /// paso específico.
 ///
-/// B8 (generando) y B9 (plan listo) del diseño no se implementan aún: dependen
-/// de la generación real de un plan por IA (Épica 5/6, no construida). Al
-/// terminar B7 se marca el borrador completo y se navega directo a
-/// Registro/Invitado, igual que ya anticipaba `SignUpPage.hasPendingPlan`
-/// desde la Épica 2 — ver `documentation/onboarding.md`.
+/// Al terminar B7 se marca el borrador completo y se navega a B8
+/// (`/onboarding/generating`, ruta propia — ver `route_paths.dart`), que
+/// genera el plan real antes de pedir cuenta (ONBOARD-101, construido
+/// 2026-10-05 con autenticación anónima — ver `documentation/onboarding.md`).
 class OnboardingPage extends ConsumerWidget {
   const OnboardingPage({super.key});
 
@@ -41,7 +40,7 @@ class OnboardingPage extends ConsumerWidget {
       } else {
         ref.read(onboardingControllerProvider.notifier).complete();
         ref.read(guestModeProvider.notifier).state = true;
-        context.go(RoutePaths.signUp);
+        context.go(RoutePaths.onboardingGenerating);
       }
     }
 

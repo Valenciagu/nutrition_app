@@ -85,6 +85,18 @@ String goalLabel(AppLocalizations l10n, NutritionGoal goal) {
   };
 }
 
+/// Subtítulo de un objetivo (B1 ya lo muestra junto al título en sus
+/// tarjetas) — segundo consumidor real en B9 (`OnboardingPlanReadyPage`,
+/// "Basado en tu objetivo de..."), igual que [goalLabel].
+String goalSubtitle(AppLocalizations l10n, NutritionGoal goal) {
+  return switch (goal) {
+    NutritionGoal.loseFat => l10n.onboardingGoalLoseFatSubtitle,
+    NutritionGoal.gainMuscle => l10n.onboardingGoalGainMuscleSubtitle,
+    NutritionGoal.maintainWeight => l10n.onboardingGoalMaintainSubtitle,
+    NutritionGoal.eatHealthier => l10n.onboardingGoalEatHealthierSubtitle,
+  };
+}
+
 String activityLevelLabel(AppLocalizations l10n, ActivityLevel level) {
   return switch (level) {
     ActivityLevel.sedentary => l10n.onboardingActivitySedentaryTitle,

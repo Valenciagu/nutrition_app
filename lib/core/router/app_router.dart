@@ -13,8 +13,11 @@ import '../../features/authentication/presentation/pages/welcome_page.dart';
 import '../../features/authentication/presentation/providers/auth_providers.dart';
 import '../../features/ai_assistant/presentation/pages/ai_chat_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_generating_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_plan_ready_page.dart';
 import '../../features/onboarding/presentation/providers/onboarding_providers.dart';
+import '../../features/plan/domain/entities/nutrition_plan.dart';
 import '../../features/food_analysis/presentation/pages/food_analysis_page.dart';
 import '../../features/grocery_list/presentation/pages/grocery_list_page.dart';
 import '../../features/notifications/presentation/pages/notification_settings_page.dart';
@@ -63,8 +66,18 @@ final routerProvider = Provider<GoRouter>((ref) {
     // de Onboarding completo pendiente, se sube a Firestore aquí — una sola
     // vez, sin importar si el usuario venía de "Crear cuenta" o de un
     // login normal con un borrador local viejo de una sesión anterior.
-    final userId = next.valueOrNull?.uid;
-    if (previous?.valueOrNull == null && userId != null) {
+    // La sesión anónima de B8 (ver `AuthController.ensureAnonymousSession`)
+    // también dispara este listener (null -> uid) pero no debe disparar
+    // esta migración: su perfil ya se escribe aparte, de forma no
+    // destructiva, desde el propio controlador de generación de plan (B8) —
+    // `migrateDraftToProfile` BORRA el borrador local, y B8 todavía lo
+    // necesita vivo para que SignUp (A4) siga mostrando "tu plan ya está
+    // calculado". Solo una transición a una cuenta REAL (registro/login,
+    // `isAnonymous == false`) debe migrar y limpiar.
+    final wasRealUser = previous?.valueOrNull != null && previous!.valueOrNull!.isAnonymous == false;
+    final user = next.valueOrNull;
+    final userId = user?.uid;
+    if (!wasRealUser && userId != null && user?.isAnonymous == false) {
       ref.read(onboardingRepositoryProvider).migrateDraftToProfile(userId).then((migrated) {
         if (migrated) ref.read(analyticsServiceProvider).logOnboardingCompleted();
       });
@@ -89,6 +102,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       final isLoggedIn = authState.valueOrNull != null;
+      // La sesión anónima de B8 (ver `AuthController.ensureAnonymousSession`)
+      // cuenta como "con sesión" para no rebotarla de root/plan/ai/profile,
+      // pero NO como una cuenta real: debe poder seguir llegando a SignUp
+      // (A4, desde B9 · "Empezar mi día") sin que la regla de abajo
+      // ("logueado en ruta pública -> Home") se lo impida.
+      final isAnonymous = authState.valueOrNull?.isAnonymous ?? false;
 
       // Splash es una parada transitoria, no un destino — una vez resuelto
       // el estado de sesión, siempre se sale de ahí hacia Home o Welcome.
@@ -116,13 +135,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       // devolvía a Welcome: bug real encontrado probando).
       final isGuestAccessible = RoutePaths.guestAccessibleRoutes.contains(location) && ref.read(guestModeProvider);
       if (!isLoggedIn && !isPublicRoute && !isGuestAccessible) return RoutePaths.welcome;
-      if (isLoggedIn && isPublicRoute) return RoutePaths.root;
+      if (isLoggedIn && !isAnonymous && isPublicRoute) return RoutePaths.root;
       return null;
     },
     routes: [
       GoRoute(name: 'splash', path: RoutePaths.splash, builder: (context, state) => const SplashPage()),
       GoRoute(name: 'welcome', path: RoutePaths.welcome, builder: (context, state) => const WelcomePage()),
       GoRoute(name: 'onboarding', path: RoutePaths.onboarding, builder: (context, state) => const OnboardingPage()),
+      GoRoute(
+        name: 'onboarding_generating',
+        path: RoutePaths.onboardingGenerating,
+        builder: (context, state) => const OnboardingGeneratingPage(),
+      ),
+      GoRoute(
+        name: 'onboarding_plan_ready',
+        path: RoutePaths.onboardingPlanReady,
+        builder: (context, state) => OnboardingPlanReadyPage(plan: state.extra! as NutritionPlan),
+      ),
       GoRoute(
         name: 'food_analysis',
         path: RoutePaths.foodAnalysis,

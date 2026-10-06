@@ -197,6 +197,24 @@
   "onboardingBudgetRangeFlexible": "$160+/week",
   "onboardingSubmitButton": "Create my plan",
 
+  "onboardingGeneratingTitle": "We're building your plan",
+  "onboardingGeneratingSubtitle": "This takes a few seconds. You can close the app, we'll keep working.",
+  "onboardingGeneratingStep1": "Calculating your calories and macros",
+  "onboardingGeneratingStep2": "Filtering out what you don't eat",
+  "onboardingGeneratingStep3": "Choosing this week's recipes",
+  "onboardingGeneratingStep4": "Organizing your shopping list",
+  "onboardingGeneratingErrorMessage": "We couldn't generate your plan. Nothing you answered was lost.",
+  "onboardingGeneratingRetryButton": "Retry",
+
+  "onboardingPlanReadyTitle": "Ready. Here's your day",
+  "onboardingPlanReadySubtitle": "Based on your goal of {goal}.",
+  "@onboardingPlanReadySubtitle": {
+    "placeholders": {"goal": {"type": "String"}}
+  },
+  "onboardingPlanReadyCaloriesUnit": "kcal / day",
+  "onboardingPlanReadyProteinLabel": "Protein",
+  "onboardingPlanReadyStartButton": "Start my day",
+
   "onboardingWheelPickerDoneAction": "Done",
 
   "bottomNavHomeLabel": "Home",

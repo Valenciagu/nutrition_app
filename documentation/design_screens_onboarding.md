@@ -27,11 +27,11 @@ Mismo esqueleto en las 8 pantallas numeradas del diseño: `StepHeader` (volver +
 ## B7 · Cocina y presupuesto (último paso)
 "¿Cuánto quieres cocinar?" — tres preguntas ligeras en una pantalla: tiempo por comida (15 min o menos/30 min/Sin prisa), nivel en la cocina (Básico/Me defiendo/Avanzado), presupuesto semanal (slider de 4 posiciones con rango orientativo, p. ej. "Ajustado" → "60–80 €"). CTA cambia a "Crear mi plan".
 
-## B8 · Generando tu plan (estado IA) — NO IMPLEMENTADO
-Anillo de progreso + checklist de pasos completándose (calculando calorías, filtrando alimentos, eligiendo recetas, organizando lista de compra) + skeleton shimmer. Depende de la generación real de un plan por IA (Épica 5/6, no construida) — implementarlo con contenido inventado sería engañoso, así que se difiere.
+## B8 · Generando tu plan (estado IA) — implementado 2026-10-05 (ONBOARD-101)
+Anillo de progreso + checklist de pasos completándose (calculando calorías, filtrando alimentos, eligiendo recetas, organizando lista de compra) + skeleton shimmer. El checklist/anillo son una coreografía fija por tiempo, no progreso real reportado por el backend (una sola llamada atómica) — documentado explícitamente en `onboarding_generating_page.dart` y `documentation/onboarding.md`. Requirió introducir autenticación anónima de Firebase para poder llamar `generateDailyPlan` antes de que exista una cuenta — ver `documentation/onboarding.md`.
 
-## B9 · Tu plan está listo — NO IMPLEMENTADO
-Resumen con anillo de kcal, barras de macros (proteína/carbos/grasas), preview de comidas del día, CTA "Empezar mi día". Aquí es donde se entra a A4 (registro) o se sigue como invitado. Mismo motivo de diferimiento que B8.
+## B9 · Tu plan está listo — implementado 2026-10-05 (ONBOARD-101)
+Resumen con anillo de kcal, preview de comidas del día, CTA "Empezar mi día" (navega a A4, no a Home directo — "recompensa antes que la cuenta"). **Desviación deliberada**: solo se muestran kcal y proteína, no barras de carbos/grasa — esos macros no existen a esta altura del flujo (solo por receta, Épica 7, bajo demanda); ni el saludo con nombre del mock ("Listo, Juan.") — ningún nombre existe todavía, se pide después en A4.
 
 ## Notas de sistema (del propio diseño)
 

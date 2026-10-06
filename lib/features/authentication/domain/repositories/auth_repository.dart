@@ -13,6 +13,10 @@ abstract class AuthRepository {
   /// GoRouter (que no puede esperar un `Future`).
   AuthUser? get currentUser;
 
+  /// No hace nada si ya hay una sesión (anónima o real) activa — segura de
+  /// llamar varias veces (ver `AuthController.ensureAnonymousSession`).
+  Future<void> signInAnonymously();
+
   Future<void> signInWithEmailAndPassword({required String email, required String password});
 
   Future<void> signUpWithEmailAndPassword({

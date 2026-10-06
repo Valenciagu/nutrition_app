@@ -10,6 +10,13 @@ abstract final class RoutePaths {
   static const String forgotPassword = '/forgot-password';
   static const String onboarding = '/onboarding';
 
+  /// B8/B9 (Fase 2 · Bloque B) — fuera del stepper de `onboarding` (7
+  /// pasos, B1-B7): son pantallas de ancho completo propias, sin el
+  /// header de progreso/volver, por eso son rutas separadas en vez de dos
+  /// índices más en `steps`.
+  static const String onboardingGenerating = '/onboarding/generating';
+  static const String onboardingPlanReady = '/onboarding/plan-ready';
+
   /// Tabs del shell principal (Épica 4) — `root` es Home, Plan (Épica 6),
   /// Perfil (Épica 11) y `ai` (Épica 5's `AIService`, finalmente con un
   /// consumidor real — ver `features/ai_assistant/`) son reales. No hay tab
@@ -69,7 +76,15 @@ abstract final class RoutePaths {
   /// `guestModeProvider` esté activo (ver `app_router.dart` y
   /// `documentation/authentication.md`) — las 4 tabs del shell principal y
   /// `onboarding` (iniciado desde Welcome · "Empezar").
-  static const List<String> guestAccessibleRoutes = [root, plan, ai, profile, onboarding];
+  static const List<String> guestAccessibleRoutes = [
+    root,
+    plan,
+    ai,
+    profile,
+    onboarding,
+    onboardingGenerating,
+    onboardingPlanReady,
+  ];
 
   // Reservado para próximas épicas: plan de nutrición, recetas, análisis de
   // fotos, lista de compras, suscripción.

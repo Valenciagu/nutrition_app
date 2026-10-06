@@ -97,6 +97,13 @@ class AuthController extends AsyncNotifier<void> {
     if (!state.hasError && signedIn) ref.read(analyticsServiceProvider).logLogin(method: 'google');
   }
 
+  /// Llamado por B8 (Onboarding) antes de generar el plan — ver
+  /// `documentation/onboarding.md`. No usa `AsyncValue.guard`/`state`
+  /// porque B8 ya tiene su propio controlador de progreso (no queremos que
+  /// un error aquí se confunda con un error de generación de plan); si
+  /// falla, deja que quien lo llamó lo propague.
+  Future<void> ensureAnonymousSession() => _repository.signInAnonymously();
+
   Future<void> signOut() async {
     await _repository.signOut();
     ref.read(guestModeProvider.notifier).state = false;

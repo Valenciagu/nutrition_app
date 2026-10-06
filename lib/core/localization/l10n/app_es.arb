@@ -230,6 +230,24 @@
   "onboardingBudgetRangeFlexible": "Más de 160 €/semana",
   "onboardingSubmitButton": "Crear mi plan",
 
+  "onboardingGeneratingTitle": "Estamos armando tu plan",
+  "onboardingGeneratingSubtitle": "Tarda unos segundos. Puedes cerrar la app, seguimos trabajando.",
+  "onboardingGeneratingStep1": "Calculando tus calorías y macros",
+  "onboardingGeneratingStep2": "Filtrando lo que no comes",
+  "onboardingGeneratingStep3": "Eligiendo tus recetas de la semana",
+  "onboardingGeneratingStep4": "Organizando tu lista de compra",
+  "onboardingGeneratingErrorMessage": "No pudimos generar tu plan. No perdiste nada de lo que respondiste.",
+  "onboardingGeneratingRetryButton": "Reintentar",
+
+  "onboardingPlanReadyTitle": "Listo. Este es tu día",
+  "onboardingPlanReadySubtitle": "Basado en tu objetivo de {goal}.",
+  "@onboardingPlanReadySubtitle": {
+    "placeholders": {"goal": {"type": "String"}}
+  },
+  "onboardingPlanReadyCaloriesUnit": "kcal / día",
+  "onboardingPlanReadyProteinLabel": "Proteína",
+  "onboardingPlanReadyStartButton": "Empezar mi día",
+
   "onboardingWheelPickerDoneAction": "Listo",
 
   "bottomNavHomeLabel": "Home",

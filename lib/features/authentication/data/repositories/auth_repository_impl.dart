@@ -18,6 +18,7 @@ class AuthRepositoryImpl implements AuthRepository {
       email: user.email,
       displayName: user.displayName,
       emailVerified: user.emailVerified,
+      isAnonymous: user.isAnonymous,
     );
   }
 
@@ -26,6 +27,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   AuthUser? get currentUser => _mapUser(_dataSource.currentUser);
+
+  @override
+  Future<void> signInAnonymously() {
+    return _run(() => _dataSource.signInAnonymously());
+  }
 
   @override
   Future<void> signInWithEmailAndPassword({required String email, required String password}) {
