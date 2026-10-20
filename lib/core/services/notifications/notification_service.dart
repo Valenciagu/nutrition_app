@@ -28,7 +28,7 @@ class NotificationService {
   /// interruptor maestro de la pantalla de Recordatorios.
   Future<void> initializePlugin() async {
     if (kIsWeb) return;
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings('@drawable/ic_stat_notification');
     const darwinSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestSoundPermission: false,

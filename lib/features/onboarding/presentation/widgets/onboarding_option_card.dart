@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_color_tokens.dart';
@@ -78,7 +79,7 @@ class OnboardingOptionCard extends StatelessWidget {
                   height: 26,
                   decoration: BoxDecoration(color: colors.actionPrimary, shape: BoxShape.circle),
                   alignment: Alignment.center,
-                  child: Icon(Icons.check, size: 14, color: colors.onActionPrimary),
+                  child: Icon(AppIcons.check, size: 14, color: colors.onActionPrimary),
                 ),
               ],
             ],

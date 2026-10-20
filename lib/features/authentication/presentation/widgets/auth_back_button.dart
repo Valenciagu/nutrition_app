@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/localization/app_localizations_ext.dart';
@@ -24,7 +25,7 @@ class AuthBackButton extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: colors.border),
           ),
-          child: Icon(Icons.arrow_back, size: 18, color: colors.textSecondary),
+          child: Icon(AppIcons.back, size: 18, color: colors.textSecondary),
         ),
       ),
     );

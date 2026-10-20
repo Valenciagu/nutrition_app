@@ -1,3 +1,4 @@
+import '../../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,7 +49,7 @@ class AllergiesStep extends ConsumerWidget {
             alignment: Alignment.centerLeft,
             child: Row(
               children: [
-                Icon(Icons.search, size: 16, color: colors.textDisabled),
+                Icon(AppIcons.search, size: 16, color: colors.textDisabled),
                 const SizedBox(width: 10),
                 Text(
                   l10n.onboardingAllergiesSearchHint,

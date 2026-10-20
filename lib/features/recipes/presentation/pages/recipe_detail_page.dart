@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -75,7 +76,7 @@ class RecipeDetailPage extends ConsumerWidget {
           Positioned(
             top: AppSpacing.space12,
             left: AppSpacing.space12,
-            child: RoundIconButton(icon: Icons.arrow_back, onTap: () => context.pop()),
+            child: RoundIconButton(icon: AppIcons.back, onTap: () => context.pop()),
           ),
         ],
       ),

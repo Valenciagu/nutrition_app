@@ -1,3 +1,5 @@
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/constants/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -243,12 +245,14 @@ class _PopulatedPlan extends ConsumerWidget {
           const SizedBox(height: 10),
         ],
         QuickActionTile(
+          svgIcon: AppAssets.iconRecalculateDay,
           title: l10n.planAdjustRowTitle,
           iconBackgroundColor: colors.aiActionSurface,
           onTap: () => showAdjustPlanSheet(context),
         ),
         const SizedBox(height: 10),
         QuickActionTile(
+          icon: AppIcons.groceryList,
           title: l10n.planGroceryRowTitle,
           iconBackgroundColor: colors.background,
           onTap: () => context.push(RoutePaths.groceryListPath()),
@@ -270,6 +274,7 @@ class _PopulatedPlan extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           QuickActionTile(
+            icon: AppIcons.recipe,
             title: l10n.planMealViewRecipeAction,
             iconBackgroundColor: context.colors.background,
             onTap: () {
@@ -279,6 +284,7 @@ class _PopulatedPlan extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           QuickActionTile(
+            icon: AppIcons.check,
             title: l10n.planMealMarkDoneAction,
             iconBackgroundColor: context.colors.actionPrimarySurface,
             onTap: () {
@@ -288,6 +294,7 @@ class _PopulatedPlan extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           QuickActionTile(
+            icon: AppIcons.swap,
             title: l10n.planMealFindAlternativeAction,
             iconBackgroundColor: context.colors.background,
             onTap: () {

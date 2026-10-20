@@ -1,3 +1,4 @@
+import '../constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
@@ -70,7 +71,7 @@ class BottomNavigation extends StatelessWidget {
                         boxShadow: [BoxShadow(color: colors.actionPrimary.withValues(alpha: 0.35), blurRadius: 20, offset: const Offset(0, 8))],
                       ),
                       alignment: Alignment.center,
-                      child: Icon(Icons.camera_alt_outlined, color: colors.onActionPrimary, size: 24),
+                      child: Icon(AppIcons.camera, color: colors.onActionPrimary, size: 24),
                     ),
                   ),
                 ),

@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -45,7 +46,7 @@ class GroceryListPage extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(AppSpacing.space12, AppSpacing.space8, AppSpacing.space20, AppSpacing.space8),
               child: Row(
                 children: [
-                  RoundIconButton(icon: Icons.arrow_back, onTap: () => context.pop()),
+                  RoundIconButton(icon: AppIcons.back, onTap: () => context.pop()),
                   const SizedBox(width: AppSpacing.space12),
                   Text(l10n.groceryListTitle, style: AppTypography.titleL.copyWith(fontSize: 22, color: colors.textPrimary)),
                 ],
@@ -184,7 +185,7 @@ class _GroceryItemRow extends ConsumerWidget {
                   border: item.checked ? null : Border.all(color: colors.border, width: 1.5),
                 ),
                 alignment: Alignment.center,
-                child: item.checked ? Icon(Icons.check, size: 14, color: colors.onActionPrimary) : null,
+                child: item.checked ? Icon(AppIcons.check, size: 14, color: colors.onActionPrimary) : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -235,7 +236,7 @@ class _MissingRecipeRow extends StatelessWidget {
               Expanded(
                 child: Text(meal.name, style: AppTypography.bodyM.copyWith(fontSize: 14, color: colors.textPrimary)),
               ),
-              Icon(Icons.chevron_right, color: colors.textDisabled),
+              Icon(AppIcons.chevronRight, color: colors.textDisabled),
             ],
           ),
         ),

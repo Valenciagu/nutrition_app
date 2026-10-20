@@ -8,6 +8,7 @@ Focus on these files (the whole project is readable):
 - `Fase 3 - Home.dc.html`
 - `Fase 4 - Plan y Recetas.dc.html`
 - `Fases 5-12 - Entrega final.dc.html`
+- `Marca e iconos.dc.html` (Epic 18 — isotipo, ícono de app, iconos propios, briefs de fotografía; archivos finales en `brand/` e `icons/`)
 - `ios-frame.jsx`
 - `support.js`
 - `uploads/desygn.md.md`

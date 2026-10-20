@@ -1,3 +1,6 @@
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/constants/app_assets.dart';
+import '../../../../core/widgets/app_svg_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -66,6 +69,7 @@ Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SheetOption(
+            svgIcon: AppAssets.iconFoodScanner,
             iconBackgroundColor: colors.actionPrimarySurface,
             title: l10n.cameraSheetAnalyzeMealTitle,
             subtitle: l10n.cameraSheetAnalyzeMealSubtitle,
@@ -73,6 +77,7 @@ Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
           ),
           const SizedBox(height: 10),
           _SheetOption(
+            svgIcon: AppAssets.iconIngredientsPhoto,
             iconBackgroundColor: colors.actionPrimarySurface,
             title: l10n.cameraSheetIngredientsTitle,
             subtitle: l10n.cameraSheetIngredientsSubtitle,
@@ -80,6 +85,7 @@ Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
           ),
           const SizedBox(height: 10),
           _SheetOption(
+            icon: AppIcons.manualLog,
             iconBackgroundColor: colors.background,
             title: l10n.cameraSheetLogManualTitle,
             subtitle: l10n.cameraSheetLogManualSubtitle,
@@ -114,12 +120,14 @@ Future<ImageSource?> _showImageSourceSheet(BuildContext context) {
         mainAxisSize: MainAxisSize.min,
         children: [
           QuickActionTile(
+            icon: AppIcons.camera,
             title: l10n.cameraSourceCameraOption,
             iconBackgroundColor: colors.actionPrimarySurface,
             onTap: () => Navigator.of(sheetContext).pop(ImageSource.camera),
           ),
           const SizedBox(height: 8),
           QuickActionTile(
+            icon: AppIcons.gallery,
             title: l10n.cameraSourceGalleryOption,
             iconBackgroundColor: colors.background,
             onTap: () => Navigator.of(sheetContext).pop(ImageSource.gallery),
@@ -132,12 +140,16 @@ Future<ImageSource?> _showImageSourceSheet(BuildContext context) {
 
 class _SheetOption extends StatelessWidget {
   const _SheetOption({
+    this.icon,
+    this.svgIcon,
     required this.iconBackgroundColor,
     required this.title,
     required this.subtitle,
     required this.onTap,
   });
 
+  final IconData? icon;
+  final String? svgIcon;
   final Color iconBackgroundColor;
   final String title;
   final String subtitle;
@@ -157,7 +169,15 @@ class _SheetOption extends StatelessWidget {
           decoration: BoxDecoration(border: Border.all(color: colors.border), borderRadius: BorderRadius.circular(18)),
           child: Row(
             children: [
-              Container(width: 42, height: 42, decoration: BoxDecoration(color: iconBackgroundColor, borderRadius: BorderRadius.circular(13))),
+              Container(
+                width: 42,
+                height: 42,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: iconBackgroundColor, borderRadius: BorderRadius.circular(13)),
+                child: svgIcon != null
+                    ? AppSvgIcon(svgIcon!, size: 22, color: colors.textPrimary)
+                    : Icon(icon, size: 22, color: colors.textPrimary),
+              ),
               const SizedBox(width: 13),
               Expanded(
                 child: Column(

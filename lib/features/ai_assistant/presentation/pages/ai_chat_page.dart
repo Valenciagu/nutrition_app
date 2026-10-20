@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -160,7 +161,7 @@ class _Header extends StatelessWidget {
               border: Border.all(color: colors.onAiAction.withValues(alpha: 0.25)),
             ),
             alignment: Alignment.center,
-            child: Icon(Icons.auto_awesome_rounded, size: 18, color: colors.onAiAction),
+            child: Icon(AppIcons.ai, size: 18, color: colors.onAiAction),
           ),
           const SizedBox(width: AppSpacing.space12),
           Column(
@@ -365,7 +366,7 @@ class _Footer extends StatelessWidget {
                   onTap: () => onSend(controller.text),
                   child: Padding(
                     padding: const EdgeInsets.all(10),
-                    child: Icon(Icons.arrow_upward_rounded, size: 20, color: colors.onActionPrimary),
+                    child: Icon(AppIcons.send, size: 20, color: colors.onActionPrimary),
                   ),
                 ),
               ),

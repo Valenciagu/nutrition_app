@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -100,7 +101,7 @@ class _FoodAnalysisPageState extends ConsumerState<FoodAnalysisPage> {
           Positioned(
             top: AppSpacing.space12,
             left: AppSpacing.space12,
-            child: RoundIconButton(icon: Icons.close, onTap: () => context.pop()),
+            child: RoundIconButton(icon: AppIcons.close, onTap: () => context.pop()),
           ),
         ],
       ),

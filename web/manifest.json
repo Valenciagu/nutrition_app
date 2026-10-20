@@ -3,7 +3,7 @@
     "short_name": "NutritionApp",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#F7F8F7",
+    "background_color": "#0B8F55",
     "theme_color": "#0B8F55",
     "description": "Asistente de nutrición personalizado con IA.",
     "orientation": "portrait-primary",

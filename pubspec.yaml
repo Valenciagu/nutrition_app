@@ -66,6 +66,8 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   timezone: ^0.9.4
   flutter_timezone: ^3.0.1
+  flutter_svg: ^2.3.0
+  phosphor_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -76,7 +78,42 @@ dev_dependencies:
   freezed: ^2.5.7
   json_serializable: ^6.9.0
   riverpod_generator: ^2.6.3
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 flutter:
   uses-material-design: true
   generate: true
+
+  assets:
+    - assets/brand/
+    - assets/icons/
+    - assets/images/
+
+# Ícono del launcher (ASSET-103). Fuente: canvas "Marca e iconos". iOS usa
+# `app_icon_1024.png` (sin alfa) + variante oscura; Android adaptativo usa
+# primer plano + fondo sólido #17A86A. Regenerar con:
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/brand/app_icon_1024.png
+  remove_alpha_ios: true
+  adaptive_icon_background: assets/brand/app_icon_background.png
+  adaptive_icon_foreground: assets/brand/app_icon_foreground.png
+  web:
+    generate: true
+    image_path: assets/brand/app_icon_1024.png
+    background_color: "#0B8F55"
+    theme_color: "#0B8F55"
+
+# Splash nativo. Fondo #0B8F55 (no #17A86A): el Splash de Flutter que le
+# sigue lleva texto blanco encima y es #0B8F55 — así no hay salto de color.
+# Regenerar con: dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#0B8F55"
+  image: assets/brand/splash_logo_1152.png
+  android_12:
+    color: "#0B8F55"
+    image: assets/brand/splash_logo_1152.png
+  web: false

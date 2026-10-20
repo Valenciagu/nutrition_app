@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -31,28 +33,11 @@ class SplashPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 76,
-                  height: 76,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.16),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  alignment: Alignment.center,
-                  // TODO(design-sync): reemplazar por el isotipo real
-                  // cuando exista (pendiente set de iconos/wordmark, ver
-                  // design_system.md).
-                  child: Text(
-                    'N',
-                    style: AppTypography.titleL.copyWith(fontSize: 30, color: Colors.white),
-                  ),
-                ),
+                SvgPicture.asset(AppAssets.isotypeWhite, width: 76, height: 76),
                 const SizedBox(height: AppSpacing.space16),
-                Text(
-                  l10n.appTitle,
-                  textAlign: TextAlign.center,
-                  style: AppTypography.titleL.copyWith(color: Colors.white),
+                Semantics(
+                  label: l10n.appTitle,
+                  child: ExcludeSemantics(child: SvgPicture.asset(AppAssets.wordmarkWhite, height: 26)),
                 ),
                 const SizedBox(height: AppSpacing.space8),
                 Text(

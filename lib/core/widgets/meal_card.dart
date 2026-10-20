@@ -1,3 +1,4 @@
+import '../constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
@@ -99,7 +100,7 @@ class MealCard extends StatelessWidget {
                   border: isRegistered ? null : Border.all(color: colors.border, width: 1.5),
                 ),
                 alignment: Alignment.center,
-                child: isRegistered ? Icon(Icons.check, size: 16, color: colors.onActionPrimary) : null,
+                child: isRegistered ? Icon(AppIcons.check, size: 16, color: colors.onActionPrimary) : null,
               ),
             ],
           ),

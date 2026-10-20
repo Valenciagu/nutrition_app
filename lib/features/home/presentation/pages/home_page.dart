@@ -1,3 +1,5 @@
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/constants/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -114,6 +116,7 @@ class HomePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 10),
                 QuickActionTile(
+                  icon: AppIcons.plan,
                   title: l10n.homePlanRowTitle,
                   subtitle: l10n.homePlanRowSubtitle,
                   iconBackgroundColor: colors.actionPrimarySurface,
@@ -121,6 +124,7 @@ class HomePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 10),
                 QuickActionTile(
+                  icon: AppIcons.groceryList,
                   title: l10n.homeGroceryRowTitle,
                   subtitle: l10n.homeGroceryRowSubtitle,
                   iconBackgroundColor: colors.background,
@@ -128,6 +132,7 @@ class HomePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 10),
                 QuickActionTile(
+                  svgIcon: AppAssets.iconAiSparkle,
                   title: l10n.homeAiRowTitle,
                   subtitle: l10n.homeAiRowSubtitle,
                   iconBackgroundColor: colors.aiActionSurface,

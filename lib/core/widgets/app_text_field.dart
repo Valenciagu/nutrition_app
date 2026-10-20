@@ -1,3 +1,4 @@
+import '../constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -161,7 +162,7 @@ class _AppTextFieldState extends State<AppTextField> {
                   style: AppTypography.label.copyWith(fontSize: 14, color: colors.textSecondary),
                 ),
               if (widget.kind == AppTextFieldKind.search)
-                Icon(Icons.search, size: 20, color: colors.textSecondary),
+                Icon(AppIcons.search, size: 20, color: colors.textSecondary),
               if (widget.kind == AppTextFieldKind.password)
                 GestureDetector(
                   onTap: () => setState(() => _obscure = !_obscure),
@@ -179,7 +180,7 @@ class _AppTextFieldState extends State<AppTextField> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (hasError) ...[
-                Icon(Icons.error_outline, size: 14, color: colors.error),
+                Icon(AppIcons.error, size: 14, color: colors.error),
                 const SizedBox(width: 4),
               ],
               Flexible(

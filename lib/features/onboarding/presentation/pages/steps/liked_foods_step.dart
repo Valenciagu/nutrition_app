@@ -1,3 +1,4 @@
+import '../../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -136,7 +137,7 @@ class _FoodTile extends StatelessWidget {
                           height: 22,
                           decoration: BoxDecoration(color: colors.actionPrimary, shape: BoxShape.circle),
                           alignment: Alignment.center,
-                          child: Icon(Icons.check, size: 12, color: colors.onActionPrimary),
+                          child: Icon(AppIcons.check, size: 12, color: colors.onActionPrimary),
                         ),
                       ),
                   ],

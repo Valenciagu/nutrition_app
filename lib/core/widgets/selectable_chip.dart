@@ -1,3 +1,4 @@
+import '../constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
@@ -72,7 +73,7 @@ class SelectableChip extends StatelessWidget {
               ),
               if (selected && showCheckWhenSelected) ...[
                 const SizedBox(width: 8),
-                Icon(Icons.check, size: 15, color: textColor),
+                Icon(AppIcons.check, size: 15, color: textColor),
               ],
             ],
           ),

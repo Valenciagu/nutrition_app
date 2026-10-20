@@ -2,7 +2,7 @@
 
 Transcribed from the Claude Design canvas linked in `desing.md` (project `d3c0cd06-9d89-4ceb-b4b7-0f3f858d37c1`, files `Fase 1 - Fundamentos.dc.html` and `Fichas de componentes.dc.html`, read 2026-09-11). This is the source of truth for implementation — read this before `DesignSync`-fetching anything, and extend it when a new `Fase N` file gets read.
 
-Transcribed so far: Fase 1 (this file), Fichas de componentes (this file), Fase 2 Block A/Auth (`documentation/design_screens_auth.md`), Fase 2 Block B/Onboarding (`documentation/design_screens_onboarding.md`), Fase 3/Home (`documentation/design_screens_home.md`), Fase 4/Plan y Recetas (`documentation/design_screens_plan.md`, read 2026-09-20 at the start of Epic 6). `Fases 5-12 - Entrega final` — only its Fase 9/10 block (Progreso · Perfil, screens I1/J1) has been read so far, at the start of Epic 11; transcribed inline in `documentation/profile.md` rather than a dedicated `design_screens_*.md` (a single small block, not worth a whole new file). Its other blocks (Fase 5 Análisis de comida, Fase 6 Ingredientes, Fase 7 IA/Fase 8 Lista de compra, Fase 11 Premium, Fase 12 Pulido) remain unread — fetch when their epic starts. Also not yet read: `ios-frame.jsx`, `support.js`, `uploads/desygn.md.md`.
+Transcribed so far (plus, since 2026-10-05, `Marca e iconos` — see "Brand, icons & imagery" below): Fase 1 (this file), Fichas de componentes (this file), Fase 2 Block A/Auth (`documentation/design_screens_auth.md`), Fase 2 Block B/Onboarding (`documentation/design_screens_onboarding.md`), Fase 3/Home (`documentation/design_screens_home.md`), Fase 4/Plan y Recetas (`documentation/design_screens_plan.md`, read 2026-09-20 at the start of Epic 6). `Fases 5-12 - Entrega final` — only its Fase 9/10 block (Progreso · Perfil, screens I1/J1) has been read so far, at the start of Epic 11; transcribed inline in `documentation/profile.md` rather than a dedicated `design_screens_*.md` (a single small block, not worth a whole new file). Its other blocks (Fase 5 Análisis de comida, Fase 6 Ingredientes, Fase 7 IA/Fase 8 Lista de compra, Fase 11 Premium, Fase 12 Pulido) remain unread — fetch when their epic starts. Also not yet read: `ios-frame.jsx`, `support.js`, `uploads/desygn.md.md`.
 
 ## Product design direction
 
@@ -15,6 +15,21 @@ Four rules that shape every screen:
 4. **Progress, never guilt** — going over a target is never shown in red; it's neutral + a rebalancing action. Red is reserved for actual system errors.
 
 Open decisions (per the canvas, still pending real assets from the user): final wordmark/logo, icon set (proposal: Lucide or Phosphor, ~8-10 custom icons for food scanner/ingredients/recalculate-day/streak), real food photography (fixed recipe: natural side light, matte neutral background, 90° or 45° angle, clean simple plate, realistic portion, no hands/utensils; 1:1 for cards, 4:5 for recipe detail).
+
+## Brand, icons & imagery (Epic 18 — canvas file `Marca e iconos.dc.html`, read 2026-10-05)
+
+Delivered by Claude Design from the prompt in `documentation/claude_design_assets_prompt.md`. Files live in the canvas project under `brand/` and `icons/`.
+
+- **Isotype "Plato en proporción"** (direction 1a, chosen over "Bowl y bocado" and "Plato con foco"): a plate seen from above split into one half and two quarters (the plate method — balance without counting grams; also echoes the progress rings). Two-tone: half `#0B8F55`, quarters `#17A86A`. Readable at 16 px; min size 16 px (isotype) / 12 px height (horizontal logo); clear space = ¼ of the diameter. Wrong uses: deforming, painting segments with macro colors, gradients/shadows.
+- **Wordmark**: Plus Jakarta Sans ExtraBold 800, tracking −15/1000 em, converted to outlines (615×95 viewBox). Green `#0B8F55` on light, white on `#0B8F55` or dark.
+- **Files in the repo** (imported 2026-10-05, c2pa `<metadata>` stripped from SVGs): `assets/brand/` — `isotype_color/white/mono.svg`, `wordmark_color/white.svg`, `app_icon_1024.png`, `app_icon_foreground.png`, `app_icon_background.png` (solid `#17A86A`, regenerated locally), `app_icon_dark_1024.png`, `splash_logo_1152.png`; `assets/icons/` — the 18 own icons. Launcher icons and native splash are generated from these (`pubspec.yaml`: `flutter_launcher_icons`, `flutter_native_splash`). Android notification icon: `android/app/src/main/res/drawable/ic_stat_notification.xml` (vector built from the isotype). **Still only in the canvas:** `logo_horizontal_*.svg`, `splash_logo.svg`, `notification_icon.svg`/`_96.png`. The PNGs still carry the c2pa chunk — harmless, strip before store release if wanted.
+- **Own icons** (grid 24, stroke 1.75, `currentColor`, regular + fill): `food_scanner`, `ingredients_photo`, `recalculate_day`, `streak`, `ai_sparkle`, `macro_protein` (egg), `macro_carbs` (bread), `macro_fat` (drop), `macro_water` (glass). At 20 px Flutter scales the stroke to ≈1.46, matching the 1.5 rule without a separate file.
+- **Decisions the canvas flagged (resolved as recommended unless noted):**
+  - **Splash background is `#0B8F55`, not `#17A86A`** (the A1 splash carries white wordmark/tagline, and `#17A86A` fails AA with text). The app icon does use `#17A86A` (no text). The native splash should also be `#0B8F55` to avoid a color jump into the Flutter splash. *(Corrects the earlier prompt, which said `#17A86A`.)*
+  - **Streak badge is amber** (`#C98A17` icon on `warningSurface`-like `#FDF3E2`, text `#7A4A00`), not green: a streak is consistency, not a health state. *Needs user confirmation.*
+  - **Google button** must follow Google's branding, overriding Fase 2's generic social-button style: light = fill `#FFFFFF`, 1 px border `#747775`, text `#1F1F1F`; dark = `#131314` / `#8E918F` / `#E3E3E3`; Roboto Medium 14/20 (the single exception to the one-font rule); official 20×20 "G"; padding Android 12·G·10·text·12, iOS 16·G·12·text·16; height 52, pill. Apple: system `SignInWithAppleButton` (black on light, white/outlined on dark), SF font, at least as prominent as Google; Apple first on iOS, Google first on Android.
+  - **Photography is briefs only** (no generated photos): one shared recipe (left window light at 45°, matte stone/linen `#E8E6E1`–`#D9D6CF`, 26 cm bone-white plate, no hands/cutlery, 5200 K). Hero: top-down bowl (brown rice, roasted chickpeas, carrot, avocado, red cabbage, lemon yogurt), bleed top-right, calm bottom third for the white fade. Goal series 1:1 at 45°, plate = 70 % of frame: lose fat (grilled chicken + big salad, green), gain muscle (salmon/steak + rice + egg + broccoli, reddish), maintain (literal plate method ½ roasted veg, ¼ chicken, ¼ potato/quinoa, golden), eat healthier (bowl of 5–6 ingredients: edamame, mango, radish, cabbage, quinoa, sesame; multicolor). Hatched placeholders stay until real photos exist.
+  - **Alternative name "Mitad"** proposed (names what the isotype draws); all files still say NutritionApp. Trademark/domain availability unchecked. Not adopted.
 
 ## Color tokens
 
@@ -80,7 +95,7 @@ Implemented in `app_spacing.dart`, `app_radius.dart`, `app_elevation.dart`, `app
 - **Radius**: xs 4, sm 8, md 12, lg 16, xl 20, sheet 28 (top corners only), full 999 (buttons/chips always use `full`; cards use `lg`/`xl`; images inside a card use `md`).
 - **Elevation**: e0 flat, e1 card, e2 float, e3 sheet, e4 dialog — light mode uses shadow; dark mode uses surface-color + border instead.
 - **Component heights**: button lg/md/sm = 52/44/36, field 56, chip 36, app bar 56, bottom nav 64 (+ safe area), FAB 60, list item 64, tab 44. Touch target minimum is always 48×48 regardless of visual size.
-- **Icons**: sizes 16/20/24/28/32, stroke 1.75 (or 1.5 at size 20). Icon set not yet chosen (Lucide/Phosphor proposal pending the user).
+- **Icons**: sizes 16/20/24/28/32, stroke 1.75 (or 1.5 at size 20). **Phosphor** (chosen 2026-10-05, delegated by the user) via `phosphor_flutter`; widgets use `AppIcons.*` (`core/constants/app_icons.dart`), never `Icons.*`. SVG assets go through `flutter_svg` with paths in `AppAssets`.
 - **Borders**: hairline 1, selected 1.5, focus 2.
 - **Motion durations**: instant 80ms (tap feedback), fast 140ms (chips/toggles), base 220ms (cards/sheets), slow 320ms (screen transitions), progress 600ms (rings/bars). Nothing exceeds 320ms except progress/AI. Everything must be interruptible; reduce-motion swaps movement for a 140ms fade, never removes it entirely.
 - **Curves**: standard `cubic-bezier(.2,0,0,1)`, enter `cubic-bezier(0,0,0,1)`, exit `cubic-bezier(.3,0,1,1)`.
@@ -130,6 +145,6 @@ Chrome only (scrim `rgba(16,21,18,.42)`, radius 28 top, 44×5 handle, optional t
 ## Known gaps / follow-ups
 
 - Dark-mode placeholder colors noted with `*` above need confirming once a real dark-mode screen is built.
-- Icon set undecided (Lucide vs Phosphor) — nothing in `core/widgets` hardcodes an icon package yet; current placeholders use Flutter's built-in `Icons`.
+- Icon set decided (Phosphor, 2026-10-05). Still pending real assets: brand isotype/wordmark, launcher icon, Google "G", photography — see TASKS.md Epic 18.
 - `AppButton`'s "success" checkmark micro-state isn't implemented.
 - Photography direction is documented but no real assets exist yet — not blocking, only matters once a feature renders real food photos.

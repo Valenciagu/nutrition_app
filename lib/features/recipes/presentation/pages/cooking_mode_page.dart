@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -122,7 +123,7 @@ class _CookingModePageState extends ConsumerState<CookingModePage> {
                     borderRadius: BorderRadius.circular(20),
                     child: Padding(
                       padding: const EdgeInsets.all(6),
-                      child: Icon(Icons.close, size: 22, color: colors.textPrimary),
+                      child: Icon(AppIcons.close, size: 22, color: colors.textPrimary),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space12),

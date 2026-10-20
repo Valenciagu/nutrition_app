@@ -1,6 +1,8 @@
+import '../constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
+import 'app_svg_icon.dart';
 import '../theme/app_typography.dart';
 
 /// QuickActionTile — uno de los dos componentes nuevos que propone Fase 3 ·
@@ -21,13 +23,19 @@ class QuickActionTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.trailingText,
+    this.icon,
+    this.svgIcon,
     required this.iconBackgroundColor,
     required this.onTap,
-  });
+  }) : assert((icon == null) != (svgIcon == null), 'Pass exactly one of icon / svgIcon');
 
   final String title;
   final String? subtitle;
   final String? trailingText;
+  /// Exactamente uno: `icon` (set Phosphor vía `AppIcons`) o `svgIcon`
+  /// (icono propio, `AppAssets.icon*`).
+  final IconData? icon;
+  final String? svgIcon;
   final Color iconBackgroundColor;
   final VoidCallback onTap;
 
@@ -49,7 +57,11 @@ class QuickActionTile extends StatelessWidget {
               Container(
                 width: 36,
                 height: 36,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(color: iconBackgroundColor, borderRadius: BorderRadius.circular(11)),
+                child: svgIcon != null
+                    ? AppSvgIcon(svgIcon!, size: 20, color: colors.textPrimary)
+                    : Icon(icon, size: 20, color: colors.textPrimary),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -71,7 +83,7 @@ class QuickActionTile extends StatelessWidget {
               if (trailingText != null)
                 Text(trailingText!, style: AppTypography.bodyM.copyWith(fontSize: 13, color: colors.textDisabled))
               else
-                Icon(Icons.chevron_right, color: colors.textDisabled),
+                Icon(AppIcons.chevronRight, color: colors.textDisabled),
             ],
           ),
         ),

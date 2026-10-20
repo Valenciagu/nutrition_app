@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -82,16 +83,19 @@ class ProfilePage extends ConsumerWidget {
                   title: l10n.profileSectionFoodTitle,
                   rows: [
                     QuickActionTile(
+                      icon: AppIcons.goal,
                       title: l10n.profileRowGoalDataTitle,
                       iconBackgroundColor: colors.background,
                       onTap: () => context.push(RoutePaths.profileEditGoalPath()),
                     ),
                     QuickActionTile(
+                      icon: AppIcons.preferences,
                       title: l10n.profileRowPreferencesTitle,
                       iconBackgroundColor: colors.background,
                       onTap: () => context.push(RoutePaths.profileEditPreferencesPath()),
                     ),
                     QuickActionTile(
+                      icon: AppIcons.bookmark,
                       title: l10n.profileRowSavedRecipesTitle,
                       iconBackgroundColor: colors.background,
                       onTap: () => _showComingSoon(context, l10n),
@@ -103,24 +107,28 @@ class ProfilePage extends ConsumerWidget {
                   title: l10n.profileSectionSettingsTitle,
                   rows: [
                     QuickActionTile(
+                      icon: AppIcons.bell,
                       title: l10n.profileRowRemindersTitle,
                       trailingText: _remindersSummary(ref, l10n),
                       iconBackgroundColor: colors.background,
                       onTap: () => context.push(RoutePaths.profileNotificationsPath()),
                     ),
                     QuickActionTile(
+                      icon: AppIcons.theme,
                       title: l10n.profileRowThemeTitle,
                       trailingText: l10n.profileThemeAutomaticValue,
                       iconBackgroundColor: colors.background,
                       onTap: () => _showComingSoon(context, l10n),
                     ),
                     QuickActionTile(
+                      icon: AppIcons.language,
                       title: l10n.profileRowLanguageTitle,
                       trailingText: _languageName(context),
                       iconBackgroundColor: colors.background,
                       onTap: () => _showComingSoon(context, l10n),
                     ),
                     QuickActionTile(
+                      icon: AppIcons.privacy,
                       title: l10n.profileRowPrivacyTitle,
                       iconBackgroundColor: colors.background,
                       onTap: () => context.push(RoutePaths.profilePrivacyPath()),

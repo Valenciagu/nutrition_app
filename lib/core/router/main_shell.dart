@@ -1,3 +1,4 @@
+import '../constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,10 +36,10 @@ class MainShell extends ConsumerWidget {
         onTabSelected: (index) => navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
         onCameraTap: () => showCameraActionSheet(context, ref),
         tabs: [
-          BottomNavTab(icon: Icons.home_rounded, label: l10n.bottomNavHomeLabel),
-          BottomNavTab(icon: Icons.calendar_today_rounded, label: l10n.bottomNavPlanLabel),
-          BottomNavTab(icon: Icons.auto_awesome_rounded, label: l10n.bottomNavAiLabel),
-          BottomNavTab(icon: Icons.person_rounded, label: l10n.bottomNavProfileLabel),
+          BottomNavTab(icon: AppIcons.home, label: l10n.bottomNavHomeLabel),
+          BottomNavTab(icon: AppIcons.plan, label: l10n.bottomNavPlanLabel),
+          BottomNavTab(icon: AppIcons.ai, label: l10n.bottomNavAiLabel),
+          BottomNavTab(icon: AppIcons.profile, label: l10n.bottomNavProfileLabel),
         ],
       ),
     );

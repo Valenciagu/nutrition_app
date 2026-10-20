@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -44,7 +45,7 @@ class PrivacyDataPage extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(AppSpacing.space12, AppSpacing.space8, AppSpacing.space20, AppSpacing.space8),
               child: Row(
                 children: [
-                  RoundIconButton(icon: Icons.arrow_back, onTap: () => context.pop()),
+                  RoundIconButton(icon: AppIcons.back, onTap: () => context.pop()),
                   const SizedBox(width: AppSpacing.space12),
                   Text(l10n.profileRowPrivacyTitle, style: AppTypography.titleL.copyWith(fontSize: 20, color: colors.textPrimary)),
                 ],

@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -177,7 +178,7 @@ class _AlternativeCard extends StatelessWidget {
                   height: 26,
                   decoration: BoxDecoration(color: colors.actionPrimary, shape: BoxShape.circle),
                   alignment: Alignment.center,
-                  child: Icon(Icons.check, size: 13, color: colors.onActionPrimary),
+                  child: Icon(AppIcons.check, size: 13, color: colors.onActionPrimary),
                 ),
               ],
             ],

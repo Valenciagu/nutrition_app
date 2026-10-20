@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -202,7 +203,7 @@ class _SentConfirmationState extends State<_SentConfirmation> {
                   height: 64,
                   decoration: BoxDecoration(color: colors.actionPrimarySurface, borderRadius: BorderRadius.circular(20)),
                   alignment: Alignment.center,
-                  child: Icon(Icons.check, size: 28, color: colors.actionPrimary),
+                  child: Icon(AppIcons.check, size: 28, color: colors.actionPrimary),
                 ),
                 const SizedBox(height: AppSpacing.space16),
                 Text(

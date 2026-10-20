@@ -1,3 +1,4 @@
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/localization/app_localizations_ext.dart';
@@ -36,7 +37,7 @@ class LegalAcceptanceCheckbox extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(AppRadius.xs + 3),
             ),
-            child: value ? Icon(Icons.check, size: 14, color: colors.onActionPrimary) : null,
+            child: value ? Icon(AppIcons.check, size: 14, color: colors.onActionPrimary) : null,
           ),
           const SizedBox(width: AppSpacing.space8),
           Expanded(
