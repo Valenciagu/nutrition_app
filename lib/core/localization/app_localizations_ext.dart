@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../errors/failure.dart';
 import 'generated/app_localizations.dart';
 
 /// The single access point for user-facing strings across the app.
@@ -23,4 +24,22 @@ AppLocalizations resolveDeviceLocalizations() {
     if (supported.languageCode == deviceLocale.languageCode) return lookupAppLocalizations(supported);
   }
   return lookupAppLocalizations(AppLocalizations.supportedLocales.first);
+}
+
+/// Texto de usuario para un error: mapea el tipo concreto de [Failure] a su
+/// string localizado. Cualquier cosa que no sea un [Failure] (p. ej. una
+/// excepción inesperada) cae en el mensaje genérico.
+extension FailureMessageX on AppLocalizations {
+  String messageForError(Object error) {
+    return switch (error) {
+      NetworkFailure() => failureNetworkMessage,
+      AuthFailure() => failureAuthMessage,
+      PermissionFailure() => failurePermissionMessage,
+      ValidationFailure() => failureValidationMessage,
+      AiValidationFailure() => failureAiValidationMessage,
+      AiQuotaExceededFailure() => failureQuotaMessage,
+      ServerFailure() => failureServerMessage,
+      _ => genericErrorMessage,
+    };
+  }
 }

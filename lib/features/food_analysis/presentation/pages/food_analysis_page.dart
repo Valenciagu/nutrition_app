@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/errors/failure.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -36,7 +37,9 @@ class _FoodAnalysisPageState extends ConsumerState<FoodAnalysisPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(foodAnalysisControllerProvider.notifier).analyze(widget.imageBytes);
+      ref
+          .read(foodAnalysisControllerProvider.notifier)
+          .analyze(widget.imageBytes);
     });
   }
 
@@ -67,7 +70,12 @@ class _FoodAnalysisPageState extends ConsumerState<FoodAnalysisPage> {
                     offset: const Offset(0, -AppRadius.sheet),
                     child: Container(
                       width: double.infinity,
-                      constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - 300 + AppRadius.sheet),
+                      constraints: BoxConstraints(
+                        minHeight:
+                            MediaQuery.of(context).size.height -
+                            300 +
+                            AppRadius.sheet,
+                      ),
                       decoration: BoxDecoration(
                         color: colors.background,
                         borderRadius: const BorderRadius.only(
@@ -80,14 +88,21 @@ class _FoodAnalysisPageState extends ConsumerState<FoodAnalysisPage> {
                           padding: EdgeInsets.all(AppSpacing.space24),
                           child: AppStateBlock.loading(),
                         ),
-                        error: (error, _) => Padding(
-                          padding: const EdgeInsets.all(AppSpacing.space20),
-                          child: AppStateBlock.error(
-                            title: l10n.genericErrorTitle,
-                            message: l10n.genericErrorMessage,
-                            onAction: () => ref.read(foodAnalysisControllerProvider.notifier).analyze(widget.imageBytes),
-                          ),
-                        ),
+                        error: (error, stack) {
+                          debugPrint(
+                            'analyzeFoodPhoto failed: $error (cause: ${error is Failure ? error.cause : null})',
+                          );
+                          return Padding(
+                            padding: const EdgeInsets.all(AppSpacing.space20),
+                            child: AppStateBlock.error(
+                              title: l10n.genericErrorTitle,
+                              message: l10n.messageForError(error),
+                              onAction: () => ref
+                                  .read(foodAnalysisControllerProvider.notifier)
+                                  .analyze(widget.imageBytes),
+                            ),
+                          );
+                        },
                         data: (result) => result == null
                             ? const SizedBox.shrink()
                             : FoodAnalysisResultCard(result: result),
@@ -101,7 +116,10 @@ class _FoodAnalysisPageState extends ConsumerState<FoodAnalysisPage> {
           Positioned(
             top: AppSpacing.space12,
             left: AppSpacing.space12,
-            child: RoundIconButton(icon: AppIcons.close, onTap: () => context.pop()),
+            child: RoundIconButton(
+              icon: AppIcons.close,
+              onTap: () => context.pop(),
+            ),
           ),
         ],
       ),

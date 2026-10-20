@@ -12,6 +12,34 @@
   "@genericErrorMessage": {
     "description": "Generic error state body text."
   },
+  "failureNetworkMessage": "No pudimos conectarnos. Revisa tu conexión a internet e intenta de nuevo.",
+  "@failureNetworkMessage": {
+    "description": "Error body for NetworkFailure."
+  },
+  "failureAuthMessage": "No pudimos verificar tu sesión o tu dispositivo. Cierra y vuelve a abrir la app e intenta de nuevo.",
+  "@failureAuthMessage": {
+    "description": "Error body for AuthFailure (includes App Check rejections, which the backend reports as unauthenticated)."
+  },
+  "failurePermissionMessage": "No tienes permiso para realizar esta acción.",
+  "@failurePermissionMessage": {
+    "description": "Error body for PermissionFailure."
+  },
+  "failureValidationMessage": "Los datos enviados no son válidos. Intenta con otra foto.",
+  "@failureValidationMessage": {
+    "description": "Error body for ValidationFailure."
+  },
+  "failureAiValidationMessage": "No pudimos interpretar la respuesta de la IA. Intenta de nuevo.",
+  "@failureAiValidationMessage": {
+    "description": "Error body for AiValidationFailure."
+  },
+  "failureQuotaMessage": "Alcanzaste tu límite diario de análisis. Vuelve a intentarlo mañana.",
+  "@failureQuotaMessage": {
+    "description": "Error body for AiQuotaExceededFailure."
+  },
+  "failureServerMessage": "Nuestro servidor tuvo un problema. Intenta de nuevo en unos minutos.",
+  "@failureServerMessage": {
+    "description": "Error body for ServerFailure."
+  },
   "retryButtonLabel": "Reintentar",
   "@retryButtonLabel": {
     "description": "Label for the button that retries a failed action."
