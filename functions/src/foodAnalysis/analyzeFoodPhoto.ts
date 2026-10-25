@@ -58,8 +58,15 @@ interface AnalyzeFoodPhotoResponse {
  *
  * Solo se persiste en Firestore (`users/{uid}/foodAnalyses/{analysisId}`)
  * un análisis que sí reconoció comida — no vale la pena un documento por
- * cada intento fallido. La foto en Storage no se borra en ese caso (gap
- * documentado, ver `documentation/food_analysis.md`).
+ * cada intento fallido.
+ *
+ * Retención de la foto (Instrucciones.md §68): ninguna pantalla vuelve a
+ * mostrar una foto ya analizada, así que guardarla no sirve a nada — se
+ * borra de Storage al terminar, haya salido bien o mal (`finally`). Si ese
+ * borrado falla, la regla de ciclo de vida del bucket
+ * (`storage-lifecycle.json`, borra `users/` tras 1 día) es la red de
+ * seguridad. Un reintento desde el cliente sube la foto de nuevo con otro
+ * `analysisId`, así que borrarla nunca rompe un reintento.
  */
 export const analyzeFoodPhoto = onCall<AnalyzeFoodPhotoRequest, Promise<AnalyzeFoodPhotoResponse>>(
   { secrets: [openAiApiKey], region: "us-central1", invoker: "public", enforceAppCheck: true },
@@ -80,98 +87,124 @@ export const analyzeFoodPhoto = onCall<AnalyzeFoodPhotoRequest, Promise<AnalyzeF
       throw new HttpsError("not-found", "No se encontró la foto. Intenta subirla de nuevo.");
     }
 
-    const [metadata] = await file.getMetadata();
-    const size = Number(metadata.size ?? 0);
-    if (size > MAX_IMAGE_BYTES) {
-      throw new HttpsError("invalid-argument", "La foto es demasiado grande.");
-    }
-
-    const profile = await fetchMinimalProfile(request.auth.uid);
-    const quota = await consumeAiQuota(request.auth.uid, profile.isPremium, QUOTA_FEATURE);
-
     try {
-      const [buffer] = await file.download();
-      const base64Image = buffer.toString("base64");
-      const contentType = (metadata.contentType as string | undefined) ?? "image/jpeg";
-
-      const openai = getOpenAiClient();
-      const response = await openai.responses.parse({
-        model: AI_MODELS.foodPhotoAnalysis,
-        input: [
-          { role: "system", content: buildFoodAnalysisSystemPrompt({ avoidFoods: profile.avoidFoods }) },
-          {
-            role: "user",
-            content: [
-              { type: "input_text", text: "Analiza esta foto de comida." },
-              { type: "input_image", image_url: `data:${contentType};base64,${base64Image}`, detail: "auto" },
-            ],
-          },
-        ],
-        text: { format: zodTextFormat(FoodAnalysisSchema, "food_analysis") },
-      });
-
-      const parsed = response.output_parsed;
-      if (!parsed) {
-        throw new Error("Empty structured output from OpenAI.");
-      }
-
-      const analyzedAt = new Date().toISOString();
-
-      if (!parsed.isFoodPhoto) {
-        logger.info("analyzeFoodPhoto: photo did not show recognizable food", { analysisId });
-        return {
-          id: analysisId,
-          isFoodPhoto: false,
-          foodName: null,
-          portionDescription: null,
-          calories: null,
-          proteinGrams: null,
-          carbsGrams: null,
-          fatGrams: null,
-          confidence: null,
-          uncertaintyNote: null,
-          allergenWarning: false,
-          analyzedAt,
-          remainingToday: quota.remainingToday,
-        };
-      }
-
-      const safety = checkFoodAnalysisSafety(parsed, profile.avoidFoods);
-      const result: AnalyzeFoodPhotoResponse = {
-        id: analysisId,
-        isFoodPhoto: true,
-        foodName: parsed.foodName,
-        portionDescription: parsed.portionDescription,
-        calories: parsed.estimatedCalories,
-        proteinGrams: parsed.estimatedProteinGrams,
-        carbsGrams: parsed.estimatedCarbsGrams,
-        fatGrams: parsed.estimatedFatGrams,
-        confidence: parsed.confidence,
-        uncertaintyNote: parsed.uncertaintyNote,
-        allergenWarning: safety.allergenWarning,
-        analyzedAt,
-        remainingToday: quota.remainingToday,
-      };
-
-      await getFirestore()
-        .collection("users")
-        .doc(request.auth.uid)
-        .collection("foodAnalyses")
-        .doc(analysisId)
-        .set({ ...result, imagePath: storagePath });
-
-      return result;
-    } catch (error) {
-      if (error instanceof HttpsError) throw error;
-      await refundAiQuota(request.auth.uid, QUOTA_FEATURE);
-      const err = error as { message?: string; status?: number; code?: string; type?: string; name?: string };
-      logger.error(
-        `analyzeFoodPhoto: OpenAI call failed :: name=${err.name} status=${err.status} code=${err.code} type=${err.type} message=${err.message}`,
-      );
-      throw new HttpsError("internal", "No se pudo analizar la foto en este momento. Intenta de nuevo.");
+      return await analyzeStoredPhoto(request.auth.uid, analysisId, file);
+    } finally {
+      await deletePhotoQuietly(file, analysisId);
     }
   },
 );
+
+async function analyzeStoredPhoto(
+  uid: string,
+  analysisId: string,
+  file: StorageFile,
+): Promise<AnalyzeFoodPhotoResponse> {
+  const [metadata] = await file.getMetadata();
+  const size = Number(metadata.size ?? 0);
+  if (size > MAX_IMAGE_BYTES) {
+    throw new HttpsError("invalid-argument", "La foto es demasiado grande.");
+  }
+
+  const profile = await fetchMinimalProfile(uid);
+  const quota = await consumeAiQuota(uid, profile.isPremium, QUOTA_FEATURE);
+
+  try {
+    const [buffer] = await file.download();
+    const base64Image = buffer.toString("base64");
+    const contentType = (metadata.contentType as string | undefined) ?? "image/jpeg";
+
+    const openai = getOpenAiClient();
+    const response = await openai.responses.parse({
+      model: AI_MODELS.foodPhotoAnalysis,
+      input: [
+        { role: "system", content: buildFoodAnalysisSystemPrompt({ avoidFoods: profile.avoidFoods }) },
+        {
+          role: "user",
+          content: [
+            { type: "input_text", text: "Analiza esta foto de comida." },
+            { type: "input_image", image_url: `data:${contentType};base64,${base64Image}`, detail: "auto" },
+          ],
+        },
+      ],
+      text: { format: zodTextFormat(FoodAnalysisSchema, "food_analysis") },
+    });
+
+    const parsed = response.output_parsed;
+    if (!parsed) {
+      throw new Error("Empty structured output from OpenAI.");
+    }
+
+    const analyzedAt = new Date().toISOString();
+
+    if (!parsed.isFoodPhoto) {
+      logger.info("analyzeFoodPhoto: photo did not show recognizable food", { analysisId });
+      return {
+        id: analysisId,
+        isFoodPhoto: false,
+        foodName: null,
+        portionDescription: null,
+        calories: null,
+        proteinGrams: null,
+        carbsGrams: null,
+        fatGrams: null,
+        confidence: null,
+        uncertaintyNote: null,
+        allergenWarning: false,
+        analyzedAt,
+        remainingToday: quota.remainingToday,
+      };
+    }
+
+    const safety = checkFoodAnalysisSafety(parsed, profile.avoidFoods);
+    const result: AnalyzeFoodPhotoResponse = {
+      id: analysisId,
+      isFoodPhoto: true,
+      foodName: parsed.foodName,
+      portionDescription: parsed.portionDescription,
+      calories: parsed.estimatedCalories,
+      proteinGrams: parsed.estimatedProteinGrams,
+      carbsGrams: parsed.estimatedCarbsGrams,
+      fatGrams: parsed.estimatedFatGrams,
+      confidence: parsed.confidence,
+      uncertaintyNote: parsed.uncertaintyNote,
+      allergenWarning: safety.allergenWarning,
+      analyzedAt,
+      remainingToday: quota.remainingToday,
+    };
+
+    await getFirestore()
+      .collection("users")
+      .doc(uid)
+      .collection("foodAnalyses")
+      .doc(analysisId)
+      .set(result);
+
+    return result;
+  } catch (error) {
+    if (error instanceof HttpsError) throw error;
+    await refundAiQuota(uid, QUOTA_FEATURE);
+    const err = error as { message?: string; status?: number; code?: string; type?: string; name?: string };
+    logger.error(
+      `analyzeFoodPhoto: OpenAI call failed :: name=${err.name} status=${err.status} code=${err.code} type=${err.type} message=${err.message}`,
+    );
+    throw new HttpsError("internal", "No se pudo analizar la foto en este momento. Intenta de nuevo.");
+  }
+}
+
+type StorageFile = ReturnType<ReturnType<ReturnType<typeof getStorage>["bucket"]>["file"]>;
+
+/** Nunca hace fallar el análisis por no poder borrar — solo lo registra. */
+async function deletePhotoQuietly(file: StorageFile, analysisId: string): Promise<void> {
+  try {
+    await file.delete({ ignoreNotFound: true });
+  } catch (error) {
+    logger.warn("analyzeFoodPhoto: could not delete photo, lifecycle rule will", {
+      analysisId,
+      message: (error as Error).message,
+    });
+  }
+}
 
 async function fetchMinimalProfile(userId: string): Promise<{ avoidFoods: string[]; isPremium: boolean }> {
   const doc = await getFirestore().collection("users").doc(userId).get();
