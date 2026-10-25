@@ -13,3 +13,4 @@ node_modules/
 
 # Firebase debug logs
 *-debug.log
+test-build/

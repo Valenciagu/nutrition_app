@@ -159,7 +159,7 @@ Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after b
 - Not marked COMPLETE: a security review is inherently something to repeat before release (Epic 17), not a one-time checkbox, and App Check's production-provider phase remains deferred (not blocked — a deliberate scope call, see above).
 
 ## Epic 16 — Testing (deferred to the end per user request)
-- [ ] Unit/widget/integration tests, Firestore rules tests, AI validation tests — added as a dedicated pass near project completion, not per-feature.
+- [~] First test pass (2026-10-19, see `documentation/testing.md`): 38 Dart unit tests (`flutter test`), 13 backend tests (`npm test` in `functions/`, Node's built-in runner, no new framework), Firestore rules tests against the emulator (`npm run test:rules`). Still missing: widget tests (need Firebase mocks), integration tests, OpenAI-response validation tests beyond the safety layer. Found and fixed a real bug while writing them: `categorizeIngredient` matched substrings, so "fresas"/"queso fresco" landed in Protein ("res").
 
 ## Epic 17 — Production Release
 - [ ] Full security review (Instrucciones.md §80), store listing prep, release builds.
