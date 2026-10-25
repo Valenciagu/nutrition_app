@@ -285,6 +285,9 @@
 
   "profileTitle": "Perfil",
 
+  "updateRequiredTitle": "Actualiza la app para continuar",
+  "updateRequiredMessage": "Esta versión ya no es compatible. Instala la última versión para seguir usando tu plan.",
+  "updateRequiredAction": "Actualizar ahora",
   "homeGreetingMorning": "Buenos días",
   "homeGreetingAfternoon": "Buenas tardes",
   "homeGreetingEvening": "Buenas noches",

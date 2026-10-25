@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- El ícono de notificación se pide por nombre desde Dart
+     ('@drawable/ic_stat_notification', notification_service.dart): ningún
+     código Android lo referencia, así que la reducción de recursos de
+     release lo borraría. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_notification" />

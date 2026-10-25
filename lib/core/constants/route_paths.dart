@@ -4,6 +4,10 @@ abstract final class RoutePaths {
   static const String root = '/';
 
   static const String splash = '/splash';
+
+  /// Bloqueo de actualización obligatoria (Épica 17) — ver
+  /// `appUpdateStatusProvider` y el `redirect` de `app_router.dart`.
+  static const String updateRequired = '/update-required';
   static const String welcome = '/welcome';
   static const String login = '/login';
   static const String signUp = '/sign-up';

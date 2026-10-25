@@ -231,6 +231,9 @@
 
   "profileTitle": "Profile",
 
+  "updateRequiredTitle": "Update the app to continue",
+  "updateRequiredMessage": "This version is no longer supported. Install the latest version to keep using your plan.",
+  "updateRequiredAction": "Update now",
   "homeGreetingMorning": "Good morning",
   "homeGreetingAfternoon": "Good afternoon",
   "homeGreetingEvening": "Good evening",

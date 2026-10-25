@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../services/app_version/app_update_status.dart';
+import '../widgets/update_required_page.dart';
 import '../../features/authentication/presentation/pages/forgot_password_page.dart';
 import '../../features/authentication/presentation/pages/login_page.dart';
 import '../../features/authentication/presentation/pages/sign_up_page.dart';
@@ -84,6 +86,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     }
   });
   ref.listen(guestModeProvider, (previous, next) => refreshNotifier.notify());
+  ref.listen(appUpdateStatusProvider, (previous, next) => refreshNotifier.notify());
 
   return GoRouter(
     initialLocation: RoutePaths.splash,
@@ -96,6 +99,14 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final authState = ref.read(authStateChangesProvider);
       final location = state.matchedLocation;
+
+      // Versión mínima obligatoria (Épica 17) — antes que cualquier otra
+      // regla: con la versión vieja no se navega a ningún lado. Mientras la
+      // consulta no resuelve (o si falla) no bloquea: falla abierto, ver
+      // `appUpdateStatusProvider`.
+      final updateRequired = ref.read(appUpdateStatusProvider).valueOrNull?.isUpdateRequired ?? false;
+      if (updateRequired) return location == RoutePaths.updateRequired ? null : RoutePaths.updateRequired;
+      if (location == RoutePaths.updateRequired) return RoutePaths.splash;
 
       if (authState.isLoading && !authState.hasValue) {
         return location == RoutePaths.splash ? null : RoutePaths.splash;
@@ -140,6 +151,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(name: 'splash', path: RoutePaths.splash, builder: (context, state) => const SplashPage()),
+      GoRoute(
+        name: 'update_required',
+        path: RoutePaths.updateRequired,
+        builder: (context, state) => const UpdateRequiredPage(),
+      ),
       GoRoute(name: 'welcome', path: RoutePaths.welcome, builder: (context, state) => const WelcomePage()),
       GoRoute(name: 'onboarding', path: RoutePaths.onboarding, builder: (context, state) => const OnboardingPage()),
       GoRoute(
