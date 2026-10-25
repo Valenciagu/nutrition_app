@@ -38,6 +38,27 @@ class FirebasePlanRepository implements PlanRepository {
   }
 
   @override
+  Future<List<NutritionPlan>> getRecentPlans({required String userId, required String untilDate, required int limit}) async {
+    try {
+      // El id del documento ES la fecha YYYY-MM-DD, que ordena igual
+      // lexicográfica que cronológicamente — no hace falta índice compuesto.
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('nutritionPlans')
+          .where(FieldPath.documentId, isLessThanOrEqualTo: untilDate)
+          .orderBy(FieldPath.documentId, descending: true)
+          .limit(limit)
+          .get();
+      return snapshot.docs.map((doc) => NutritionPlan.fromJson(doc.data())).toList();
+    } on FirebaseException catch (e) {
+      throw _mapFirestoreException(e);
+    } on TypeError catch (e) {
+      throw AiValidationFailure(message: 'El plan guardado tiene una forma inesperada', cause: e);
+    }
+  }
+
+  @override
   Future<NutritionPlan> generatePlan({required String userId, required String date}) async {
     // `remainingToday` viaja en la respuesta pero todavía no se muestra en
     // ningún lado del cliente — no hay una UI que lo necesite todavía, se

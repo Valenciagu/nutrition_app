@@ -233,7 +233,7 @@ class _PopulatedPlan extends ConsumerWidget {
           MealCard(
             overlineText: meal.status == MealStatus.registered
                 ? l10n.planMealOverlineRegistered(mealSlotLabel(l10n, meal.slotLabelKey))
-                : l10n.planMealOverlineScheduled(mealSlotLabel(l10n, meal.slotLabelKey), _timeLabel(meal)),
+                : l10n.planMealOverlineScheduled(mealSlotLabel(l10n, meal.slotLabelKey), meal.timeLabel),
             title: meal.name,
             detailText: meal.status == MealStatus.registered
                 ? l10n.planCaloriesValue(meal.calories)
@@ -259,12 +259,6 @@ class _PopulatedPlan extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  String _timeLabel(PlannedMeal meal) {
-    final hour = meal.scheduledHour.toString().padLeft(2, '0');
-    final minute = meal.scheduledMinute.toString().padLeft(2, '0');
-    return '$hour:$minute';
   }
 
   void _showMealActionsSheet(BuildContext context, WidgetRef ref, PlannedMeal meal) {

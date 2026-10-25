@@ -48,6 +48,11 @@ class PlannedMeal {
   final MealStatus status;
   final String? recipeId;
 
+  /// "HH:mm" — formato de 24 h igual en todos los idiomas, por eso no pasa
+  /// por `AppLocalizations`. Lo comparten D1 (Plan) y C1 (Home).
+  String get timeLabel =>
+      '${scheduledHour.toString().padLeft(2, '0')}:${scheduledMinute.toString().padLeft(2, '0')}';
+
   PlannedMeal copyWith({
     String? id,
     String? slotLabelKey,

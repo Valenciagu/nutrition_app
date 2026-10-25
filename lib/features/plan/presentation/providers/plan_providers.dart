@@ -10,6 +10,7 @@ import '../../data/repositories/firebase_plan_repository.dart';
 import '../../domain/entities/meal_alternative.dart';
 import '../../domain/entities/nutrition_plan.dart';
 import '../../domain/repositories/plan_repository.dart';
+import '../../domain/streak_calculator.dart';
 
 /// D1 (día) / D2 (semana) — mismo toggle "Semana"/"Día" del diseño, sin
 /// navegar a una ruta nueva: cambia qué contenido pinta `PlanPage` dentro
@@ -42,6 +43,39 @@ final planForDateProvider = FutureProvider.autoDispose<NutritionPlan?>((ref) asy
   return ref.watch(planRepositoryProvider).getPlan(userId: uid, date: dateKey(date));
 });
 
+/// El plan de HOY, independiente del día que esté mirando D1
+/// (`selectedPlanDateProvider`) — lo consume Home (C1). `null` sin sesión o
+/// sin plan generado para hoy.
+final todayPlanProvider = FutureProvider.autoDispose<NutritionPlan?>((ref) async {
+  final uid = ref.watch(authStateChangesProvider).valueOrNull?.uid;
+  if (uid == null) return null;
+  return ref.watch(planRepositoryProvider).getPlan(userId: uid, date: dateKey(DateTime.now()));
+});
+
+/// Cuántos días hacia atrás mira la racha — una sola query acotada; una
+/// racha más larga se muestra como este tope, no como un número inventado.
+const streakLookbackDays = 60;
+
+/// Racha de días seguidos con alguna comida registrada (ver
+/// `computeStreak`). 0 sin sesión.
+final streakProvider = FutureProvider.autoDispose<int>((ref) async {
+  final uid = ref.watch(authStateChangesProvider).valueOrNull?.uid;
+  if (uid == null) return 0;
+  final now = DateTime.now();
+  final plans = await ref
+      .watch(planRepositoryProvider)
+      .getRecentPlans(userId: uid, untilDate: dateKey(now), limit: streakLookbackDays);
+  return computeStreak(plans, now);
+});
+
+/// Tras cualquier escritura sobre un plan: además de D1, Home (C1) muestra
+/// el plan de hoy y la racha, que viven en providers propios.
+void _invalidatePlanReads(Ref ref) {
+  ref.invalidate(planForDateProvider);
+  ref.invalidate(todayPlanProvider);
+  ref.invalidate(streakProvider);
+}
+
 /// Orquesta "Generar plan" — mismo patrón `AsyncNotifier` que
 /// `AuthController`/`OnboardingController`: el estado `AsyncValue<void>` le
 /// da a la pantalla loading/error "gratis" vía `AsyncValue.guard`.
@@ -61,7 +95,7 @@ class GeneratePlanController extends AsyncNotifier<void> {
       await ref.read(planRepositoryProvider).generatePlan(userId: uid, date: dateKey(date));
     });
     if (!state.hasError) {
-      ref.invalidate(planForDateProvider);
+      _invalidatePlanReads(ref);
       ref.read(analyticsServiceProvider).logPlanGenerated();
     }
   }
@@ -105,7 +139,7 @@ class AdjustPlanController extends AsyncNotifier<void> {
       await ref.read(planRepositoryProvider).adjustPlan(userId: uid, date: dateKey(date), message: message);
     });
     if (!state.hasError) {
-      ref.invalidate(planForDateProvider);
+      _invalidatePlanReads(ref);
       ref.read(analyticsServiceProvider).logPlanAdjusted();
     }
   }
@@ -132,7 +166,7 @@ class MealRegistrationController extends AsyncNotifier<void> {
           .setMealRegistered(userId: uid, date: dateKey(date), mealId: mealId, registered: registered);
     });
     if (!state.hasError) {
-      ref.invalidate(planForDateProvider);
+      _invalidatePlanReads(ref);
       // Solo se reporta al registrar, no al deshacer — el evento representa
       // "el usuario comió esto", no cada toggle del switch.
       if (registered) ref.read(analyticsServiceProvider).logMealRegistered();
@@ -177,7 +211,7 @@ class MealAlternativesController extends AsyncNotifier<List<MealAlternative>?> {
       return null;
     });
     if (!state.hasError) {
-      ref.invalidate(planForDateProvider);
+      _invalidatePlanReads(ref);
       ref.read(analyticsServiceProvider).logMealReplaced();
     }
   }

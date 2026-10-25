@@ -300,6 +300,21 @@
   "homeGroceryRowSubtitle": "Con lo que necesitas esta semana",
   "homeAiRowTitle": "Pregúntale algo a la IA",
   "homeAiRowSubtitle": "“¿Qué ceno si llego tarde?”",
+  "homeCaloriesLeftLabel": "kcal libres",
+  "homeCaloriesEatenLabel": "kcal consumidas",
+  "homeProteinEatenLabel": "g de proteína",
+  "homeMealsRegisteredLabel": "comidas registradas",
+  "homeUpNextLabel": "Ahora toca",
+  "homeCookAction": "Cocinar",
+  "homeSwapAction": "Cambiar",
+  "homeDayCompleteTitle": "Registraste todas las comidas de hoy",
+  "homeDayCompleteSubtitle": "Buen trabajo. Mañana tu plan te espera.",
+  "homeQuickActionsLabel": "Acciones rápidas",
+  "homeAnalyzeRowSubtitle": "Hazle una foto y la analizamos",
+  "homeStreakSemantics": "{count, plural, =1{1 día seguido} other{{count} días seguidos}}",
+  "@homeStreakSemantics": {
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "cameraSheetTitle": "¿Qué quieres hacer?",
   "cameraSheetAnalyzeMealTitle": "Analizar mi comida",

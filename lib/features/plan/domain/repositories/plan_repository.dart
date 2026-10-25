@@ -13,6 +13,11 @@ abstract class PlanRepository {
   /// una semana (5 lecturas), no pensado para rangos largos.
   Future<Map<String, NutritionPlan?>> getPlansForDates({required String userId, required List<String> dates});
 
+  /// Los últimos [limit] planes con fecha <= [untilDate] (YYYY-MM-DD), del
+  /// más reciente al más antiguo — una sola query, para la racha de Home.
+  /// Los días sin plan simplemente no aparecen.
+  Future<List<NutritionPlan>> getRecentPlans({required String userId, required String untilDate, required int limit});
+
   /// Genera (y persiste server-side) un plan nuevo para esa fecha,
   /// sobrescribiendo cualquier plan anterior del mismo día.
   Future<NutritionPlan> generatePlan({required String userId, required String date});

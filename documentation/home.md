@@ -1,5 +1,20 @@
 # Épica 4 — Home
 
+## Actualización 2026-10-19 — C1 con datos reales
+
+Home ya no se queda siempre en C3. Si hay un plan para HOY (`todayPlanProvider`, nuevo en `plan_providers.dart`, independiente del día que mire Plan) se pinta **C1**:
+
+- **Anillo**: kcal libres = meta (`homeDailyCalorieGoalProvider`) − kcal de comidas registradas. Al pasarse de la meta el anillo queda lleno y la cifra en 0 — nunca negativo ni rojo.
+- **Cifras**: kcal consumidas, proteína consumida y comidas registradas, con `MacroStatTile`. **Desviación consciente del diseño**: C1 propone 3 `MacroBar` (proteína/carbos/grasas), pero el plan solo guarda kcal y proteína por comida — carbos/grasas serían inventados (mismo criterio que B9). Si el backend empieza a guardar esos macros, se construye `MacroBar`.
+- **"Ahora toca"**: `MealCard` de la primera comida pendiente (misma regla que D1) + "Cocinar" (abre D3) y "Cambiar" (hoja D4, alineando `selectedPlanDateProvider` a hoy). Con todo registrado, una tarjeta de "día completo".
+- **Acciones rápidas**: filas `QuickActionTile` (Analizar comida, Lista de compra, IA). El diseño propone grid 2x2; se mantuvo la variante de fila ya construida.
+- **Racha**: badge ámbar en el header (`streakProvider` + `computeStreak` en `plan/domain/streak_calculator.dart`): días seguidos con ≥1 comida registrada, contando desde ayer si hoy aún no hay registros. Una sola query (`PlanRepository.getRecentPlans`, últimos 60 planes ≤ hoy, ordenados por id de documento — sin índice compuesto). Color ámbar confirmado por el usuario el 2026-10-25.
+- Las acciones de Plan (generar, ajustar, registrar, reemplazar) invalidan además `todayPlanProvider` y `streakProvider` (`_invalidatePlanReads`), así que Home se actualiza al volver.
+- Pull-to-refresh en Home.
+- **C3**: las filas "Empieza por aquí" ahora navegan de verdad (Plan, Lista de compra, IA) en vez de mostrar "Muy pronto".
+
+Sigue pendiente: **C2** (`AISuggestionCard` tras una comida imprevista) — no existe un evento guardado de "comida imprevista" que lo dispare. Tests a escribir en la pasada de tests: `computeStreak` (hoy sin registros, huecos, día sin plan).
+
 ## Qué hace
 
 Shell principal de la app: 4 tabs (Home, Plan, IA, Perfil) + botón de cámara central, usando `StatefulShellRoute` de GoRouter para que cada tab mantenga su propia pila de navegación. Home muestra el estado "primer día" (C3 del diseño): saludo, anillo de calorías apagado con la meta calculada en el Onboarding, y 3 accesos rápidos. Plan e IA son placeholders (`ComingSoonPage`) hasta las Épicas 6 y 5; Perfil aloja temporalmente el botón de cerrar sesión hasta la Épica 11.

@@ -246,6 +246,21 @@
   "homeGroceryRowSubtitle": "With what you need this week",
   "homeAiRowTitle": "Ask the AI something",
   "homeAiRowSubtitle": "\"What should I have for dinner if I'm running late?\"",
+  "homeCaloriesLeftLabel": "kcal left",
+  "homeCaloriesEatenLabel": "kcal eaten",
+  "homeProteinEatenLabel": "g protein",
+  "homeMealsRegisteredLabel": "meals logged",
+  "homeUpNextLabel": "Up next",
+  "homeCookAction": "Cook",
+  "homeSwapAction": "Swap",
+  "homeDayCompleteTitle": "You logged every meal today",
+  "homeDayCompleteSubtitle": "Nice work. Your plan will be waiting tomorrow.",
+  "homeQuickActionsLabel": "Quick actions",
+  "homeAnalyzeRowSubtitle": "Snap a photo and we'll analyze it",
+  "homeStreakSemantics": "{count, plural, =1{1 day in a row} other{{count} days in a row}}",
+  "@homeStreakSemantics": {
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "cameraSheetTitle": "What do you want to do?",
   "cameraSheetAnalyzeMealTitle": "Analyze my meal",
