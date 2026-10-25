@@ -105,6 +105,7 @@ Validated: `flutter analyze` clean, `flutter build web --debug` succeeds after b
 - Depends on: Epic 5, Storage rules (security skill).
 
 ## Epic 9 — Ingredient Photo Analysis (Premium)
+- **2026-10-19**: still parked — asked the user whether to build it open-to-all now or keep waiting for Epic 13 (product decision, not a technical one).
 - [ ] Same pipeline as Epic 8, applied to fridge/pantry photos → recipe suggestions.
 - Depends on: Epic 8 (done), Epic 13 (premium gating, deferred — see below). **Deliberately NOT given a provisional gate**: this feature's entire premise is being premium-exclusive — shipping it open-to-everyone "for now" would be a real, silent product decision (converting a premium feature into a free one), not a technical stand-in. Stays parked until Epic 13 exists.
 
