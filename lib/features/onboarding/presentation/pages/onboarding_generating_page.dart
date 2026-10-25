@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -78,7 +79,15 @@ class _OnboardingGeneratingPageState extends ConsumerState<OnboardingGeneratingP
             AppSpacing.space20,
           ),
           child: state.hasError
-              ? _ErrorState(onRetry: _generate)
+              ? _ErrorState(
+                  error: state.error!,
+                  onRetry: _generate,
+                  // Salida del error: vuelve al último paso del stepper
+                  // (`onboardingStepIndexProvider` no es autoDispose) con
+                  // las respuestas intactas — sin esto, si el reintento
+                  // falla siempre, la pantalla no tiene escapatoria.
+                  onBack: () => context.go(RoutePaths.onboarding),
+                )
               : AnimatedBuilder(
                   animation: _choreography,
                   builder: (context, _) {
@@ -192,14 +201,25 @@ class _ChecklistRow extends StatelessWidget {
 }
 
 class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.onRetry});
+  const _ErrorState({required this.error, required this.onRetry, required this.onBack});
 
+  final Object error;
   final VoidCallback onRetry;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.colors;
+    final error = this.error;
+    debugPrint('Onboarding plan generation failed: $error (cause: ${error is Failure ? error.cause : null})');
+    // `failureValidationMessage` habla de "otra foto" (Épica 8) — aquí no
+    // aplica, así que ese caso y el genérico usan el mensaje propio de B8.
+    final message = switch (error) {
+      ValidationFailure() => l10n.onboardingGeneratingErrorMessage,
+      Failure() => l10n.messageForError(error),
+      _ => l10n.onboardingGeneratingErrorMessage,
+    };
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -207,12 +227,14 @@ class _ErrorState extends StatelessWidget {
         Icon(Icons.error_outline, size: 48, color: colors.error),
         const SizedBox(height: 16),
         Text(
-          l10n.onboardingGeneratingErrorMessage,
+          message,
           textAlign: TextAlign.center,
           style: AppTypography.bodyL.copyWith(fontSize: 15, color: colors.textSecondary),
         ),
         const Spacer(),
         AppButton(label: l10n.onboardingGeneratingRetryButton, fullWidth: true, onPressed: onRetry),
+        const SizedBox(height: AppSpacing.space8),
+        AppButton(label: l10n.commonBackAction, variant: AppButtonVariant.text, fullWidth: true, onPressed: onBack),
       ],
     );
   }

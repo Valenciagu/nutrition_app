@@ -108,6 +108,18 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 
 ---
 
+## Onboarding — B8 (generación del plan)
+
+### BUG-O08 — B8 sin salida si la generación del plan falla
+- **Reportado** (2026-10-19): al terminar el onboarding, B8 mostraba "No pudimos generar tu plan" con un único botón "Reintentar"; si el reintento volvía a fallar, el usuario quedaba atrapado (B8 no tiene header ni botón de volver).
+- **Causa raíz (UX)**: `_ErrorState` solo ofrecía reintentar y siempre mostraba el mismo mensaje genérico, sin importar qué falló (sesión anónima, Firestore, `generateDailyPlan`, App Check, cuota).
+- **Fix**: el error ahora muestra el mensaje específico vía `messageForError` (salvo `ValidationFailure`, cuyo texto habla de fotos) y lo imprime con `debugPrint` (error + causa); nuevo botón "Volver" que regresa al último paso del stepper con las respuestas intactas.
+- **Causa raíz del fallo en sí**: el proveedor "Anónimo" seguía sin activar en Firebase Console (pendiente manual de ONBOARD-101). Activado por el usuario 2026-10-19; la generación del plan pasa a B9 — confirmado por el usuario.
+- **Archivo**: `lib/features/onboarding/presentation/pages/onboarding_generating_page.dart`.
+- **Estado**: corregido (salida + diagnóstico), sin commitear.
+
+---
+
 ## Resumen
 
 | ID | Épica | Bug | Causa raíz | Estado |
@@ -121,6 +133,7 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 | BUG-O06 | Home (hoja de cámara) | Overflow en "Analizar mi comida" | `showAppBottomSheet` sin scroll, padding de safe-area varía por dispositivo | Corregido y commiteado |
 | BUG-O07 | Shell principal | Botones del sistema se superponen a la barra de tabs | `BottomNavigation` sin `SafeArea` | Corregido y commiteado |
 | BUG-D01 | Backend/Deployment | Todas las funciones devolvían 403 pese a deploy exitoso | `firebase-tools` nunca re-aplica el invoker público en un `update`, solo en `create` | Corregido y commiteado, confirmado en producción |
+| BUG-O08 | Onboarding | B8 sin salida si falla la generación del plan | Error solo ofrecía "Reintentar", mensaje genérico | Corregido, confirmado por el usuario (proveedor Anónimo activado) |
 | BUG-A01 | Analytics | Crash tras analizar foto (`_AssertionError`) | `bool` pasado como valor de parámetro de evento (solo acepta `String`/`num`) | Corregido y commiteado |
 
 **Bugs BUG-H01/O01-O07 confirmados resueltos por el usuario y todos commiteados.** BUG-D01/A01 encontrados y corregidos 2026-09-30 durante el primer ciclo de pruebas end-to-end en producción — ambos confirmados funcionando por el usuario.

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -109,6 +110,28 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
   Future<void> _signInWithGoogle() async {
     await ref.read(authControllerProvider.notifier).signInWithGoogle();
+  }
+
+  /// Si venía de B9 ya hay una sesión anónima (con el plan ya en Firestore
+  /// bajo ese `uid`) — `ensureAnonymousSession` no hace nada en ese caso. Si
+  /// llegó aquí directo desde Login sin pasar por Onboarding, esto le da una
+  /// sesión real igual, para que Plan/IA funcionen como invitado también por
+  /// ese camino. `ensureAnonymousSession` no pasa por el `state` del
+  /// controlador (ver su doc), así que el error se captura aquí: sin esto un
+  /// fallo de Firebase quedaba como excepción no capturada y el botón no
+  /// hacía nada.
+  Future<void> _continueAsGuest() async {
+    try {
+      await ref.read(authControllerProvider.notifier).ensureAnonymousSession();
+    } on AuthFailure catch (e) {
+      debugPrint('Anonymous sign-in failed: ${e.code} — ${e.message}');
+      if (!mounted) return;
+      final message = mapAuthError(context.l10n, e).generalError ?? context.l10n.authErrorGeneric;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      return;
+    }
+    await ref.read(onboardingRepositoryProvider).clearDraft();
+    if (mounted) context.go(RoutePaths.root);
   }
 
   @override
@@ -271,17 +294,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               const SizedBox(height: AppSpacing.space12),
               Center(
                 child: GestureDetector(
-                  onTap: () async {
-                    // Si venía de B9 ya hay una sesión anónima (con el plan
-                    // ya en Firestore bajo ese `uid`) — `ensureAnonymousSession`
-                    // no hace nada en ese caso. Si llegó aquí directo desde
-                    // Login sin pasar por Onboarding, esto le da una sesión
-                    // real igual, para que Plan/IA funcionen como invitado
-                    // también por ese camino.
-                    await ref.read(authControllerProvider.notifier).ensureAnonymousSession();
-                    await ref.read(onboardingRepositoryProvider).clearDraft();
-                    if (context.mounted) context.go(RoutePaths.root);
-                  },
+                  onTap: _continueAsGuest,
                   child: Text(
                     l10n.authSignUpGuestAction,
                     style: AppTypography.bodyM.copyWith(fontSize: 13, color: colors.textDisabled),
