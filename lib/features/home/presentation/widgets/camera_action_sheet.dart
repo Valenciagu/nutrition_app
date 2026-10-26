@@ -16,11 +16,52 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/quick_action_tile.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
 
-/// C5 · Acción central (Fase 3 · Home). "Analizar mi comida" (Épica 8) es la
-/// única de las 3 opciones conectada a algo real — las otras 2
-/// (Ingredientes → Épica 9, Registrar sin foto → sin épica dueña todavía)
-/// siguen confirmando la intención con un snackbar, mismo criterio que
-/// antes de la Épica 8 (ver `documentation/food_analysis.md`).
+/// Pide una foto (cámara o galería) y abre [route] con sus bytes por
+/// `extra`. Lo comparten "Analizar mi comida" (Épica 8) y "Tengo
+/// ingredientes" (Épica 9), desde esta hoja o directo desde Home.
+///
+/// Las dos exigen subir a Storage y llamar a una Cloud Function
+/// autenticada (Instrucciones.md §70) — sin camino de invitado, mismo
+/// criterio que Plan (Épica 6). Se revisa la sesión ANTES de abrir la
+/// cámara/galería: pedirle una foto a un invitado para recién ahí decirle
+/// que necesita una cuenta sería peor UX que no pedírsela.
+Future<void> pickPhotoAndOpen(BuildContext context, WidgetRef ref, {required String route, required String title}) async {
+  final uid = ref.read(authStateChangesProvider).valueOrNull?.uid;
+  if (uid == null) {
+    if (context.mounted) context.go(RoutePaths.signUp);
+    return;
+  }
+
+  final source = await _showImageSourceSheet(context, title);
+  if (source == null || !context.mounted) return;
+
+  final picked = await ImagePicker().pickImage(
+    source: source,
+    // Compresión del lado del cliente (Instrucciones.md §68) — la
+    // validación real de tamaño/tipo la hace `storage.rules` server-side,
+    // esto es solo para no subir una foto de cámara sin comprimir.
+    imageQuality: 70,
+    maxWidth: 1600,
+  );
+  if (picked == null || !context.mounted) return;
+
+  final bytes = await picked.readAsBytes();
+  if (context.mounted) context.push(route, extra: bytes);
+}
+
+Future<void> startIngredientAnalysis(BuildContext context, WidgetRef ref) {
+  return pickPhotoAndOpen(
+    context,
+    ref,
+    route: RoutePaths.ingredientAnalysis,
+    title: context.l10n.cameraSheetIngredientsTitle,
+  );
+}
+
+/// C5 · Acción central (Fase 3 · Home). "Analizar mi comida" (Épica 8) y
+/// "Tengo ingredientes" (Épica 9) abren la cámara/galería; "Registrar sin
+/// foto" (sin épica dueña todavía) sigue confirmando la intención con un
+/// snackbar.
 Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
   final l10n = context.l10n;
   final colors = context.colors;
@@ -30,35 +71,14 @@ Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.comingSoonSnackbarMessage)));
   }
 
-  Future<void> handleAnalyzeMeal(BuildContext sheetContext) async {
+  void handleAnalyzeMeal(BuildContext sheetContext) {
     Navigator.of(sheetContext).pop();
+    pickPhotoAndOpen(context, ref, route: RoutePaths.foodAnalysis, title: l10n.cameraSheetAnalyzeMealTitle);
+  }
 
-    // Analizar una foto exige subirla a Storage y llamar a una Cloud
-    // Function autenticada (Instrucciones.md §70) — sin camino de invitado,
-    // mismo criterio que Plan (Épica 6). Se revisa la sesión ANTES de abrir
-    // la cámara/galería: pedirle una foto a un invitado para recién ahí
-    // decirle que necesita una cuenta sería peor UX que no pedírsela.
-    final uid = ref.read(authStateChangesProvider).valueOrNull?.uid;
-    if (uid == null) {
-      if (context.mounted) context.go(RoutePaths.signUp);
-      return;
-    }
-
-    final source = await _showImageSourceSheet(context);
-    if (source == null || !context.mounted) return;
-
-    final picked = await ImagePicker().pickImage(
-      source: source,
-      // Compresión del lado del cliente (Instrucciones.md §68) — la
-      // validación real de tamaño/tipo la hace `storage.rules` server-side,
-      // esto es solo para no subir una foto de cámara sin comprimir.
-      imageQuality: 70,
-      maxWidth: 1600,
-    );
-    if (picked == null || !context.mounted) return;
-
-    final bytes = await picked.readAsBytes();
-    if (context.mounted) context.push(RoutePaths.foodAnalysis, extra: bytes);
+  void handleIngredients(BuildContext sheetContext) {
+    Navigator.of(sheetContext).pop();
+    startIngredientAnalysis(context, ref);
   }
 
   return showAppBottomSheet(
@@ -81,7 +101,7 @@ Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
             iconBackgroundColor: colors.actionPrimarySurface,
             title: l10n.cameraSheetIngredientsTitle,
             subtitle: l10n.cameraSheetIngredientsSubtitle,
-            onTap: () => handleComingSoon(sheetContext),
+            onTap: () => handleIngredients(sheetContext),
           ),
           const SizedBox(height: 10),
           _SheetOption(
@@ -106,15 +126,15 @@ Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
 
 /// "Tomar foto" / "Elegir de la galería" (Instrucciones.md §6: el usuario
 /// debe poder "tomar O subir" una foto de comida) — una segunda hoja, en vez
-/// de forzar la elección dentro de la primera, para no complicar las otras 2
-/// opciones que no la necesitan.
-Future<ImageSource?> _showImageSourceSheet(BuildContext context) {
+/// de forzar la elección dentro de la primera, para no complicar la opción
+/// que no la necesita.
+Future<ImageSource?> _showImageSourceSheet(BuildContext context, String title) {
   final l10n = context.l10n;
   final colors = context.colors;
 
   return showAppBottomSheet<ImageSource>(
     context,
-    title: l10n.cameraSheetAnalyzeMealTitle,
+    title: title,
     builder: (sheetContext) {
       return Column(
         mainAxisSize: MainAxisSize.min,

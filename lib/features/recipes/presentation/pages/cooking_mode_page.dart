@@ -25,12 +25,15 @@ import '../../domain/entities/recipe_step.dart';
 /// Al terminar el último paso, registra la comida directamente (mismo
 /// controlador que "Registrar" en D3) y vuelve al plan — nota del diseño:
 /// "lleva a registrar la comida directamente".
+///
+/// [mealId] es `null` para una receta que no pertenece a ningún plan (una
+/// sugerencia desde una foto de ingredientes, Épica 9): no hay comida que
+/// registrar, así que terminar solo cierra el modo cocina.
 class CookingModePage extends ConsumerStatefulWidget {
-  const CookingModePage({super.key, required this.recipe, required this.date, required this.mealId});
+  const CookingModePage({super.key, required this.recipe, this.mealId});
 
   final Recipe recipe;
-  final String date;
-  final String mealId;
+  final String? mealId;
 
   @override
   ConsumerState<CookingModePage> createState() => _CookingModePageState();
@@ -87,7 +90,12 @@ class _CookingModePageState extends ConsumerState<CookingModePage> {
       _goToStep(_stepIndex + 1);
       return;
     }
-    await ref.read(mealRegistrationControllerProvider.notifier).setRegistered(widget.mealId, registered: true);
+    final mealId = widget.mealId;
+    if (mealId == null) {
+      context.pop();
+      return;
+    }
+    await ref.read(mealRegistrationControllerProvider.notifier).setRegistered(mealId, registered: true);
     if (mounted) context.go(RoutePaths.plan);
   }
 

@@ -6,8 +6,8 @@ Pasada dedicada, como se había acordado (no tests por feature). Prioridad: lóg
 
 | Qué | Comando | Dónde |
 |---|---|---|
-| Dart (unitarios) | `flutter test` | raíz |
-| Backend (unitarios) | `npm test` | `functions/` |
+| Dart (unitarios, 40) | `flutter test` | raíz |
+| Backend (unitarios, 15) | `npm test` | `functions/` |
 | Reglas de Firestore | `npm run test:rules` | `functions/` — levanta el emulador con `firebase emulators:exec` (necesita Java); usa un projectId `demo-*`, nunca toca el proyecto real |
 
 El backend usa el runner propio de Node (`node:test`), sin agregar Jest/Mocha. Los tests se compilan con `tsconfig.test.json` a `functions/test-build/` (en `.gitignore` y en el `ignore` de `firebase.json`, así que nunca se despliegan).
@@ -22,9 +22,10 @@ El backend usa el runner propio de Node (`node:test`), sin agregar Jest/Mocha. L
 - `features/onboarding` — `estimateDailyCalories` con valores calculados a mano.
 - `features/grocery_list` — `categorizeIngredient`, incluida la regresión de "fresas"/"queso fresco".
 - `features/notifications` — `isInQuietHours`, incluido el rango que cruza medianoche.
+- `features/ingredients` — parseo de la respuesta de `suggestRecipesFromIngredients` (2026-10-25).
 
 **Backend (`functions/test/`)**
-- `safety.test.ts` — las 4 capas de seguridad: plan (rango de calorías, autorreporte), receta (escaneo de alérgenos por ingrediente, macros vs. calorías), foto (advierte sin bloquear), asistente (alimento evitado, instrucciones de medicación).
+- `safety.test.ts` — las capas de seguridad, incluido `filterSafeSuggestedRecipes` de la Épica 9 (descarta solo las inseguras y escanea también los faltantes): plan (rango de calorías, autorreporte), receta (escaneo de alérgenos por ingrediente, macros vs. calorías), foto (advierte sin bloquear), asistente (alimento evitado, instrucciones de medicación).
 - `calorieEstimate.test.ts` — **paridad con Dart**: mismos casos y mismos resultados que el test de Dart. Si alguien cambia la fórmula en un solo lado, uno de los dos falla.
 
 **Reglas (`functions/test/rules/firestore.rules-spec.ts`)**

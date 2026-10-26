@@ -37,6 +37,13 @@ abstract final class RoutePaths {
   /// GoRouter (binario, no cabe en la URL).
   static const String foodAnalysis = '/food-analysis';
 
+  /// Épica 9 — "Tengo ingredientes": mismo criterio que [foodAnalysis]. La
+  /// receta sugerida y su modo cocina reciben la receta por `extra` (no hay
+  /// id que leer de Firestore: las sugerencias no se guardan).
+  static const String ingredientAnalysis = '/ingredients';
+  static const String ingredientRecipe = '/ingredients/recipe';
+  static const String ingredientRecipeCooking = '/ingredients/recipe/cook';
+
   /// D3 (Épica 7) — anidada bajo `plan` (no una tab propia) para que D3 y D5
   /// vivan en la pila de navegación del tab Plan, con el back nativo
   /// funcionando sin lógica extra. `recipe` toma `date`/`mealId`, no

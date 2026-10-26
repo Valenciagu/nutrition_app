@@ -40,4 +40,7 @@ export const AI_MODELS = {
   // distinto, sino para poder enrutar análisis de imagen a un modelo
   // diferente en el futuro sin tocar `analyzeFoodPhoto.ts`.
   foodPhotoAnalysis: "gpt-5.6-luna",
+  // Épica 9 (Instrucciones.md §7: "without hard-coding the functionality to
+  // a single image model") — clave propia por el mismo motivo.
+  ingredientPhotoAnalysis: "gpt-5.6-luna",
 } as const;

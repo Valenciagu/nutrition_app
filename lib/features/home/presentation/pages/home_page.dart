@@ -251,6 +251,14 @@ class _PopulatedHome extends ConsumerWidget {
           onTap: () => showCameraActionSheet(context, ref),
         ),
         const SizedBox(height: 10),
+        QuickActionTile(
+          svgIcon: AppAssets.iconIngredientsPhoto,
+          title: l10n.cameraSheetIngredientsTitle,
+          subtitle: l10n.cameraSheetIngredientsSubtitle,
+          iconBackgroundColor: colors.actionPrimarySurface,
+          onTap: () => startIngredientAnalysis(context, ref),
+        ),
+        const SizedBox(height: 10),
         const _GroceryRow(),
         const SizedBox(height: 10),
         const _AiRow(),
@@ -268,7 +276,14 @@ class _UpNextMeal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    void openRecipe() => context.go(RoutePaths.recipeDetailPath(plan.date, meal.id));
+    // "Registrar" en D3/D5 opera sobre el día que mira Plan
+    // (`selectedPlanDateProvider`), no sobre la fecha de la ruta — se alinea
+    // a hoy antes de abrir, igual que "Cambiar".
+    void alignPlanToToday() => ref.read(selectedPlanDateProvider.notifier).state = DateTime.now();
+    void openRecipe() {
+      alignPlanToToday();
+      context.go(RoutePaths.recipeDetailPath(plan.date, meal.id));
+    }
 
     return Column(
       children: [
@@ -294,9 +309,7 @@ class _UpNextMeal extends ConsumerWidget {
                 size: AppButtonSize.md,
                 fullWidth: true,
                 onPressed: () {
-                  // La hoja de reemplazo (D4) opera sobre el día que mira
-                  // Plan — se alinea a hoy, que es el plan de esta comida.
-                  ref.read(selectedPlanDateProvider.notifier).state = DateTime.now();
+                  alignPlanToToday();
                   showReplaceMealSheet(context, meal);
                 },
               ),

@@ -22,6 +22,9 @@ import '../../features/onboarding/presentation/providers/onboarding_providers.da
 import '../../features/plan/domain/entities/nutrition_plan.dart';
 import '../../features/food_analysis/presentation/pages/food_analysis_page.dart';
 import '../../features/grocery_list/presentation/pages/grocery_list_page.dart';
+import '../../features/ingredients/domain/entities/ingredient_suggestions.dart';
+import '../../features/ingredients/presentation/pages/ingredient_analysis_page.dart';
+import '../../features/ingredients/presentation/pages/suggested_recipe_page.dart';
 import '../../features/notifications/presentation/pages/notification_settings_page.dart';
 import '../../features/plan/presentation/pages/plan_page.dart';
 import '../../features/profile/presentation/pages/edit_goal_biometrics_page.dart';
@@ -173,6 +176,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.foodAnalysis,
         builder: (context, state) => FoodAnalysisPage(imageBytes: state.extra! as Uint8List),
       ),
+      GoRoute(
+        name: 'ingredient_analysis',
+        path: RoutePaths.ingredientAnalysis,
+        builder: (context, state) => IngredientAnalysisPage(imageBytes: state.extra! as Uint8List),
+      ),
+      GoRoute(
+        name: 'ingredient_recipe',
+        path: RoutePaths.ingredientRecipe,
+        builder: (context, state) => SuggestedRecipePage(suggestion: state.extra! as SuggestedRecipe),
+      ),
+      GoRoute(
+        name: 'ingredient_recipe_cooking',
+        path: RoutePaths.ingredientRecipeCooking,
+        builder: (context, state) => CookingModePage(recipe: state.extra! as Recipe),
+      ),
       GoRoute(name: 'login', path: RoutePaths.login, builder: (context, state) => const LoginPage()),
       GoRoute(
         name: 'sign_up',
@@ -212,7 +230,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                         path: RoutePaths.cookingModeSegment,
                         builder: (context, state) => CookingModePage(
                           recipe: state.extra! as Recipe,
-                          date: state.pathParameters['date']!,
                           mealId: state.pathParameters['mealId']!,
                         ),
                       ),

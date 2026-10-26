@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/firebase_functions_error_mapper.dart';
+import '../../../../core/errors/firebase_storage_error_mapper.dart';
 import '../../domain/entities/food_analysis_result.dart';
 import '../../domain/repositories/food_analysis_repository.dart';
 
@@ -29,7 +30,7 @@ class FirebaseFoodAnalysisRepository implements FoodAnalysisRepository {
       final ref = _storage.ref('users/$userId/foodAnalyses/$analysisId.jpg');
       await ref.putData(imageBytes, SettableMetadata(contentType: 'image/jpeg'));
     } on FirebaseException catch (e) {
-      throw _mapStorageException(e);
+      throw mapFirebaseStorageException(e);
     }
 
     try {
@@ -40,18 +41,6 @@ class FirebaseFoodAnalysisRepository implements FoodAnalysisRepository {
       throw mapFirebaseFunctionsException(e);
     } on TypeError catch (e) {
       throw AiValidationFailure(message: 'analyzeFoodPhoto devolvió una respuesta con forma inesperada', cause: e);
-    }
-  }
-
-  Failure _mapStorageException(FirebaseException e) {
-    switch (e.code) {
-      case 'unauthorized':
-        return PermissionFailure(message: e.message, cause: e);
-      case 'canceled':
-      case 'retry-limit-exceeded':
-        return NetworkFailure(message: e.message, cause: e);
-      default:
-        return ServerFailure(message: e.message, cause: e);
     }
   }
 }

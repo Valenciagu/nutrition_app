@@ -1,17 +1,21 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import { getFirestore } from "firebase-admin/firestore";
-import { getStorage } from "firebase-admin/storage";
 import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODELS, getOpenAiClient, openAiApiKey } from "../config/openai";
 import { consumeAiQuota, refundAiQuota } from "../ai/quota";
+import {
+  assertPhotoUsable,
+  deletePhotoQuietly,
+  photoAsDataUri,
+  userPhotoFile,
+  type StorageFile,
+} from "../storage/userPhoto";
 import { FoodAnalysisSchema } from "./schema";
 import { buildFoodAnalysisSystemPrompt } from "./prompts/foodAnalysisV1";
 import { checkFoodAnalysisSafety } from "./safety";
 
 const QUOTA_FEATURE = "foodAnalysis";
-// Debe coincidir con el límite de `storage.rules` — ver ese archivo.
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 interface AnalyzeFoodPhotoRequest {
   /** Id generado por el cliente (`firestore.collection(...).doc().id`), ya
@@ -80,17 +84,12 @@ export const analyzeFoodPhoto = onCall<AnalyzeFoodPhotoRequest, Promise<AnalyzeF
       throw new HttpsError("invalid-argument", "Falta `analysisId`.");
     }
 
-    const storagePath = `users/${request.auth.uid}/foodAnalyses/${analysisId}.jpg`;
-    const file = getStorage().bucket().file(storagePath);
-    const [exists] = await file.exists();
-    if (!exists) {
-      throw new HttpsError("not-found", "No se encontró la foto. Intenta subirla de nuevo.");
-    }
-
+    const file = userPhotoFile(request.auth.uid, "foodAnalyses", analysisId);
     try {
+      await assertPhotoUsable(file);
       return await analyzeStoredPhoto(request.auth.uid, analysisId, file);
     } finally {
-      await deletePhotoQuietly(file, analysisId);
+      await deletePhotoQuietly(file, "analyzeFoodPhoto");
     }
   },
 );
@@ -100,19 +99,11 @@ async function analyzeStoredPhoto(
   analysisId: string,
   file: StorageFile,
 ): Promise<AnalyzeFoodPhotoResponse> {
-  const [metadata] = await file.getMetadata();
-  const size = Number(metadata.size ?? 0);
-  if (size > MAX_IMAGE_BYTES) {
-    throw new HttpsError("invalid-argument", "La foto es demasiado grande.");
-  }
-
   const profile = await fetchMinimalProfile(uid);
   const quota = await consumeAiQuota(uid, profile.isPremium, QUOTA_FEATURE);
 
   try {
-    const [buffer] = await file.download();
-    const base64Image = buffer.toString("base64");
-    const contentType = (metadata.contentType as string | undefined) ?? "image/jpeg";
+    const imageDataUri = await photoAsDataUri(file);
 
     const openai = getOpenAiClient();
     const response = await openai.responses.parse({
@@ -123,7 +114,7 @@ async function analyzeStoredPhoto(
           role: "user",
           content: [
             { type: "input_text", text: "Analiza esta foto de comida." },
-            { type: "input_image", image_url: `data:${contentType};base64,${base64Image}`, detail: "auto" },
+            { type: "input_image", image_url: imageDataUri, detail: "auto" },
           ],
         },
       ],
@@ -189,20 +180,6 @@ async function analyzeStoredPhoto(
       `analyzeFoodPhoto: OpenAI call failed :: name=${err.name} status=${err.status} code=${err.code} type=${err.type} message=${err.message}`,
     );
     throw new HttpsError("internal", "No se pudo analizar la foto en este momento. Intenta de nuevo.");
-  }
-}
-
-type StorageFile = ReturnType<ReturnType<ReturnType<typeof getStorage>["bucket"]>["file"]>;
-
-/** Nunca hace fallar el análisis por no poder borrar — solo lo registra. */
-async function deletePhotoQuietly(file: StorageFile, analysisId: string): Promise<void> {
-  try {
-    await file.delete({ ignoreNotFound: true });
-  } catch (error) {
-    logger.warn("analyzeFoodPhoto: could not delete photo, lifecycle rule will", {
-      analysisId,
-      message: (error as Error).message,
-    });
   }
 }
 

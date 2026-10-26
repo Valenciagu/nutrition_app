@@ -270,6 +270,18 @@
   "cameraSheetAnalyzeMealSubtitle": "Photo of your plate and estimated calories",
   "cameraSheetIngredientsTitle": "I have ingredients",
   "cameraSheetIngredientsSubtitle": "Recipes with what's in your fridge",
+  "ingredientsDetectedTitle": "What we spotted in your photo",
+  "ingredientsRecipesTitle": "You can cook",
+  "ingredientsAiNote": "AI-suggested recipes based on your photo. Check the ingredients before cooking.",
+  "ingredientsNotDetectedTitle": "We can't see any ingredients",
+  "ingredientsNotDetectedMessage": "Take a well-lit photo of your fridge, pantry or groceries.",
+  "ingredientsHaveEverything": "You have everything",
+  "ingredientsMissingCount": "{count, plural, =1{1 item missing} other{{count} items missing}}",
+  "@ingredientsMissingCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ingredientsMissingSectionTitle": "You'd still need",
+  "ingredientsCloseAction": "Close",
   "cameraSheetLogManualTitle": "Log without a photo",
   "cameraSheetLogManualSubtitle": "Search or type what you ate",
   "cameraSourceCameraOption": "Take a photo",

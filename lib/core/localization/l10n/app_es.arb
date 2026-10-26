@@ -324,6 +324,18 @@
   "cameraSheetAnalyzeMealSubtitle": "Foto del plato y calorías estimadas",
   "cameraSheetIngredientsTitle": "Tengo ingredientes",
   "cameraSheetIngredientsSubtitle": "Recetas con lo que hay en la nevera",
+  "ingredientsDetectedTitle": "Lo que vimos en tu foto",
+  "ingredientsRecipesTitle": "Puedes cocinar",
+  "ingredientsAiNote": "Recetas sugeridas por IA a partir de tu foto. Revisa los ingredientes antes de cocinar.",
+  "ingredientsNotDetectedTitle": "No vemos ingredientes",
+  "ingredientsNotDetectedMessage": "Toma una foto de tu nevera, tu despensa o tus compras, con buena luz.",
+  "ingredientsHaveEverything": "Tienes todo",
+  "ingredientsMissingCount": "{count, plural, =1{Te falta 1} other{Te faltan {count}}}",
+  "@ingredientsMissingCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ingredientsMissingSectionTitle": "Te falta conseguir",
+  "ingredientsCloseAction": "Cerrar",
   "cameraSheetLogManualTitle": "Registrar sin foto",
   "cameraSheetLogManualSubtitle": "Buscar o escribir lo que comiste",
   "cameraSourceCameraOption": "Tomar foto",

@@ -29,6 +29,11 @@ const DAILY_LIMITS: Record<string, { free: number; premium: number }> = {
   // Análisis de imagen (Épica 8) consume más tokens por llamada que texto
   // plano — límite más bajo a propósito, igual criterio que `planGeneration`.
   foodAnalysis: { free: 5, premium: 20 },
+  // Épica 9 — foto de ingredientes → 3 recetas completas: imagen + la salida
+  // más grande de todas. La especificación la ubica como premium; hasta que
+  // existan suscripciones (Épica 13) va abierta a todos con este límite
+  // gratuito bajo (decisión del usuario, 2026-10-25).
+  ingredientAnalysis: { free: 3, premium: 15 },
 };
 
 export interface QuotaCheckResult {

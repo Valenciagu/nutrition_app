@@ -7,6 +7,8 @@ import { checkNutritionAssistantSafety } from "../src/ai/safety";
 import type { GeneratedMeal } from "../src/plan/schema";
 import type { GeneratedRecipe } from "../src/recipes/schema";
 import type { FoodAnalysis } from "../src/foodAnalysis/schema";
+import { filterSafeSuggestedRecipes } from "../src/ingredients/safety";
+import type { SuggestedRecipe } from "../src/ingredients/schema";
 
 const meal = (calories: number, containsExcludedFood = false): GeneratedMeal => ({
   name: "Comida",
@@ -68,6 +70,31 @@ test("receta: un id de restricción desconocido se busca literal", () => {
 
 test("receta: macros que no cuadran con las calorías se rechazan", () => {
   assert.equal(checkRecipeSafety(recipe({ carbsGrams: 200, fatGrams: 100 }), [], 450, 30).reason, "macros_inconsistent");
+});
+
+const suggested = (name: string, overrides: Partial<SuggestedRecipe> = {}): SuggestedRecipe => ({
+  ...recipe(),
+  name,
+  calories: 455,
+  proteinGrams: 30,
+  missingIngredients: [],
+  ...overrides,
+});
+
+test("ingredientes: descarta solo las recetas inseguras y conserva el resto", () => {
+  const safe = suggested("Arroz con pollo");
+  const flagged = suggested("Con maní", { containsExcludedFood: true });
+  const badMacros = suggested("Rara", { calories: 1500 });
+  assert.deepEqual(
+    filterSafeSuggestedRecipes([safe, flagged, badMacros], []).map((r) => r.name),
+    ["Arroz con pollo"],
+  );
+});
+
+test("ingredientes: un alérgeno en lo que falta comprar también descarta la receta", () => {
+  const needsBread = suggested("Sándwich", { missingIngredients: ["Pan tajado"] });
+  assert.deepEqual(filterSafeSuggestedRecipes([needsBread], ["gluten"]), []);
+  assert.equal(filterSafeSuggestedRecipes([needsBread], []).length, 1);
 });
 
 const analysis = (foodName: string | null, containsExcludedFood = false): FoodAnalysis => ({
