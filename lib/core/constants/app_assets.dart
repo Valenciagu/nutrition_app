@@ -8,6 +8,15 @@ abstract final class AppAssets {
   static const String wordmarkColor = 'assets/brand/wordmark_color.svg';
   static const String wordmarkWhite = 'assets/brand/wordmark_white.svg';
 
+  /// "G" oficial del kit "Sign in with Google" (signin-assets.zip de
+  /// developers.google.com/identity/branding-guidelines), recortada SIN
+  /// redibujar del PNG @4x del botón cuadrado sin texto: 80x80 px = 20 lógicos.
+  /// PNG y no SVG porque el SVG oficial usa foreignObject/degradado
+  /// cónico/desenfoque, que flutter_svg no dibuja. Una por tema porque el
+  /// fondo del recorte es el relleno oficial del botón (#FFFFFF / #131314).
+  static const String googleGLight = 'assets/brand/google_g_light.png';
+  static const String googleGDark = 'assets/brand/google_g_dark.png';
+
   // Iconos propios (grilla 24, trazo 1.75, `currentColor`). `Fill` es la
   // variante rellena; úsense con `AppSvgIcon`, no con `Icon`.
   static const String iconFoodScanner = 'assets/icons/food_scanner_regular.svg';

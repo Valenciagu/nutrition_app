@@ -13,6 +13,7 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../auth_error_presentation.dart';
 import '../providers/auth_providers.dart';
 import '../widgets/auth_back_button.dart';
+import '../widgets/google_sign_in_button.dart';
 
 /// A3 · Iniciar sesión.
 class LoginPage extends ConsumerStatefulWidget {
@@ -186,10 +187,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               // Developer de pago (Épica 13 la necesita igual, ver
               // TASKS.md), a diferencia de Google, que no necesita pagar
               // nada. Se agrega cuando esa cuenta exista.
-              AppButton(
+              GoogleSignInButton(
                 label: l10n.authLoginGoogleButton,
-                variant: AppButtonVariant.neutral,
-                fullWidth: true,
                 isLoading: isLoading,
                 onPressed: _signInWithGoogle,
               ),

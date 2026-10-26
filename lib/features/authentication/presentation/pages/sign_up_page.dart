@@ -18,6 +18,7 @@ import '../providers/auth_providers.dart';
 import '../widgets/auth_back_button.dart';
 import '../widgets/legal_acceptance_checkbox.dart';
 import '../widgets/password_strength_indicator.dart';
+import '../widgets/google_sign_in_button.dart';
 
 /// A4 · Crear cuenta.
 ///
@@ -284,10 +285,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               // onboarding tenga que retroceder hasta Login para usarlo.
               // Solo Google, mismo motivo que en Login: Apple sigue
               // parqueado con la Épica 13 (cuenta de pago pendiente).
-              AppButton(
+              GoogleSignInButton(
                 label: l10n.authLoginGoogleButton,
-                variant: AppButtonVariant.neutral,
-                fullWidth: true,
                 isLoading: isLoading,
                 onPressed: _signInWithGoogle,
               ),

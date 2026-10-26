@@ -145,6 +145,6 @@ Chrome only (scrim `rgba(16,21,18,.42)`, radius 28 top, 44×5 handle, optional t
 ## Known gaps / follow-ups
 
 - Dark-mode placeholder colors noted with `*` above need confirming once a real dark-mode screen is built.
-- Icon set decided (Phosphor, 2026-10-05). Still pending real assets: brand isotype/wordmark, launcher icon, Google "G", photography — see TASKS.md Epic 18.
+- Icon set decided (Phosphor, 2026-10-05). Brand isotype/wordmark, launcher icon and Google "G" (ASSET-104, 2026-10-25) done. Still pending real assets: photography — see TASKS.md Epic 18.
 - `AppButton`'s "success" checkmark micro-state isn't implemented.
 - Photography direction is documented but no real assets exist yet — not blocking, only matters once a feature renders real food photos.
