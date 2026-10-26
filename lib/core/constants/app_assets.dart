@@ -17,6 +17,20 @@ abstract final class AppAssets {
   static const String googleGLight = 'assets/brand/google_g_light.png';
   static const String googleGDark = 'assets/brand/google_g_dark.png';
 
+  /// Fotografía (ASSET-105), generada con los prompts de
+  /// `documentation/image_generation_prompts.md` y comprimida a JPG al tamaño
+  /// en que se muestra. Qué foto corresponde a cada objetivo/alimento lo
+  /// decide `onboarding_catalog.dart` (este archivo no conoce esos enums).
+  static const String welcomeHero = 'assets/images/welcome_hero.jpg';
+  static const String goalLoseFat = 'assets/images/goal_lose_fat.jpg';
+  static const String goalGainMuscle = 'assets/images/goal_gain_muscle.jpg';
+  static const String goalMaintainWeight = 'assets/images/goal_maintain_weight.jpg';
+  static const String goalEatHealthier = 'assets/images/goal_eat_healthier.jpg';
+
+  /// `assets/images/food_<id>.jpg`, con el id del catálogo de B4
+  /// (`likedFoodCatalogIds`).
+  static String food(String foodId) => 'assets/images/food_$foodId.jpg';
+
   // Iconos propios (grilla 24, trazo 1.75, `currentColor`). `Fill` es la
   // variante rellena; úsense con `AppSvgIcon`, no con `Icon`.
   static const String iconFoodScanner = 'assets/icons/food_scanner_regular.svg';

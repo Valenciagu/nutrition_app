@@ -63,6 +63,7 @@ class LikedFoodsStep extends ConsumerWidget {
                 for (final foodId in likedFoodCatalogIds)
                   _FoodTile(
                     label: foodLabel(l10n, foodId),
+                    imageAsset: foodImageAsset(foodId),
                     selected: answers.likedFoods.contains(foodId),
                     onTap: () => controller.toggleLikedFood(foodId),
                   ),
@@ -94,9 +95,12 @@ class LikedFoodsStep extends ConsumerWidget {
 }
 
 class _FoodTile extends StatelessWidget {
-  const _FoodTile({required this.label, required this.selected, required this.onTap});
+  const _FoodTile({required this.label, required this.imageAsset, required this.selected, required this.onTap});
 
   final String label;
+
+  /// `null` mientras ese alimento no tenga foto (ver `foodImageAsset`).
+  final String? imageAsset;
   final bool selected;
   final VoidCallback onTap;
 
@@ -121,11 +125,11 @@ class _FoodTile extends StatelessWidget {
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: colors.border,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(13)),
-                        ),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(13)),
+                        child: imageAsset != null
+                            ? Image.asset(imageAsset!, fit: BoxFit.cover)
+                            : ColoredBox(color: colors.border),
                       ),
                     ),
                     if (selected)

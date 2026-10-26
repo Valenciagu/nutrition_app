@@ -1,3 +1,4 @@
+import '../../../core/constants/app_assets.dart';
 import '../../../core/localization/generated/app_localizations.dart';
 import '../domain/entities/onboarding_answers.dart';
 
@@ -52,6 +53,23 @@ String foodLabel(AppLocalizations l10n, String id) {
     default:
       return id;
   }
+}
+
+/// Alimentos de B4 que todavía no tienen foto (ASSET-105 parcial): su tile
+/// muestra el recuadro neutro de siempre en vez de una imagen inexistente.
+const Set<String> _foodsWithoutPhoto = {'tofu'};
+
+/// Foto de un alimento de B4, o `null` si aún no existe.
+String? foodImageAsset(String id) => _foodsWithoutPhoto.contains(id) ? null : AppAssets.food(id);
+
+/// Foto de cada objetivo en las tarjetas de B1.
+String goalImageAsset(NutritionGoal goal) {
+  return switch (goal) {
+    NutritionGoal.loseFat => AppAssets.goalLoseFat,
+    NutritionGoal.gainMuscle => AppAssets.goalGainMuscle,
+    NutritionGoal.maintainWeight => AppAssets.goalMaintainWeight,
+    NutritionGoal.eatHealthier => AppAssets.goalEatHealthier,
+  };
 }
 
 String mealSlotLabel(AppLocalizations l10n, String labelKey) {

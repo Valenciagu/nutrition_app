@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
@@ -27,13 +28,20 @@ class WelcomePage extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Foto de comida a sangre en la mitad superior — placeholder
-            // rayado hasta tener el banco de fotografía real (design_system.md).
+            // Foto de comida a sangre en la mitad superior (ASSET-105). La
+            // foto es cuadrada y el área más ancha que alta: `cover` recorta
+            // arriba y abajo, y `topCenter` conserva el plato y la fruta.
+            // Decorativa: el titular ya dice lo mismo, así que no se anuncia.
             Expanded(
               flex: 5,
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
-                color: colors.background,
+                child: Image.asset(
+                  AppAssets.welcomeHero,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                  excludeFromSemantics: true,
+                ),
               ),
             ),
             Expanded(

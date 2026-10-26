@@ -14,7 +14,7 @@ class OnboardingOptionCard extends StatelessWidget {
     required this.subtitle,
     required this.selected,
     required this.onTap,
-    this.showImagePlaceholder = false,
+    this.imageAsset,
   });
 
   final String title;
@@ -22,8 +22,8 @@ class OnboardingOptionCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  /// B1 muestra una foto por opción (ancla el significado); B3 no.
-  final bool showImagePlaceholder;
+  /// B1 muestra una foto por opción (ancla el significado); B3 no (`null`).
+  final String? imageAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +44,10 @@ class OnboardingOptionCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              if (showImagePlaceholder) ...[
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(color: colors.border, borderRadius: BorderRadius.circular(14)),
+              if (imageAsset != null) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.asset(imageAsset!, width: 52, height: 52, fit: BoxFit.cover),
                 ),
                 const SizedBox(width: 14),
               ],

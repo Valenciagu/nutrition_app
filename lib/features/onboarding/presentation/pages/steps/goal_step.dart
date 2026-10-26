@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_color_tokens.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/onboarding_answers.dart';
+import '../../onboarding_catalog.dart';
 import '../../providers/onboarding_providers.dart';
 import '../../widgets/onboarding_option_card.dart';
 
@@ -73,7 +74,7 @@ class _GoalStepState extends ConsumerState<GoalStep> {
                 title: copy.title,
                 subtitle: copy.subtitle,
                 selected: selected == goal,
-                showImagePlaceholder: true,
+                imageAsset: goalImageAsset(goal),
                 onTap: () => _select(goal),
               );
             }),
