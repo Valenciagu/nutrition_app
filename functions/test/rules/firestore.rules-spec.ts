@@ -92,3 +92,12 @@ test("shoppingLists: solo checkedItems, y como lista", async () => {
   await assertFails(setDoc(doc(alice(), "users/alice/shoppingLists/2026-W43"), { checkedItems: [], extra: 1 }));
   await assertFails(setDoc(doc(bob(), "users/alice/shoppingLists/2026-W43"), { checkedItems: [] }));
 });
+
+test("shoppingLists: extraItems (Épica 9) como lista acotada, sola o junto a checkedItems", async () => {
+  const ref = () => doc(alice(), "users/alice/shoppingLists/2026-W43");
+  await assertSucceeds(setDoc(ref(), { extraItems: ["Papa"] }, { merge: true }));
+  await assertSucceeds(setDoc(ref(), { checkedItems: ["papa"] }, { merge: true }));
+  await assertFails(setDoc(ref(), { extraItems: "Papa" }, { merge: true }));
+  const tooMany = Array.from({ length: 101 }, (_, i) => `item ${i}`);
+  await assertFails(setDoc(ref(), { extraItems: tooMany }, { merge: true }));
+});

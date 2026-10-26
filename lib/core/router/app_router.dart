@@ -23,7 +23,8 @@ import '../../features/plan/domain/entities/nutrition_plan.dart';
 import '../../features/food_analysis/presentation/pages/food_analysis_page.dart';
 import '../../features/grocery_list/presentation/pages/grocery_list_page.dart';
 import '../../features/ingredients/domain/entities/ingredient_suggestions.dart';
-import '../../features/ingredients/presentation/pages/ingredient_analysis_page.dart';
+import '../../features/ingredients/presentation/pages/ingredient_detection_page.dart';
+import '../../features/ingredients/presentation/pages/ingredient_recipes_page.dart';
 import '../../features/ingredients/presentation/pages/suggested_recipe_page.dart';
 import '../../features/notifications/presentation/pages/notification_settings_page.dart';
 import '../../features/plan/presentation/pages/plan_page.dart';
@@ -179,7 +180,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: 'ingredient_analysis',
         path: RoutePaths.ingredientAnalysis,
-        builder: (context, state) => IngredientAnalysisPage(imageBytes: state.extra! as Uint8List),
+        builder: (context, state) => IngredientDetectionPage(imageBytes: state.extra! as Uint8List),
+      ),
+      GoRoute(
+        name: 'ingredient_recipes',
+        path: RoutePaths.ingredientRecipes,
+        builder: (context, state) => const IngredientRecipesPage(),
       ),
       GoRoute(
         name: 'ingredient_recipe',

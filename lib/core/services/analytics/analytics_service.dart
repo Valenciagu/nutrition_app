@@ -25,7 +25,7 @@ abstract class AnalyticsService {
   Future<void> logMealReplaced();
 
   Future<void> logFoodPhotoAnalyzed({required bool isFoodPhoto});
-  Future<void> logIngredientPhotoAnalyzed({required bool isIngredientPhoto, required int recipeCount});
+  Future<void> logIngredientPhotoAnalyzed({required bool isIngredientPhoto, required int ingredientCount});
 
   Future<void> logRemindersEnabled({required int activeTypeCount});
 }

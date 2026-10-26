@@ -74,6 +74,7 @@ final groceryListProvider = FutureProvider.autoDispose<GroceryListData>((ref) as
   final recipeById = {for (final recipe in recipes) recipe.id: recipe};
 
   final checkedKeys = await groceryRepo.getCheckedItemKeys(userId: uid, weekKey: currentWeekKey());
+  final extraItems = await groceryRepo.getExtraItems(userId: uid, weekKey: currentWeekKey());
 
   final byKey = <String, ({String name, GroceryCategory category, List<GroceryItemSource> sources})>{};
   for (final entry in withRecipe) {
@@ -91,6 +92,14 @@ final groceryListProvider = FutureProvider.autoDispose<GroceryListData>((ref) as
     }
   }
 
+  // Ítems añadidos a mano (Épica 9): si ya están porque una receta del plan
+  // los pide, no se duplican; si no, entran sin origen.
+  for (final name in extraItems) {
+    final key = name.trim().toLowerCase();
+    if (key.isEmpty || byKey.containsKey(key)) continue;
+    byKey[key] = (name: name.trim(), category: categorizeIngredient(name), sources: <GroceryItemSource>[]);
+  }
+
   final items = byKey.entries
       .map((e) => GroceryItem(
             key: e.key,
@@ -104,6 +113,26 @@ final groceryListProvider = FutureProvider.autoDispose<GroceryListData>((ref) as
 
   return GroceryListData(items: items, mealsWithoutRecipe: mealsWithoutRecipe);
 });
+
+/// "Añadir X a la lista de compra" desde una receta sugerida (Épica 9, F2).
+final addToGroceryListControllerProvider =
+    AsyncNotifierProvider.autoDispose<AddToGroceryListController, void>(AddToGroceryListController.new);
+
+class AddToGroceryListController extends AutoDisposeAsyncNotifier<void> {
+  @override
+  Future<void> build() async {}
+
+  Future<void> add(List<String> names) async {
+    final uid = ref.read(authStateChangesProvider).valueOrNull?.uid;
+    if (uid == null || names.isEmpty) return;
+
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() {
+      return ref.read(groceryListRepositoryProvider).addExtraItems(userId: uid, weekKey: currentWeekKey(), names: names);
+    });
+    if (!state.hasError) ref.invalidate(groceryListProvider);
+  }
+}
 
 /// Marca/desmarca un ítem como "ya tengo/compré" — invalida solo el estado
 /// marcado, no toda `groceryListProvider` (que releería todas las recetas de

@@ -1,14 +1,55 @@
 import '../../../recipes/domain/entities/recipe.dart';
 
-/// Una receta propuesta a partir de una foto de ingredientes (Épica 9). La
-/// receta en sí es una [Recipe] normal (Épica 7) — así D3/D5 la muestran
-/// sin cambios —, más lo que habría que conseguir aparte de lo que se vio.
+/// Un ingrediente de la lista de F1 (Fase 6). [confident] `false` = el
+/// modelo dudó (o aún no se confirmó): se muestra con borde punteado y no
+/// entra a las recetas hasta que el usuario lo confirme.
+class DetectedIngredient {
+  const DetectedIngredient({required this.name, required this.confident});
+
+  final String name;
+  final bool confident;
+
+  DetectedIngredient confirmed() => DetectedIngredient(name: name, confident: true);
+
+  factory DetectedIngredient.fromJson(Map<String, dynamic> json) {
+    return DetectedIngredient(name: json['name'] as String, confident: json['confident'] as bool);
+  }
+}
+
+/// Respuesta de `detectIngredients` (F1).
+class IngredientDetection {
+  const IngredientDetection({
+    required this.isIngredientPhoto,
+    required this.ingredients,
+    required this.remainingToday,
+  });
+
+  /// `false` si la foto no mostraba ingredientes — no es un error, es un
+  /// resultado (mismo criterio que `FoodAnalysisResult.isFoodPhoto`).
+  final bool isIngredientPhoto;
+  final List<DetectedIngredient> ingredients;
+  final int remainingToday;
+
+  factory IngredientDetection.fromJson(Map<String, dynamic> json) {
+    return IngredientDetection(
+      isIngredientPhoto: json['isIngredientPhoto'] as bool,
+      ingredients: (json['ingredients'] as List? ?? const [])
+          .map((raw) => DetectedIngredient.fromJson(Map<String, dynamic>.from(raw as Map)))
+          .toList(),
+      remainingToday: json['remainingToday'] as int,
+    );
+  }
+}
+
+/// Una receta propuesta en F2 a partir de la lista revisada. La receta es
+/// una [Recipe] normal (Épica 7) — así D3/D5 la muestran sin cambios —, más
+/// lo que habría que conseguir aparte.
 class SuggestedRecipe {
   const SuggestedRecipe({required this.recipe, required this.missingIngredients});
 
   final Recipe recipe;
 
-  /// Vacío si alcanza con lo de la foto + básicos (sal, aceite, agua).
+  /// Vacío = badge "Tienes todo" (los básicos — sal, aceite, agua — no cuentan).
   final List<String> missingIngredients;
 
   factory SuggestedRecipe.fromJson(Map<String, dynamic> json) {
@@ -19,28 +60,16 @@ class SuggestedRecipe {
   }
 }
 
-/// Respuesta de `suggestRecipesFromIngredients`. No se guarda en ningún lado:
-/// vive en memoria mientras el usuario mira el resultado (ver
-/// `documentation/ingredients.md`).
-class IngredientSuggestions {
-  const IngredientSuggestions({
-    required this.isIngredientPhoto,
-    required this.detectedIngredients,
-    required this.recipes,
-    required this.remainingToday,
-  });
+/// Respuesta de `suggestRecipesFromIngredients` (F2). No se guarda en ningún
+/// lado: vive en memoria mientras el usuario mira el resultado.
+class IngredientRecipeSuggestions {
+  const IngredientRecipeSuggestions({required this.recipes, required this.remainingToday});
 
-  /// `false` si la foto no mostraba ingredientes — no es un error, es un
-  /// resultado (mismo criterio que `FoodAnalysisResult.isFoodPhoto`).
-  final bool isIngredientPhoto;
-  final List<String> detectedIngredients;
   final List<SuggestedRecipe> recipes;
   final int remainingToday;
 
-  factory IngredientSuggestions.fromJson(Map<String, dynamic> json) {
-    return IngredientSuggestions(
-      isIngredientPhoto: json['isIngredientPhoto'] as bool,
-      detectedIngredients: (json['detectedIngredients'] as List? ?? const []).cast<String>(),
+  factory IngredientRecipeSuggestions.fromJson(Map<String, dynamic> json) {
+    return IngredientRecipeSuggestions(
       recipes: (json['recipes'] as List? ?? const [])
           .map((raw) => SuggestedRecipe.fromJson(Map<String, dynamic>.from(raw as Map)))
           .toList(),

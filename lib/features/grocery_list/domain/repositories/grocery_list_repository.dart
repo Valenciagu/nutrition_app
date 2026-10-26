@@ -17,4 +17,10 @@ abstract class GroceryListRepository {
     required String itemKey,
     required bool checked,
   });
+
+  /// Ítems añadidos a mano a la lista de la semana (Épica 9: "Añadir X a la
+  /// lista de compra" desde una receta sugerida), tal como se escribieron.
+  Future<List<String>> getExtraItems({required String userId, required String weekKey});
+
+  Future<void> addExtraItems({required String userId, required String weekKey, required List<String> names});
 }

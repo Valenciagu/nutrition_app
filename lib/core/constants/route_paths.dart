@@ -37,10 +37,13 @@ abstract final class RoutePaths {
   /// GoRouter (binario, no cabe en la URL).
   static const String foodAnalysis = '/food-analysis';
 
-  /// Épica 9 — "Tengo ingredientes": mismo criterio que [foodAnalysis]. La
-  /// receta sugerida y su modo cocina reciben la receta por `extra` (no hay
-  /// id que leer de Firestore: las sugerencias no se guardan).
+  /// Épica 9 — "Tengo ingredientes": mismo criterio que [foodAnalysis].
+  /// [ingredientAnalysis] = F1 (foto + lista editable), [ingredientRecipes] =
+  /// F2 (lee la lista de su provider, sin `extra`). La receta sugerida y su
+  /// modo cocina reciben la receta por `extra` (no hay id que leer de
+  /// Firestore: las sugerencias no se guardan).
   static const String ingredientAnalysis = '/ingredients';
+  static const String ingredientRecipes = '/ingredients/recipes';
   static const String ingredientRecipe = '/ingredients/recipe';
   static const String ingredientRecipeCooking = '/ingredients/recipe/cook';
 

@@ -1,42 +1,63 @@
-# Épica 9 — Foto de ingredientes → recetas
+# Épica 9 — Foto de ingredientes → recetas ("Tengo ingredientes")
 
 ## Qué hace
 
-"Tengo ingredientes": el usuario fotografía su nevera, despensa, compras o empaques. La app muestra los ingredientes que se ven y hasta 3 recetas de 1 ración hechas sobre todo con ellos (Instrucciones.md §7), cada una con lo que faltaría conseguir. Al tocar una receta se ve su detalle completo y se puede abrir el modo cocina.
+El usuario fotografía su nevera, despensa, compras o empaques. Flujo en dos pasos, tal como lo define el canvas (Fase 6):
 
-Entradas: opción "Tengo ingredientes" de la hoja de cámara (C5) y fila nueva en las acciones rápidas de Home (C1).
+1. **F1 · Ingredientes detectados** — la foto arriba y la lista de lo que se ve, **editable**: quitar (✕), confirmar los dudosos (borde punteado, "Arroz · ¿seguro?") y "+ Añadir" a mano. "Ver recetas posibles" sigue solo con los confirmados.
+2. **F2 · Recetas con lo que tienes** — "3 recetas para ti". Cada una lleva un badge "Tienes todo" (verde) o "Te falta N" (ámbar), kcal · proteína · minutos y, si falta algo, "Añadir X a la lista de compra" en un toque. "Pedir más ideas a la IA" trae otras recetas distintas sin volver a mandar la foto.
 
-**Gratis por ahora (decisión del usuario, 2026-10-25).** La especificación la pone como premium, pero las suscripciones (Épica 13) siguen postergadas por costo. Va abierta a todos con un límite diario propio y bajo: `ingredientAnalysis` en `functions/src/ai/quota.ts`, 3 al día gratis y 15 premium; la especificación ya pide "análisis limitados de fotos de ingredientes" en el plan gratis. Volverla premium es cambiar ese límite o agregar un chequeo de `isPremium` en la función; el cliente no cambia.
+Al tocar una receta se ve su detalle completo (cuerpo de D3 + "Te falta conseguir") y se puede abrir el modo cocina.
+
+Entradas: opción "Tengo ingredientes" de la hoja de cámara (C5) y fila en las acciones rápidas de Home (C1).
+
+**Gratis por ahora (decisión del usuario, 2026-10-25).** La especificación la pone como premium, pero las suscripciones (Épica 13) siguen postergadas por costo. Va abierta a todos con límites diarios propios en `functions/src/ai/quota.ts`: `ingredientDetection` (fotos, 3/15) e `ingredientRecipes` (recetas, 6/30, más alto porque "más ideas" lo repite). Volverla premium es cambiar esos límites o agregar un chequeo de `isPremium`; el cliente no cambia.
+
+## Diseño (canvas `Fases 5-12 - Entrega final.dc.html`, Fase 6, leído 2026-10-26)
+
+- "Mismo motor visual que el análisis de comida, distinto resultado: en vez de una estimación, una lista editable de ingredientes que produce recetas."
+- **F1**: foto de 270 de alto con botón volver. Título "Encontramos N ingredientes" (800, 23) y subtítulo "Quita lo que no tengas y añade lo que falte." Chips de 40 de alto, tipo píldora: seguros con borde verde de 1.5, fondo `actionPrimarySurface`, texto verde oscuro y "✕" al 60 %; dudosos con borde punteado y texto secundario; "+ Añadir" con borde normal y texto verde. Debajo, una caja de nota (fondo `background`, radio 16): "Los ingredientes con borde punteado son dudosos: confírmalos o quítalos." Al pie, CTA primario "Ver recetas posibles". Nota del canvas: "La confianza del modelo se expresa con el borde, no con porcentajes."
+- **F2**: fondo `background`. Cabecera con ← y título "3 recetas para ti" (800, 22). Tarjetas blancas de radio 20: las dos primeras grandes (foto de 130 con badge arriba a la izquierda, nombre 700/16.5, meta 500/12.5 en gris, enlace verde a la lista de compra) y la tercera compacta (miniatura de 66 y nombre + kcal · proteína). Al final, botón de acción de IA (índigo) "Pedir más ideas a la IA". Nota del canvas: "Un badge dice si puedes cocinarla ya; 'te falta 1' enlaza con la lista de compra en un toque."
+- **Fase 12** (accesibilidad): todo estado lleva texto además de color (los badges y los chips dudosos lo cumplen).
+
+**Desviaciones, documentadas:**
+
+- Los chips dudosos también llevan "✕". El canvas no lo dibuja, pero sin él la única forma de quitar uno dudoso sería confirmarlo primero, y el propio canvas pide "confírmalos o quítalos". Tocar el chip lo confirma.
+- Las recetas no tienen foto real (ninguna función genera fotos de receta): la zona de foto es el placeholder rayado, igual que D3.
+- La versión anterior de esta pantalla (2026-10-25, construida sin acceso al canvas) era de un solo paso, con la lista fija y `MealCard`. Se reemplazó por F1/F2.
 
 ## Backend (`functions/src/ingredients/`)
 
-- `suggestRecipesFromIngredients.ts` — callable con `enforceAppCheck`, timeout de 120 s. Mismo pipeline que `analyzeFoodPhoto`: el cliente sube a `users/{uid}/ingredientPhotos/{photoId}.jpg` y llama solo con `photoId`; la ruta se arma con el `uid`; la foto viaja a OpenAI como `data:` URI y **se borra al terminar** (`finally`), con la regla de 1 día del bucket como respaldo.
-- `schema.ts` — `SuggestedRecipeSchema` extiende `GeneratedRecipeSchema` (Épica 7) con nombre, kcal, proteína y `missingIngredients`. La respuesta tiene la forma exacta de `Recipe.toJson()` más `missingIngredients`.
-- `prompts/ingredientRecipesV1.ts` — solo ingredientes que de verdad se ven; básicos (sal, pimienta, aceite, agua) no cuentan como faltantes; ingredientes latinoamericanos; cada receta ≈ meta diaria / comidas del día del usuario (misma fórmula que el plan, `estimateDailyCalories`).
-- `safety.ts` — `filterSafeSuggestedRecipes` reusa `checkRecipeSafety` (Épica 7): autorreporte, escaneo de alérgenos por ingrediente **incluyendo los faltantes**, y macros consistentes con las kcal. A diferencia de `generateRecipe`, descarta solo las recetas inseguras; si no queda ninguna, devuelve error y reembolsa la cuota.
-- `storage/userPhoto.ts` (nuevo, compartido) — armar la ruta, validar tamaño, `data:` URI y borrado. Extraído de `analyzeFoodPhoto` al aparecer este segundo consumidor.
-- `storage.rules` — la regla de subida ahora cubre `foodAnalyses` e `ingredientPhotos`, y nada más bajo `users/`.
+- `detectIngredients.ts` — F1. Callable con `enforceAppCheck`. Mismo pipeline que `analyzeFoodPhoto`: el cliente sube a `users/{uid}/ingredientPhotos/{photoId}.jpg` y llama solo con `photoId`; la ruta se arma con el `uid`; la foto va a OpenAI como `data:` URI y **se borra al terminar** (`finally`, con la regla de 1 día del bucket como respaldo). Devuelve `{name, confident}[]`, sin duplicados (si alguna copia es segura, gana).
+- `suggestRecipesFromIngredients.ts` — F2. Callable de **texto** (sin foto, timeout de 120 s): `{ingredients, excludeRecipeNames}` → hasta 3 recetas con la forma de `Recipe.toJson()` + `missingIngredients`. Cada receta ≈ meta diaria / comidas del día (`estimateDailyCalories`, la misma fórmula que el plan).
+- `input.ts` — `sanitizeNameList`: los nombres que manda el cliente (el usuario puede escribir ingredientes) se limpian y acotan (30 ingredientes, 12 exclusiones, 80 caracteres). El prompt los recibe como JSON y los declara datos, no instrucciones.
+- `safety.ts` — `filterSafeSuggestedRecipes` reusa `checkRecipeSafety` (Épica 7): autorreporte, alérgenos por ingrediente **incluidos los faltantes**, y macros consistentes. Descarta solo las inseguras; si no queda ninguna, error y reembolso de cuota.
+- `prompts/ingredientDetectionV1.ts`, `prompts/ingredientRecipesV1.ts`. Modelos: `AI_MODELS.ingredientPhotoAnalysis` (visión) y `recipeGeneration` (texto).
+- `storage/userPhoto.ts` (compartido con `analyzeFoodPhoto`), `storage.rules` (subidas solo a `foodAnalyses` e `ingredientPhotos`).
 
-Nada se guarda en Firestore: no existe una pantalla de "mis recetas" que vuelva a mostrarlas, así que serían datos sin consumidor.
+Nada de esto se guarda en Firestore: no existe una pantalla de "mis recetas".
+
+## Lista de compra (Épica 10, extendida)
+
+"Añadir X a la lista de compra" escribe en `users/{uid}/shoppingLists/{weekKey}.extraItems` (`arrayUnion`, sin duplicados). `firestore.rules` permite ahora `checkedItems` y `extraItems`, ambas listas y opcionales, con `extraItems` acotada a 100 (con test de reglas). `groceryListProvider` mezcla esos ítems con los que salen de las recetas del plan; si ya estaban por una receta, no se duplican, y los manuales no muestran línea de origen. Se marcan como comprados igual que el resto. Todavía no se pueden borrar desde la lista.
 
 ## Cliente (`lib/features/ingredients/`)
 
-- `IngredientSuggestions` / `SuggestedRecipe` — la receta es una `Recipe` normal más `missingIngredients`.
-- `FirebaseIngredientAnalysisRepository` — sube y llama al callable (timeout de cliente de 120 s). El mapeo de errores de Storage se movió a `core/errors/firebase_storage_error_mapper.dart` (segundo consumidor).
-- `IngredientAnalysisController` — no es `autoDispose`: volver desde una receta muestra las mismas sugerencias sin gastar otra consulta.
-- `IngredientAnalysisPage` (`/ingredients`) — foto arriba con hoja encima (mismo esquema que `FoodAnalysisPage`): cargando, error con mensaje específico, "no vemos ingredientes", o ingredientes detectados + 3 `MealCard` + nota de que son sugerencias de IA.
-- `SuggestedRecipePage` (`/ingredients/recipe`) — `RecipeDetailBody` + "Te falta conseguir" + solo "Empezar a cocinar" (no hay comida del plan que registrar).
-- Modo cocina (`/ingredients/recipe/cook`) — `CookingModePage` con `mealId` opcional: sin él, "Terminar" solo cierra.
+- Entidades: `DetectedIngredient` (`name`, `confident`), `IngredientDetection`, `SuggestedRecipe` (`Recipe` + `missingIngredients`), `IngredientRecipeSuggestions`.
+- `FirebaseIngredientAnalysisRepository` — `detectIngredients` (Storage + callable) y `suggestRecipes` (callable de texto).
+- Providers, ninguno `autoDispose` para que volver atrás no gaste otra consulta; una foto nueva los reinicia:
+  - `ingredientDetectionControllerProvider` — F1.
+  - `ingredientListProvider` — la lista editable. Solo `confirmedNames` va a las recetas; añadir a mano confirma, ignora vacíos y repetidos, y confirma un dudoso repetido.
+  - `ingredientRecipesControllerProvider` — F2. `moreIdeas()` excluye todo lo ya mostrado en la sesión, no solo la última tanda.
+- Pantallas: `IngredientDetectionPage` (`/ingredients`), `IngredientRecipesPage` (`/ingredients/recipes`), `SuggestedRecipePage` (`/ingredients/recipe`) y `CookingModePage` sin `mealId` (`/ingredients/recipe/cook`).
+- `IngredientChip` (nuevo, de la feature): no es `SelectableChip`, que alterna una selección; este quita o confirma, y lleva el borde punteado propio (`_DashedPillPainter`; Flutter no trae `BorderStyle.dashed`).
+- Analytics: `ingredient_photo_analyzed` (`is_ingredient_photo`, `ingredient_count`).
 
-## Reusado vs. nuevo
-
-Reusado: `MealCard` para listar recetas (el `RecipeCard` diferido sigue sin construirse), `RecipeInfoTag`, `AppStateBlock`, `RoundIconButton`, `CookingModePage`, el pipeline de foto de la Épica 8. Extraído para compartir: `RecipeDetailBody` (de D3), `recipeDifficultyLabel`, `pickPhotoAndOpen` (hoja de cámara), `storage/userPhoto.ts`, `mapFirebaseStorageException`.
-
-Arreglo de paso: "Cocinar" en Home ahora alinea `selectedPlanDateProvider` a hoy. "Registrar" en D3/D5 usa ese día, y antes podía registrar en el día que mirara Plan.
+Reusado: `RecipeDetailBody`/`RecipeInfoTag` (extraídos de D3), `CookingModePage`, `AppStateBlock`, `AppButton` (variante `aiAction`), `HatchedPlaceholder`, `showAppBottomSheet` + `AppTextField` para "+ Añadir", el pipeline de foto de la Épica 8.
 
 ## Pendiente / gaps
 
-- **Diseño**: el canvas de Fase 6 (Ingredientes) no se pudo leer (Claude Design rechazó la sesión con 403; hace falta `/design-login`). Las pantallas usan solo componentes y tokens existentes; revisarlas contra el canvas cuando haya acceso.
-- **Necesita despliegue**: `firebase deploy --only functions:suggestRecipesFromIngredients,functions:analyzeFoodPhoto,storage`. Sin desplegar la regla de Storage, la subida a `ingredientPhotos` falla con permiso denegado.
+- **Desplegado por el usuario el 2026-10-26**: las tres funciones, `firestore.rules` y `storage.rules`.
 - Sin probar en un dispositivo ni contra OpenAI real.
-- Tests: parseo del cliente y filtro de seguridad. Faltan tests de la función completa con OpenAI simulado y de `storage.rules`.
+- Borrar ítems manuales desde la lista de compra.
+- Tests: parseo, lista editable, filtro de seguridad, `sanitizeNameList` y reglas de `extraItems`. Faltan tests de las funciones completas con OpenAI simulado y widget tests de F1/F2.

@@ -6,25 +6,22 @@ import { zodTextFormat } from "openai/helpers/zod";
 import { AI_MODELS, getOpenAiClient, openAiApiKey } from "../config/openai";
 import { consumeAiQuota, refundAiQuota } from "../ai/quota";
 import { estimateDailyCalories, type ActivityLevel, type Sex } from "../plan/calorieEstimate";
-import {
-  assertPhotoUsable,
-  deletePhotoQuietly,
-  photoAsDataUri,
-  userPhotoFile,
-  type StorageFile,
-} from "../storage/userPhoto";
 import { IngredientRecipesSchema } from "./schema";
 import { buildIngredientRecipesSystemPrompt } from "./prompts/ingredientRecipesV1";
 import { filterSafeSuggestedRecipes } from "./safety";
+import { sanitizeNameList } from "./input";
 
-const QUOTA_FEATURE = "ingredientAnalysis";
-const PHOTO_FOLDER = "ingredientPhotos";
+const QUOTA_FEATURE = "ingredientRecipes";
 /** Sin `mealSlots` en el perfil se asume el mismo default que Onboarding (B6). */
 const DEFAULT_MEALS_PER_DAY = 4;
+const MAX_INGREDIENTS = 30;
+const MAX_EXCLUDED_RECIPES = 12;
 
 interface SuggestRecipesRequest {
-  /** Id generado por el cliente, ya usado como nombre del archivo en Storage. */
-  photoId: string;
+  /** La lista ya revisada por el usuario en F1 (detectados + añadidos a mano). */
+  ingredients: string[];
+  /** Recetas ya mostradas — "Pedir más ideas a la IA" pide otras distintas. */
+  excludeRecipeNames?: string[];
 }
 
 /** Misma forma que `Recipe.toJson()` (Épica 7) + `missingIngredients`. */
@@ -45,144 +42,115 @@ interface SuggestedRecipeResponse {
 }
 
 interface SuggestRecipesResponse {
-  isIngredientPhoto: boolean;
-  detectedIngredients: string[];
   recipes: SuggestedRecipeResponse[];
   remainingToday: number;
 }
 
 /**
- * Épica 9 — foto de nevera/despensa → ingredientes detectados + hasta 3
- * recetas (Instrucciones.md §7). Mismo pipeline que `analyzeFoodPhoto`
- * (Épica 8): el cliente sube la foto a Storage y llama solo con el id; la
- * ruta se arma aquí desde el `uid`; la foto viaja a OpenAI como `data:` URI
- * y se borra de Storage al terminar, salga bien o mal.
+ * Épica 9, paso F2 (Fase 6 del canvas) — lista de ingredientes revisada →
+ * hasta 3 recetas de 1 ración (Instrucciones.md §7), cada una con lo que
+ * falta conseguir. Sobre texto, sin foto: por eso "Pedir más ideas" puede
+ * repetirse (con `excludeRecipeNames`) sin volver a subir ni analizar nada.
  *
- * **Gratis por ahora (decisión del usuario, 2026-10-25)**: la especificación
- * la ubica como premium, pero sin suscripciones (Épica 13) se abre a todos
- * con su propio límite diario (`ingredientAnalysis` en `ai/quota.ts`, que
- * ya distingue free/premium). Volverla premium es cambiar ese límite o
- * agregar un chequeo de `isPremium` aquí — nada del cliente.
+ * Seguridad: cada receta pasa por `filterSafeSuggestedRecipes` (alérgenos
+ * también en los faltantes, macros consistentes); se descartan solo las
+ * inseguras y, si no queda ninguna, error + reembolso. Los nombres que manda
+ * el cliente se acotan (`sanitizeNameList`) y el prompt los trata como datos.
  *
- * Nada se persiste en Firestore: las recetas sugeridas no tienen todavía
- * ninguna pantalla que las vuelva a mostrar (no hay "mis recetas"), así que
- * guardarlas sería dato sin consumidor. El cliente las tiene en memoria.
+ * Nada se persiste: no existe una pantalla de "mis recetas" que vuelva a
+ * mostrarlas. Gratis por ahora con su propio límite (`ingredientRecipes`).
  */
 export const suggestRecipesFromIngredients = onCall<SuggestRecipesRequest, Promise<SuggestRecipesResponse>>(
   { secrets: [openAiApiKey], region: "us-central1", invoker: "public", enforceAppCheck: true, timeoutSeconds: 120 },
   async (request) => {
     if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Debes iniciar sesión para analizar tus ingredientes.");
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión para ver recetas.");
     }
 
-    const photoId = request.data?.photoId?.trim();
-    if (!photoId) {
-      throw new HttpsError("invalid-argument", "Falta `photoId`.");
+    const ingredients = sanitizeNameList(request.data?.ingredients, MAX_INGREDIENTS);
+    if (ingredients.length === 0) {
+      throw new HttpsError("invalid-argument", "Agrega al menos un ingrediente.");
     }
+    const excludeRecipeNames = sanitizeNameList(request.data?.excludeRecipeNames, MAX_EXCLUDED_RECIPES);
 
-    const file = userPhotoFile(request.auth.uid, PHOTO_FOLDER, photoId);
+    const uid = request.auth.uid;
+    const profile = await fetchProfile(uid);
+    const quota = await consumeAiQuota(uid, profile.isPremium, QUOTA_FEATURE);
+
     try {
-      await assertPhotoUsable(file);
-      return await suggestFromStoredPhoto(request.auth.uid, file);
-    } finally {
-      await deletePhotoQuietly(file, "suggestRecipesFromIngredients");
+      const dailyCalories = estimateDailyCalories({
+        sex: profile.sex ?? undefined,
+        age: profile.age ?? undefined,
+        heightCm: profile.heightCm ?? undefined,
+        weightKg: profile.weightKg ?? undefined,
+        activityLevel: profile.activityLevel,
+      });
+      const targetMealCalories = Math.round(dailyCalories / profile.mealsPerDay / 10) * 10;
+
+      const response = await getOpenAiClient().responses.parse({
+        model: AI_MODELS.recipeGeneration,
+        input: [
+          {
+            role: "system",
+            content: buildIngredientRecipesSystemPrompt({
+              targetMealCalories,
+              avoidFoods: profile.avoidFoods,
+              likedFoods: profile.likedFoods,
+              cookingTimePreference: profile.cookingTimePreference,
+              budgetLevel: profile.budgetLevel,
+            }),
+          },
+          { role: "user", content: JSON.stringify({ ingredients, excludeRecipeNames }) },
+        ],
+        text: { format: zodTextFormat(IngredientRecipesSchema, "ingredient_recipes") },
+      });
+
+      const parsed = response.output_parsed;
+      if (!parsed) {
+        throw new Error("Empty structured output from OpenAI.");
+      }
+
+      const safeRecipes = filterSafeSuggestedRecipes(parsed.recipes, profile.avoidFoods);
+      if (safeRecipes.length === 0) {
+        await refundAiQuota(uid, QUOTA_FEATURE);
+        logger.warn("suggestRecipesFromIngredients: safety layer rejected every suggested recipe", {
+          generated: parsed.recipes.length,
+        });
+        throw new HttpsError(
+          "internal",
+          "No pudimos proponer recetas seguras con tus restricciones y estos ingredientes. Prueba con otros.",
+        );
+      }
+
+      return {
+        recipes: safeRecipes.map((recipe) => ({
+          id: randomUUID(),
+          name: recipe.name,
+          description: recipe.description,
+          servings: 1,
+          prepTimeMinutes: recipe.prepTimeMinutes,
+          difficulty: recipe.difficulty,
+          calories: recipe.calories,
+          proteinGrams: recipe.proteinGrams,
+          carbsGrams: recipe.carbsGrams,
+          fatGrams: recipe.fatGrams,
+          ingredients: recipe.ingredients,
+          steps: recipe.steps,
+          missingIngredients: recipe.missingIngredients,
+        })),
+        remainingToday: quota.remainingToday,
+      };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      await refundAiQuota(uid, QUOTA_FEATURE);
+      const err = error as { message?: string; status?: number; code?: string; name?: string };
+      logger.error(
+        `suggestRecipesFromIngredients: OpenAI call failed :: name=${err.name} status=${err.status} code=${err.code} message=${err.message}`,
+      );
+      throw new HttpsError("internal", "No se pudieron generar recetas en este momento. Intenta de nuevo.");
     }
   },
 );
-
-async function suggestFromStoredPhoto(uid: string, file: StorageFile): Promise<SuggestRecipesResponse> {
-  const profile = await fetchProfile(uid);
-  const quota = await consumeAiQuota(uid, profile.isPremium, QUOTA_FEATURE);
-
-  try {
-    const imageDataUri = await photoAsDataUri(file);
-    const dailyCalories = estimateDailyCalories({
-      sex: profile.sex ?? undefined,
-      age: profile.age ?? undefined,
-      heightCm: profile.heightCm ?? undefined,
-      weightKg: profile.weightKg ?? undefined,
-      activityLevel: profile.activityLevel,
-    });
-    const targetMealCalories = Math.round(dailyCalories / profile.mealsPerDay / 10) * 10;
-
-    const response = await getOpenAiClient().responses.parse({
-      model: AI_MODELS.ingredientPhotoAnalysis,
-      input: [
-        {
-          role: "system",
-          content: buildIngredientRecipesSystemPrompt({
-            targetMealCalories,
-            avoidFoods: profile.avoidFoods,
-            likedFoods: profile.likedFoods,
-            cookingTimePreference: profile.cookingTimePreference,
-            budgetLevel: profile.budgetLevel,
-          }),
-        },
-        {
-          role: "user",
-          content: [
-            { type: "input_text", text: "¿Qué puedo cocinar con esto?" },
-            { type: "input_image", image_url: imageDataUri, detail: "auto" },
-          ],
-        },
-      ],
-      text: { format: zodTextFormat(IngredientRecipesSchema, "ingredient_recipes") },
-    });
-
-    const parsed = response.output_parsed;
-    if (!parsed) {
-      throw new Error("Empty structured output from OpenAI.");
-    }
-
-    if (!parsed.isIngredientPhoto) {
-      // Igual que una foto que no es comida en Épica 8: respuesta normal, no
-      // error — la cuota ya se gastó en una llamada real a OpenAI.
-      logger.info("suggestRecipesFromIngredients: photo did not show ingredients");
-      return { isIngredientPhoto: false, detectedIngredients: [], recipes: [], remainingToday: quota.remainingToday };
-    }
-
-    const safeRecipes = filterSafeSuggestedRecipes(parsed.recipes, profile.avoidFoods);
-    if (safeRecipes.length === 0) {
-      await refundAiQuota(uid, QUOTA_FEATURE);
-      logger.warn("suggestRecipesFromIngredients: safety layer rejected every suggested recipe", {
-        generated: parsed.recipes.length,
-      });
-      throw new HttpsError(
-        "internal",
-        "No pudimos proponer recetas seguras con tus restricciones a partir de esta foto. Intenta con otra.",
-      );
-    }
-
-    return {
-      isIngredientPhoto: true,
-      detectedIngredients: parsed.detectedIngredients,
-      recipes: safeRecipes.map((recipe) => ({
-        id: randomUUID(),
-        name: recipe.name,
-        description: recipe.description,
-        servings: 1,
-        prepTimeMinutes: recipe.prepTimeMinutes,
-        difficulty: recipe.difficulty,
-        calories: recipe.calories,
-        proteinGrams: recipe.proteinGrams,
-        carbsGrams: recipe.carbsGrams,
-        fatGrams: recipe.fatGrams,
-        ingredients: recipe.ingredients,
-        steps: recipe.steps,
-        missingIngredients: recipe.missingIngredients,
-      })),
-      remainingToday: quota.remainingToday,
-    };
-  } catch (error) {
-    if (error instanceof HttpsError) throw error;
-    await refundAiQuota(uid, QUOTA_FEATURE);
-    const err = error as { message?: string; status?: number; code?: string; name?: string };
-    logger.error(
-      `suggestRecipesFromIngredients: OpenAI call failed :: name=${err.name} status=${err.status} code=${err.code} message=${err.message}`,
-    );
-    throw new HttpsError("internal", "No se pudieron analizar tus ingredientes en este momento. Intenta de nuevo.");
-  }
-}
 
 async function fetchProfile(userId: string): Promise<{
   sex: Sex | null;

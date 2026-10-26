@@ -9,6 +9,14 @@ import type { GeneratedRecipe } from "../src/recipes/schema";
 import type { FoodAnalysis } from "../src/foodAnalysis/schema";
 import { filterSafeSuggestedRecipes } from "../src/ingredients/safety";
 import type { SuggestedRecipe } from "../src/ingredients/schema";
+import { sanitizeNameList } from "../src/ingredients/input";
+
+test("ingredientes: la lista del cliente se limpia y se acota", () => {
+  assert.deepEqual(sanitizeNameList(["  Huevos ", "huevos", "", 3, "Tomate   cherry", null], 10), ["Huevos", "Tomate cherry"]);
+  assert.deepEqual(sanitizeNameList("Huevos", 10), []);
+  assert.equal(sanitizeNameList(["a", "b", "c"], 2).length, 2);
+  assert.equal(sanitizeNameList(["x".repeat(500)], 1)[0].length, 80);
+});
 
 const meal = (calories: number, containsExcludedFood = false): GeneratedMeal => ({
   name: "Comida",

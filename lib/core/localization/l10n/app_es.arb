@@ -324,9 +324,47 @@
   "cameraSheetAnalyzeMealSubtitle": "Foto del plato y calorías estimadas",
   "cameraSheetIngredientsTitle": "Tengo ingredientes",
   "cameraSheetIngredientsSubtitle": "Recetas con lo que hay en la nevera",
-  "ingredientsDetectedTitle": "Lo que vimos en tu foto",
-  "ingredientsRecipesTitle": "Puedes cocinar",
-  "ingredientsAiNote": "Recetas sugeridas por IA a partir de tu foto. Revisa los ingredientes antes de cocinar.",
+  "ingredientsFoundTitle": "{count, plural, =1{Encontramos 1 ingrediente} other{Encontramos {count} ingredientes}}",
+  "@ingredientsFoundTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ingredientsFoundSubtitle": "Quita lo que no tengas y añade lo que falte.",
+  "ingredientsDoubtfulChip": "{name} · ¿seguro?",
+  "@ingredientsDoubtfulChip": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "ingredientsDoubtfulNote": "Los ingredientes con borde punteado son dudosos: confírmalos o quítalos.",
+  "ingredientsAddChip": "+ Añadir",
+  "ingredientsAddSheetTitle": "Añadir ingrediente",
+  "ingredientsAddFieldHint": "Ej. Cebolla",
+  "ingredientsAddConfirm": "Añadir",
+  "ingredientsRemoveSemantics": "Quitar {name}",
+  "@ingredientsRemoveSemantics": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "ingredientsConfirmSemantics": "Confirmar {name}",
+  "@ingredientsConfirmSemantics": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "ingredientsSeeRecipesCta": "Ver recetas posibles",
+  "ingredientsRecipesCount": "{count, plural, =1{1 receta para ti} other{{count} recetas para ti}}",
+  "@ingredientsRecipesCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ingredientsRecipeMeta": "{calories} kcal · {protein} g proteína · {minutes} min",
+  "@ingredientsRecipeMeta": {
+    "placeholders": { "calories": { "type": "int" }, "protein": { "type": "int" }, "minutes": { "type": "int" } }
+  },
+  "ingredientsAddOneToList": "Añadir {item} a la lista de compra",
+  "@ingredientsAddOneToList": {
+    "placeholders": { "item": { "type": "String" } }
+  },
+  "ingredientsAddManyToList": "Añadir los {count} a la lista de compra",
+  "@ingredientsAddManyToList": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ingredientsAddedToList": "Listo, está en tu lista de compra",
+  "ingredientsMoreIdeasCta": "Pedir más ideas a la IA",
   "ingredientsNotDetectedTitle": "No vemos ingredientes",
   "ingredientsNotDetectedMessage": "Toma una foto de tu nevera, tu despensa o tus compras, con buena luz.",
   "ingredientsHaveEverything": "Tienes todo",

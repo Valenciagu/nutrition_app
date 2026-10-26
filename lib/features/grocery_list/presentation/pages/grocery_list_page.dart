@@ -202,8 +202,12 @@ class _GroceryItemRow extends ConsumerWidget {
                         decorationColor: colors.textDisabled,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(sourcesLabel, style: AppTypography.bodyM.copyWith(fontSize: 12, color: colors.textSecondary)),
+                    // Un ítem añadido a mano (Épica 9) no viene de ninguna
+                    // receta del plan: sin línea de origen.
+                    if (sourcesLabel.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(sourcesLabel, style: AppTypography.bodyM.copyWith(fontSize: 12, color: colors.textSecondary)),
+                    ],
                   ],
                 ),
               ),

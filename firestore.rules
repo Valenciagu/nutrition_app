@@ -83,13 +83,18 @@ service cloud.firestore {
       // `nutritionPlans`/`recipes` (contenido generado por la IA), esto es
       // SOLO estado propio del usuario (qué ya marcó como comprado/en casa):
       // el cliente escribe directo, no hay Cloud Function involucrada. Se
-      // valida la forma para no dejar guardar campos arbitrarios —
-      // `checkedItems` es la única clave permitida, siempre una lista.
+      // valida la forma para no dejar guardar campos arbitrarios — solo
+      // `checkedItems` y `extraItems` (Épica 9: "Añadir X a la lista de
+      // compra" desde una receta sugerida), ambas listas, la segunda acotada
+      // para que el documento no crezca sin límite. Cualquiera de las dos
+      // puede faltar (un `merge` de solo una no escribe la otra).
       match /shoppingLists/{weekKey} {
         allow read: if request.auth != null && request.auth.uid == userId;
         allow write: if request.auth != null && request.auth.uid == userId
-          && request.resource.data.keys().hasOnly(['checkedItems'])
-          && request.resource.data.checkedItems is list;
+          && request.resource.data.keys().hasOnly(['checkedItems', 'extraItems'])
+          && (!('checkedItems' in request.resource.data) || request.resource.data.checkedItems is list)
+          && (!('extraItems' in request.resource.data)
+            || (request.resource.data.extraItems is list && request.resource.data.extraItems.size() <= 100));
       }
     }
   }

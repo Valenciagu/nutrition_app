@@ -51,10 +51,10 @@ class FirebaseAnalyticsService implements AnalyticsService {
   }
 
   @override
-  Future<void> logIngredientPhotoAnalyzed({required bool isIngredientPhoto, required int recipeCount}) {
+  Future<void> logIngredientPhotoAnalyzed({required bool isIngredientPhoto, required int ingredientCount}) {
     return _analytics.logEvent(
       name: AnalyticsEvents.ingredientPhotoAnalyzed,
-      parameters: {'is_ingredient_photo': isIngredientPhoto ? 1 : 0, 'recipe_count': recipeCount},
+      parameters: {'is_ingredient_photo': isIngredientPhoto ? 1 : 0, 'ingredient_count': ingredientCount},
     );
   }
 

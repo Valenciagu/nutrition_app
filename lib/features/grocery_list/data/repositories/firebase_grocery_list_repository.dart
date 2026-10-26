@@ -40,6 +40,19 @@ class FirebaseGroceryListRepository implements GroceryListRepository {
     }, SetOptions(merge: true));
   }
 
+  @override
+  Future<List<String>> getExtraItems({required String userId, required String weekKey}) async {
+    final doc = await _shoppingListRef(userId, weekKey).get();
+    return ((doc.data()?['extraItems'] as List?) ?? const []).map((e) => e as String).toList();
+  }
+
+  /// `arrayUnion`: añadir dos veces lo mismo no lo duplica. `firestore.rules`
+  /// acota `extraItems` a 100 elementos.
+  @override
+  Future<void> addExtraItems({required String userId, required String weekKey, required List<String> names}) {
+    return _shoppingListRef(userId, weekKey).set({'extraItems': FieldValue.arrayUnion(names)}, SetOptions(merge: true));
+  }
+
   DocumentReference<Map<String, dynamic>> _shoppingListRef(String userId, String weekKey) {
     return _firestore.collection('users').doc(userId).collection('shoppingLists').doc(weekKey);
   }

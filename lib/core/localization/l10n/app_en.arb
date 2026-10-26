@@ -270,9 +270,47 @@
   "cameraSheetAnalyzeMealSubtitle": "Photo of your plate and estimated calories",
   "cameraSheetIngredientsTitle": "I have ingredients",
   "cameraSheetIngredientsSubtitle": "Recipes with what's in your fridge",
-  "ingredientsDetectedTitle": "What we spotted in your photo",
-  "ingredientsRecipesTitle": "You can cook",
-  "ingredientsAiNote": "AI-suggested recipes based on your photo. Check the ingredients before cooking.",
+  "ingredientsFoundTitle": "{count, plural, =1{We found 1 ingredient} other{We found {count} ingredients}}",
+  "@ingredientsFoundTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ingredientsFoundSubtitle": "Remove what you don't have and add what's missing.",
+  "ingredientsDoubtfulChip": "{name} · sure?",
+  "@ingredientsDoubtfulChip": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "ingredientsDoubtfulNote": "Ingredients with a dashed border are uncertain: confirm or remove them.",
+  "ingredientsAddChip": "+ Add",
+  "ingredientsAddSheetTitle": "Add ingredient",
+  "ingredientsAddFieldHint": "E.g. Onion",
+  "ingredientsAddConfirm": "Add",
+  "ingredientsRemoveSemantics": "Remove {name}",
+  "@ingredientsRemoveSemantics": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "ingredientsConfirmSemantics": "Confirm {name}",
+  "@ingredientsConfirmSemantics": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "ingredientsSeeRecipesCta": "See possible recipes",
+  "ingredientsRecipesCount": "{count, plural, =1{1 recipe for you} other{{count} recipes for you}}",
+  "@ingredientsRecipesCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ingredientsRecipeMeta": "{calories} kcal · {protein} g protein · {minutes} min",
+  "@ingredientsRecipeMeta": {
+    "placeholders": { "calories": { "type": "int" }, "protein": { "type": "int" }, "minutes": { "type": "int" } }
+  },
+  "ingredientsAddOneToList": "Add {item} to the grocery list",
+  "@ingredientsAddOneToList": {
+    "placeholders": { "item": { "type": "String" } }
+  },
+  "ingredientsAddManyToList": "Add all {count} to the grocery list",
+  "@ingredientsAddManyToList": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "ingredientsAddedToList": "Done, it's on your grocery list",
+  "ingredientsMoreIdeasCta": "Ask the AI for more ideas",
   "ingredientsNotDetectedTitle": "We can't see any ingredients",
   "ingredientsNotDetectedMessage": "Take a well-lit photo of your fridge, pantry or groceries.",
   "ingredientsHaveEverything": "You have everything",

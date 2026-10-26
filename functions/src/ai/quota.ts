@@ -29,11 +29,14 @@ const DAILY_LIMITS: Record<string, { free: number; premium: number }> = {
   // Análisis de imagen (Épica 8) consume más tokens por llamada que texto
   // plano — límite más bajo a propósito, igual criterio que `planGeneration`.
   foodAnalysis: { free: 5, premium: 20 },
-  // Épica 9 — foto de ingredientes → 3 recetas completas: imagen + la salida
-  // más grande de todas. La especificación la ubica como premium; hasta que
-  // existan suscripciones (Épica 13) va abierta a todos con este límite
-  // gratuito bajo (decisión del usuario, 2026-10-25).
-  ingredientAnalysis: { free: 3, premium: 15 },
+  // Épica 9 — la especificación la ubica como premium; hasta que existan
+  // suscripciones (Épica 13) va abierta a todos con estos límites gratuitos
+  // bajos (decisión del usuario, 2026-10-25). Dos pasos con cuota propia:
+  // detectar (imagen, `detectIngredients`) y generar recetas desde la lista
+  // revisada (texto, `suggestRecipesFromIngredients`) — este último más
+  // alto porque "Pedir más ideas" lo repite sin otra foto.
+  ingredientDetection: { free: 3, premium: 15 },
+  ingredientRecipes: { free: 6, premium: 30 },
 };
 
 export interface QuotaCheckResult {
