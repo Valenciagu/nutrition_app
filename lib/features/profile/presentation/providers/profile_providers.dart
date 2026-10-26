@@ -27,17 +27,33 @@ final userProfileProvider = FutureProvider.autoDispose<OnboardingAnswers>((ref) 
 });
 
 /// Estado en edición de una pantalla de "Objetivo y datos"/"Preferencias y
-/// alergias" — se siembra desde [userProfileProvider] al entrar (ver
-/// `seed`), vive solo mientras la pantalla está abierta (`.autoDispose`, sin
-/// guardado local ni migración).
+/// alergias" — vive solo mientras la pantalla está abierta (`.autoDispose`,
+/// sin guardado local ni migración: salir sin guardar descarta a propósito).
 final profileEditControllerProvider =
     NotifierProvider.autoDispose<ProfileEditController, OnboardingAnswers>(ProfileEditController.new);
 
 class ProfileEditController extends AutoDisposeNotifier<OnboardingAnswers> {
-  @override
-  OnboardingAnswers build() => const OnboardingAnswers();
+  bool _isSeeded = false;
 
-  void seed(OnboardingAnswers answers) => state = answers;
+  /// `false` si se creó sin el perfil cargado: guardar ese estado vacío
+  /// sobrescribiría objetivo, biométricos y ALERGIAS en Firestore (BUG-P01),
+  /// así que [ProfileSaveController] se niega a hacerlo.
+  bool get isSeeded => _isSeeded;
+
+  /// Nace con el perfil que YA está cargado. Antes se sembraba con un
+  /// `ref.listen` en la pantalla, que solo se dispara cuando el valor CAMBIA:
+  /// como `ProfilePage` ya mantiene vivo [userProfileProvider], al abrir la
+  /// edición el valor no cambiaba, nunca se sembraba y el formulario salía
+  /// vacío (BUG-P01). Las pantallas solo muestran el formulario en el estado
+  /// `data` de ese provider, así que al crearse este controlador el perfil
+  /// siempre está disponible. `read` y no `watch`: recargar el perfil no
+  /// debe pisar lo que el usuario está editando.
+  @override
+  OnboardingAnswers build() {
+    final loaded = ref.read(userProfileProvider).valueOrNull;
+    _isSeeded = loaded != null;
+    return loaded ?? const OnboardingAnswers();
+  }
 
   void setGoal(NutritionGoal goal) => state = state.copyWith(goal: goal);
 
@@ -77,6 +93,10 @@ class ProfileSaveController extends AutoDisposeAsyncNotifier<void> {
     final uid = ref.read(authStateChangesProvider).valueOrNull?.uid;
     if (uid == null) return;
 
+    if (!ref.read(profileEditControllerProvider.notifier).isSeeded) {
+      state = AsyncError(StateError('Profile edit form was never seeded; refusing to overwrite the profile'), StackTrace.current);
+      return;
+    }
     final answers = ref.read(profileEditControllerProvider);
     state = const AsyncLoading();
     state = await AsyncValue.guard(() {

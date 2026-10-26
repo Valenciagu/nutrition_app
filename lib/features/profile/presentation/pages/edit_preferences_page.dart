@@ -28,22 +28,14 @@ class EditPreferencesPage extends ConsumerStatefulWidget {
 }
 
 class _EditPreferencesPageState extends ConsumerState<EditPreferencesPage> {
-  bool _seeded = false;
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = context.colors;
     final profileAsync = ref.watch(userProfileProvider);
 
-    ref.listen(userProfileProvider, (previous, next) {
-      final data = next.valueOrNull;
-      if (data != null && !_seeded) {
-        _seeded = true;
-        ref.read(profileEditControllerProvider.notifier).seed(data);
-      }
-    });
-
+    // El formulario se llena solo: el controlador de edición nace con el
+    // valor ya cargado (ver su `build`, BUG-P01) — aquí ya no se siembra.
     ref.listen(profileSaveControllerProvider, (previous, next) {
       if (next.hasError) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.genericErrorMessage)));

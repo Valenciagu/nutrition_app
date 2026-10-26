@@ -120,6 +120,18 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 
 ---
 
+## Épica 11/12 — Perfil y Recordatorios
+
+### BUG-P01 — Las pantallas de edición de Perfil se abrían vacías y guardar podía borrar el perfil
+- **Reportado** (2026-10-25): en Perfil → "Preferencias y alergias", el usuario marca opciones, sale y vuelve a entrar: no aparece nada marcado. Los datos sí estaban guardados en Firestore.
+- **Causa raíz**: las tres pantallas de edición (`edit_preferences_page.dart`, `edit_goal_biometrics_page.dart`, `notification_settings_page.dart`) llenaban su formulario con `ref.listen(provider, ...)`, que solo se dispara cuando el valor CAMBIA. `ProfilePage` ya mantiene vivos `userProfileProvider` y `notificationPreferencesProvider` (este último por la fila "Recordatorios"), así que al abrir la edición el valor ya estaba en `AsyncData`, el listener nunca corría y el controlador de edición (`.autoDispose`) se quedaba con el estado vacío por defecto. En carga en frío sí funcionaba, por eso parecía intermitente.
+- **Por qué era grave**: "Guardar" sobre ese formulario vacío escribía `OnboardingAnswers().toJson()` con `merge: true`: objetivo/sexo/actividad en `null`, edad/estatura/peso en sus valores por defecto y `avoidFoods` reemplazado por la selección parcial. `avoidFoods` es el filtro de alérgenos que usan `generateDailyPlan`, `generateRecipe`, `askNutritionAssistant` y `suggestRecipesFromIngredients`, así que borrar alergias era un riesgo de seguridad para el usuario. En Notificaciones, guardar apagaba todos los recordatorios.
+- **Fix**: el `build()` de `ProfileEditController` y de `NotificationSettingsEditController` toma el valor ya cargado (`ref.read(provider).valueOrNull`). Las pantallas solo muestran el formulario en el estado `data` de ese provider, así que el controlador siempre nace lleno. Se usa `read` y no `watch`, para que recargar el dato no pise lo que el usuario está editando. Se quitaron el listener y la bandera `_seeded` de las tres pantallas. **Defensa adicional**: cada controlador expone `isSeeded`, y los controladores de guardado se niegan a escribir (error → snackbar genérico) si el formulario nunca se llenó. Así, un bug parecido en el futuro no puede volver a borrar datos. Salir sin guardar sigue descartando los cambios, a propósito.
+- **Archivos**: `lib/features/profile/presentation/providers/profile_providers.dart`, `lib/features/notifications/presentation/providers/notification_providers.dart`, las tres páginas citadas. Test: `test/features/profile/profile_edit_seeding_test.dart`.
+- **Estado**: corregido, `flutter analyze` limpio y tests pasando. **Sin verificar en dispositivo** (entrar → marcar → Guardar → reentrar; entrar → salir sin guardar → reentrar; lo mismo en "Objetivo y datos" y Recordatorios). Sin commitear.
+
+---
+
 ## Resumen
 
 | ID | Épica | Bug | Causa raíz | Estado |
@@ -134,6 +146,7 @@ Mismo bug que BUG-O01, mismo fix — el usuario lo reportó como un bug aparte (
 | BUG-O07 | Shell principal | Botones del sistema se superponen a la barra de tabs | `BottomNavigation` sin `SafeArea` | Corregido y commiteado |
 | BUG-D01 | Backend/Deployment | Todas las funciones devolvían 403 pese a deploy exitoso | `firebase-tools` nunca re-aplica el invoker público en un `update`, solo en `create` | Corregido y commiteado, confirmado en producción |
 | BUG-O08 | Onboarding | B8 sin salida si falla la generación del plan | Error solo ofrecía "Reintentar", mensaje genérico | Corregido, confirmado por el usuario (proveedor Anónimo activado) |
+| BUG-P01 | Perfil / Recordatorios | Edición abría vacía; guardar podía borrar perfil y alergias | `ref.listen` no se dispara con un valor ya cargado | Corregido (+ guardado bloqueado si no se sembró), sin verificar en dispositivo |
 | BUG-A01 | Analytics | Crash tras analizar foto (`_AssertionError`) | `bool` pasado como valor de parámetro de evento (solo acepta `String`/`num`) | Corregido y commiteado |
 
 **Bugs BUG-H01/O01-O07 confirmados resueltos por el usuario y todos commiteados.** BUG-D01/A01 encontrados y corregidos 2026-09-30 durante el primer ciclo de pruebas end-to-end en producción — ambos confirmados funcionando por el usuario.

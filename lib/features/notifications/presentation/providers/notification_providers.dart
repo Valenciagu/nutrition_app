@@ -51,10 +51,23 @@ final notificationSettingsEditControllerProvider =
     );
 
 class NotificationSettingsEditController extends AutoDisposeNotifier<NotificationPreferences> {
-  @override
-  NotificationPreferences build() => const NotificationPreferences();
+  bool _isSeeded = false;
 
-  void seed(NotificationPreferences prefs) => state = prefs;
+  /// Ver `ProfileEditController.isSeeded` (BUG-P01): aquí guardar un estado
+  /// vacío apagaría todos los recordatorios.
+  bool get isSeeded => _isSeeded;
+
+  /// Nace con las preferencias YA cargadas — mismo arreglo que
+  /// `ProfileEditController.build` (BUG-P01): `ProfilePage` mantiene vivo
+  /// [notificationPreferencesProvider] (fila "Recordatorios"), así que un
+  /// `ref.listen` en la pantalla nunca se disparaba y el formulario salía
+  /// con los valores por defecto.
+  @override
+  NotificationPreferences build() {
+    final loaded = ref.read(notificationPreferencesProvider).valueOrNull;
+    _isSeeded = loaded != null;
+    return loaded ?? const NotificationPreferences();
+  }
 
   void setEnabled(bool value) => state = state.copyWith(enabled: value);
 
@@ -88,6 +101,13 @@ class NotificationSettingsSaveController extends AutoDisposeAsyncNotifier<bool> 
     final uid = ref.read(authStateChangesProvider).valueOrNull?.uid;
     if (uid == null) return;
 
+    if (!ref.read(notificationSettingsEditControllerProvider.notifier).isSeeded) {
+      state = AsyncError(
+        StateError('Notification settings form was never seeded; refusing to overwrite preferences'),
+        StackTrace.current,
+      );
+      return;
+    }
     final prefs = ref.read(notificationSettingsEditControllerProvider);
     final service = ref.read(notificationServiceProvider);
 
