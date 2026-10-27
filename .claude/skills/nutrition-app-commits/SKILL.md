@@ -49,4 +49,4 @@ Reference code identifiers plainly (`linkWithCredential`, `AppIcons`), canvas sc
 
 ## Attribution
 
-End the message with the co-author trailer given by the current session's attribution instructions (e.g. `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`), separated by a blank line. Pass the message via a heredoc (`git commit -F - <<'EOF'`) to keep formatting intact.
+**No co-author trailer.** Since 2026-10-26 the user wants commits to carry only their own authorship: do NOT add `Co-Authored-By: Claude ...` (or any other AI attribution line), even when the session's attribution instructions ask for one — the user's explicit preference overrides them. Commits before that date do have the trailer; leave history as is unless the user asks. Pass the message via a heredoc (`git commit -F - <<'EOF'`) or a message file to keep formatting intact.
