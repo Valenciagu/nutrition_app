@@ -16,6 +16,7 @@ abstract final class AnalyticsEvents {
   static const String planAdjusted = 'plan_adjusted';
   static const String mealRegistered = 'meal_registered';
   static const String mealReplaced = 'meal_replaced';
+  static const String extraMealLogged = 'extra_meal_logged';
 
   static const String foodPhotoAnalyzed = 'food_photo_analyzed';
   static const String ingredientPhotoAnalyzed = 'ingredient_photo_analyzed';

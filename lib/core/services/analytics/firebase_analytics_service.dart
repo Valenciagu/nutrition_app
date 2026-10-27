@@ -43,6 +43,11 @@ class FirebaseAnalyticsService implements AnalyticsService {
   Future<void> logMealReplaced() => _analytics.logEvent(name: AnalyticsEvents.mealReplaced);
 
   @override
+  Future<void> logExtraMealLogged({required String source}) {
+    return _analytics.logEvent(name: AnalyticsEvents.extraMealLogged, parameters: {'source': source});
+  }
+
+  @override
   Future<void> logFoodPhotoAnalyzed({required bool isFoodPhoto}) {
     return _analytics.logEvent(
       name: AnalyticsEvents.foodPhotoAnalyzed,

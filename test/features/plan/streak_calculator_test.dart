@@ -52,4 +52,15 @@ void main() {
     final plans = [plan('2026-11-01', [eaten]), plan('2026-10-31', [eaten])];
     expect(computeStreak(plans, DateTime(2026, 11, 1)), 2);
   });
+
+  test('un día con solo comidas fuera del plan también cuenta', () {
+    final plans = [
+      plan('2026-10-19', [eaten]),
+      plan('2026-10-18', [notEaten]),
+      plan('2026-10-17', [eaten]),
+    ];
+    expect(computeStreak(plans, today, extraMealDates: {'2026-10-18'}), 3);
+    // Sin plan ese día, la comida extra lo sostiene igual.
+    expect(computeStreak([plan('2026-10-19', [eaten])], today, extraMealDates: {'2026-10-18', '2026-10-17'}), 3);
+  });
 }

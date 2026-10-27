@@ -13,7 +13,11 @@ Home ya no se queda siempre en C3. Si hay un plan para HOY (`todayPlanProvider`,
 - Pull-to-refresh en Home.
 - **C3**: las filas "Empieza por aquí" ahora navegan de verdad (Plan, Lista de compra, IA) en vez de mostrar "Muy pronto".
 
-Sigue pendiente: **C2** (`AISuggestionCard` tras una comida imprevista) — no existe un evento guardado de "comida imprevista" que lo dispare. Tests a escribir en la pasada de tests: `computeStreak` (hoy sin registros, huecos, día sin plan).
+**Comidas extra (LOG-101, 2026-10-26)**: el anillo y las cifras de C1 salen de `dayIntake(plan, extraMeals)` — comidas del plan registradas + comidas fuera del plan de hoy (`extraMealsForDateProvider`). En C3 (sin plan hoy), si ya hay comidas extra el anillo se enciende con lo comido en vez de quedar apagado. Ver `documentation/meal_log.md`.
+
+**C2 (2026-10-26)**: `AISuggestionCard` arriba del anillo cuando hoy hay plan con comidas pendientes y la comida extra más reciente aún no tuvo su propuesta resuelta (`homeAiSuggestionProvider` → `pickSuggestionMeal`, con tests). "Recalcular mi día" llama a `adjustDailyPlan` sobre hoy con un mensaje armado ("Comí X fuera del plan (unas N kcal)…"); `adjustDailyPlan` ahora suma las comidas extra del día a lo ya consumido, así que el presupuesto que reparte es el real. "Ahora no" o un recálculo exitoso marcan esa comida como resuelta (`handledSuggestionMealIdProvider`, `shared_preferences` por usuario, local a propósito); una comida extra nueva vuelve a mostrarla.
+
+**Racha**: desde el 2026-10-26 un día cuenta si tiene una comida del plan registrada **o** alguna comida extra (`computeStreak(..., extraMealDates:)`, fechas de `ExtraMealRepository.getDatesWithMeals`). Tests a escribir en la pasada de tests: `computeStreak` (hoy sin registros, huecos, día sin plan).
 
 ## Qué hace
 

@@ -10,6 +10,7 @@ import '../../../../core/constants/route_paths.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/app_color_tokens.dart';
+import '../../../../core/utils/date_key.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -21,6 +22,8 @@ import '../../../../core/widgets/meal_card.dart';
 import '../../../../core/widgets/progress_ring.dart';
 import '../../../../core/widgets/quick_action_tile.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
+import '../../../meal_log/domain/entities/extra_meal.dart';
+import '../../../meal_log/presentation/providers/extra_meal_providers.dart';
 import '../../../onboarding/presentation/onboarding_catalog.dart';
 import '../../../plan/domain/entities/nutrition_plan.dart';
 import '../../../plan/domain/entities/planned_meal.dart';
@@ -28,9 +31,12 @@ import '../../../plan/presentation/providers/plan_providers.dart';
 import '../../../plan/presentation/widgets/replace_meal_sheet.dart';
 import '../providers/home_providers.dart';
 import '../widgets/camera_action_sheet.dart';
+import '../../../../core/widgets/ai_suggestion_card.dart';
+import '../providers/ai_suggestion_providers.dart';
 
 /// Home (Fase 3). Dos estados según haya o no un plan para HOY:
-/// - **C1** (poblado): anillo con las kcal libres reales (meta − registradas),
+/// - **C1** (poblado): anillo con las kcal libres reales (meta − lo comido:
+///   comidas del plan registradas + comidas extra, ver [DayIntake]),
 ///   lo consumido, "Ahora toca" con la próxima comida pendiente del plan y
 ///   acciones rápidas.
 /// - **C3** (primer día / sin plan hoy): anillo apagado con la meta.
@@ -47,6 +53,8 @@ class HomePage extends ConsumerWidget {
     final colors = context.colors;
     final goalAsync = ref.watch(homeDailyCalorieGoalProvider);
     final todayPlanAsync = ref.watch(todayPlanProvider);
+    // Comidas fuera del plan (LOG-101): suman al anillo aunque hoy no haya plan.
+    final extrasAsync = ref.watch(extraMealsForDateProvider(dateKey(DateTime.now())));
     // La racha nunca bloquea la pantalla: mientras carga (o si falla) no se
     // muestra el badge, nada más.
     final streak = ref.watch(streakProvider).valueOrNull ?? 0;
@@ -54,26 +62,29 @@ class HomePage extends ConsumerWidget {
     void retry() {
       ref.invalidate(homeDailyCalorieGoalProvider);
       ref.invalidate(todayPlanProvider);
+      ref.invalidate(extraMealsForDateProvider);
     }
 
     Widget body;
-    if (goalAsync.isLoading || todayPlanAsync.isLoading) {
+    if (goalAsync.isLoading || todayPlanAsync.isLoading || (extrasAsync.isLoading && !extrasAsync.hasValue)) {
       body = const _HomeSkeleton();
-    } else if (goalAsync.hasError || todayPlanAsync.hasError) {
+    } else if (goalAsync.hasError || todayPlanAsync.hasError || extrasAsync.hasError) {
       body = Center(
         child: AppStateBlock.error(
           title: l10n.genericErrorTitle,
-          message: l10n.messageForError(goalAsync.error ?? todayPlanAsync.error!),
+          message: l10n.messageForError(goalAsync.error ?? todayPlanAsync.error ?? extrasAsync.error!),
           onAction: retry,
         ),
       );
     } else {
       final dailyGoal = goalAsync.requireValue;
       final plan = todayPlanAsync.requireValue;
+      final intake = dayIntake(plan, extrasAsync.requireValue);
       body = RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(todayPlanProvider);
           ref.invalidate(streakProvider);
+          ref.invalidate(extraMealsForDateProvider);
           await ref.read(todayPlanProvider.future);
         },
         child: SingleChildScrollView(
@@ -85,9 +96,9 @@ class HomePage extends ConsumerWidget {
               _HomeHeader(streak: streak),
               const SizedBox(height: AppSpacing.space16),
               if (plan != null && plan.meals.isNotEmpty)
-                _PopulatedHome(plan: plan, dailyGoal: dailyGoal)
+                _PopulatedHome(plan: plan, dailyGoal: dailyGoal, intake: intake)
               else
-                _EmptyHome(dailyGoal: dailyGoal),
+                _EmptyHome(dailyGoal: dailyGoal, intake: intake),
             ],
           ),
         ),
@@ -178,19 +189,19 @@ class _HomeHeader extends ConsumerWidget {
 /// únicos macros que `generateDailyPlan` guarda por comida, mismo criterio
 /// que B9). Por eso no hay barras de carbos/grasas: serían inventadas.
 class _PopulatedHome extends ConsumerWidget {
-  const _PopulatedHome({required this.plan, required this.dailyGoal});
+  const _PopulatedHome({required this.plan, required this.dailyGoal, required this.intake});
 
   final NutritionPlan plan;
   final int dailyGoal;
+  final DayIntake intake;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final colors = context.colors;
 
-    final registered = plan.meals.where((m) => m.status == MealStatus.registered).toList();
-    final eatenCalories = plan.registeredCalories;
-    final eatenProtein = registered.fold(0, (sum, meal) => sum + meal.proteinGrams);
+    final eatenCalories = intake.calories;
+    final eatenProtein = intake.proteinGrams;
     // Al pasarse de la meta el anillo se queda lleno y la cifra en 0 — nunca
     // un número negativo ni rojo ("progreso, nunca culpa").
     final caloriesLeft = math.max(dailyGoal - eatenCalories, 0);
@@ -203,6 +214,8 @@ class _PopulatedHome extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // C2 — propuesta de la IA, arriba del anillo y solo si existe.
+        const _AiSuggestion(),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
@@ -215,7 +228,7 @@ class _PopulatedHome extends ConsumerWidget {
                 children: [
                   MacroStatTile(value: eatenCalories, label: l10n.homeCaloriesEatenLabel, color: colors.textPrimary),
                   MacroStatTile(value: eatenProtein, label: l10n.homeProteinEatenLabel, color: colors.macroProtein),
-                  MacroStatTile(value: registered.length, label: l10n.homeMealsRegisteredLabel, color: colors.textPrimary),
+                  MacroStatTile(value: intake.mealsCount, label: l10n.homeMealsRegisteredLabel, color: colors.textPrimary),
                 ],
               ),
             ],
@@ -263,6 +276,52 @@ class _PopulatedHome extends ConsumerWidget {
         const SizedBox(height: 10),
         const _AiRow(),
       ],
+    );
+  }
+}
+
+/// C2 · tras una comida fuera del plan (LOG-101), la IA propone equilibrar
+/// lo que queda del día. "Recalcular mi día" es el mismo `adjustDailyPlan`
+/// de D1 (que ya descuenta las comidas extra del presupuesto), con un
+/// mensaje armado aquí; "Ahora no" la descarta hasta la próxima comida extra.
+class _AiSuggestion extends ConsumerWidget {
+  const _AiSuggestion();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final meal = ref.watch(homeAiSuggestionProvider);
+    final isAdjusting = ref.watch(adjustPlanControllerProvider).isLoading;
+    if (meal == null) return const SizedBox.shrink();
+
+    Future<void> recalculate() async {
+      // `adjustForSelectedDate` ajusta el día que mira Plan: se alinea a hoy.
+      ref.read(selectedPlanDateProvider.notifier).state = DateTime.now();
+      await ref
+          .read(adjustPlanControllerProvider.notifier)
+          .adjustForSelectedDate(l10n.homeAiSuggestionAdjustMessage(meal.name, meal.calories));
+      if (!context.mounted) return;
+      final result = ref.read(adjustPlanControllerProvider);
+      if (result.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.messageForError(result.error!))));
+        return;
+      }
+      await ref.read(handledSuggestionMealIdProvider.notifier).markHandled(meal.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.homeAiSuggestionDone)));
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space16),
+      child: AISuggestionCard(
+        message: l10n.homeAiSuggestionMessage(meal.name),
+        primaryLabel: l10n.homeAiSuggestionRecalculate,
+        isPrimaryLoading: isAdjusting,
+        onPrimary: isAdjusting ? null : recalculate,
+        dismissLabel: l10n.homeAiSuggestionDismiss,
+        onDismiss: () => ref.read(handledSuggestionMealIdProvider.notifier).markHandled(meal.id),
+      ),
     );
   }
 }
@@ -324,9 +383,13 @@ class _UpNextMeal extends ConsumerWidget {
 /// C3 — sin plan para hoy. El anillo apagado muestra solo la meta; las
 /// filas llevan a las pantallas reales (antes eran un snackbar "Muy pronto").
 class _EmptyHome extends ConsumerWidget {
-  const _EmptyHome({required this.dailyGoal});
+  const _EmptyHome({required this.dailyGoal, required this.intake});
 
   final int dailyGoal;
+
+  /// Sin plan hoy puede haber igual comidas extra: entonces el anillo se
+  /// enciende con lo comido, como en C1.
+  final DayIntake intake;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -342,7 +405,14 @@ class _EmptyHome extends ConsumerWidget {
           decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(22)),
           child: Column(
             children: [
-              ProgressRing(progress: 0, centerNumber: dailyGoal, centerLabel: l10n.homeCaloriesAheadLabel, dimmed: true),
+              if (intake.mealsCount == 0)
+                ProgressRing(progress: 0, centerNumber: dailyGoal, centerLabel: l10n.homeCaloriesAheadLabel, dimmed: true)
+              else
+                ProgressRing(
+                  progress: dailyGoal == 0 ? 0.0 : (intake.calories / dailyGoal).clamp(0.0, 1.0),
+                  centerNumber: math.max(dailyGoal - intake.calories, 0),
+                  centerLabel: l10n.homeCaloriesLeftLabel,
+                ),
               const SizedBox(height: 12),
               Text(l10n.homeEmptyTitle, style: AppTypography.titleM.copyWith(fontSize: 17, color: colors.textPrimary), textAlign: TextAlign.center),
               const SizedBox(height: 6),

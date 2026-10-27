@@ -14,7 +14,10 @@ import '../../../../core/widgets/app_bottom_sheet.dart';
 import '../../../../core/widgets/app_state_block.dart';
 import '../../../../core/widgets/meal_card.dart';
 import '../../../../core/widgets/quick_action_tile.dart';
+import '../../../../core/utils/date_key.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
+import '../../../meal_log/presentation/providers/extra_meal_providers.dart';
+import '../../../meal_log/presentation/widgets/extra_meals_section.dart';
 import '../../../onboarding/presentation/onboarding_catalog.dart';
 import '../../domain/entities/nutrition_plan.dart';
 import '../../domain/entities/planned_meal.dart';
@@ -154,7 +157,17 @@ class _PlanContent extends ConsumerWidget {
                 message: l10n.genericErrorMessage,
                 onAction: () => ref.invalidate(planForDateProvider),
               ),
-              data: (plan) => plan == null ? _EmptyPlan(l10n: l10n) : _PopulatedPlan(l10n: l10n, plan: plan),
+              // Comidas fuera del plan (LOG-101) — también en un día sin plan.
+              data: (plan) => plan == null
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _EmptyPlan(l10n: l10n),
+                        const SizedBox(height: 10),
+                        ExtraMealsSection(date: dateKey(selectedDate)),
+                      ],
+                    )
+                  : _PopulatedPlan(l10n: l10n, plan: plan),
             ),
           ],
         ],
@@ -192,6 +205,9 @@ class _PopulatedPlan extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final registeredCount = plan.meals.where((m) => m.status == MealStatus.registered).length;
+    // Las kcal del día suman también las comidas extra — mismo total que Home.
+    final extraMeals = ref.watch(extraMealsForDateProvider(plan.date)).valueOrNull ?? const [];
+    final eatenCalories = dayIntake(plan, extraMeals).calories;
 
     // La primera comida pendiente (en el orden en que vienen del plan, que
     // ya sigue el horario del día) es "la próxima" — la única con
@@ -223,7 +239,7 @@ class _PopulatedPlan extends ConsumerWidget {
                 style: AppTypography.bodyM.copyWith(fontSize: 12.5, color: colors.textSecondary),
               ),
               Text(
-                l10n.planCaloriesValue(plan.registeredCalories),
+                l10n.planCaloriesValue(eatenCalories),
                 style: AppTypography.label.copyWith(fontSize: 13, fontWeight: FontWeight.w700, color: colors.actionPrimary),
               ),
             ],
@@ -245,6 +261,7 @@ class _PopulatedPlan extends ConsumerWidget {
           ).appListEntrance(index),
           const SizedBox(height: 10),
         ],
+        ExtraMealsSection(date: plan.date),
         QuickActionTile(
           svgIcon: AppAssets.iconRecalculateDay,
           title: l10n.planAdjustRowTitle,

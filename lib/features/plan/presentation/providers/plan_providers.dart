@@ -6,6 +6,7 @@ import '../../../../core/services/analytics/firebase_analytics_service.dart';
 import '../../../../core/services/firebase_instances.dart';
 import '../../../../core/utils/date_key.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
+import '../../../meal_log/presentation/providers/extra_meal_providers.dart';
 import '../../data/repositories/firebase_plan_repository.dart';
 import '../../domain/entities/meal_alternative.dart';
 import '../../domain/entities/nutrition_plan.dart';
@@ -56,16 +57,21 @@ final todayPlanProvider = FutureProvider.autoDispose<NutritionPlan?>((ref) async
 /// racha más larga se muestra como este tope, no como un número inventado.
 const streakLookbackDays = 60;
 
-/// Racha de días seguidos con alguna comida registrada (ver
-/// `computeStreak`). 0 sin sesión.
+/// Racha de días seguidos con alguna comida registrada — del plan o fuera
+/// de él (ver `computeStreak`). 0 sin sesión.
 final streakProvider = FutureProvider.autoDispose<int>((ref) async {
   final uid = ref.watch(authStateChangesProvider).valueOrNull?.uid;
   if (uid == null) return 0;
   final now = DateTime.now();
-  final plans = await ref
-      .watch(planRepositoryProvider)
-      .getRecentPlans(userId: uid, untilDate: dateKey(now), limit: streakLookbackDays);
-  return computeStreak(plans, now);
+  final (plans, extraMealDates) = await (
+    ref.watch(planRepositoryProvider).getRecentPlans(userId: uid, untilDate: dateKey(now), limit: streakLookbackDays),
+    ref.watch(extraMealRepositoryProvider).getDatesWithMeals(
+          userId: uid,
+          fromDate: dateKey(now.subtract(const Duration(days: streakLookbackDays))),
+          toDate: dateKey(now),
+        ),
+  ).wait;
+  return computeStreak(plans, now, extraMealDates: extraMealDates);
 });
 
 /// Tras cualquier escritura sobre un plan: además de D1, Home (C1) muestra

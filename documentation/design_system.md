@@ -44,6 +44,8 @@ Implemented in `lib/core/theme/app_color_tokens.dart` as `AppColorTokens` (a `Th
 | `onActionPrimarySurface` | `#076B40` | `#B8F5D6`** | Text/icon on top of `actionPrimarySurface` (selected pill/chip/card pattern) — NOT in the canvas, added 2026-09-20 after a dark-mode bug (see below) |
 | `onActionPrimary` | `#FFFFFF` | `#06301D` | |
 | `aiActionSurface` / `onAiAction` | `#EEEDFB` / `#332D93` | `#262163` / `#CFCCFA` | Lighter indigo "AI action" button fill |
+| `aiAccent` / `onAiAccent` | `#4740C4` / `#FFFFFF` | `#9D98F5` / `#14123A`* | `AISuggestionCard` (Fase 3 · C2): AI status dot + solid indigo main action (`AppButtonVariant.aiPrimary`). Added 2026-10-26 |
+| `aiSuggestionSurface` / `aiSuggestionBorder` | `#F3F2FD` / `#E5E3FA` | `#1B1934`* / `#2E2A5C`* | `AISuggestionCard` background and border (C2). Added 2026-10-26 |
 | `background` | `#F7F8F7` | `#0C110F` | |
 | `surface` | `#FFFFFF` | `#141A17` | |
 | `surfaceElevated` | `#FFFFFF` (+e2 shadow) | `#1C2420` | Dark expresses elevation via surface color, not shadow |
@@ -162,13 +164,15 @@ The canvas defines exactly 10 base components ("lo que no está aquí se constru
 | 09 | BottomNavigation | Deferred until 2+ tab features exist | — |
 | 10 | StateBlock | **Built** (empty/loading/error) | `core/widgets/app_state_block.dart` (`AppStateBlock`) |
 
+Fase 3 adds `AISuggestionCard` (`core/widgets/ai_suggestion_card.dart`, built 2026-10-26 for C2; the canvas says it's reusable in Plan and the analysis result).
+
 Plus two generic surfaces implied by the foundations doc but not literally one of the 10: `AppCard` (`core/widgets/app_card.dart`) and `AppSkeletonBar` (`core/widgets/app_skeleton.dart`, the shimmer primitive `AppStateBlock.loading` uses).
 
 **Why defer 03/04/05/06/07/09 now:** they're real, specified components, not skipped — but building them before a consumer feature exists risks getting API shape wrong (e.g. `MealCard`'s swipe actions depend on Plan feature interactions that don't exist yet). They'll be built as part of the epic that first needs them, still living in `core/widgets/` (not duplicated per-feature) per the reuse-first rule.
 
 ### Button (`AppButton`)
 
-4 hierarchies + 1 specialized: `primary`, `secondary`, `neutral`, `text`, `aiAction`. Never two `primary` buttons on one screen. Height 52/44/36 (lg/md/sm), radius `full`, horizontal padding 26/20/16, label 15/600 (lg) or 14/600 (md/sm), icon 20 (stroke 1.5), touch target always ≥48 even if the button itself is 44. States: default, pressed (scale .97 + darker fill, 80ms), focus (2px ring, 2px offset), disabled (fill `border` color, text `textDisabled` — never disable on tap, use loading instead), loading (16px spinner replaces the leading slot, label stays, width doesn't jump). A `success` micro-animation (checkmark, 600ms) from the canvas is **not implemented yet** — flagged as a gap.
+4 hierarchies + 1 specialized: `primary`, `secondary`, `neutral`, `text`, `aiAction` — plus `aiPrimary` (solid indigo, added 2026-10-26), which exists only for the main action inside `AISuggestionCard` (Fase 3 · C2 draws it that way; on that pale indigo card `aiAction`'s fill would vanish). Not a general-purpose primary. Never two `primary` buttons on one screen. Height 52/44/36 (lg/md/sm), radius `full`, horizontal padding 26/20/16, label 15/600 (lg) or 14/600 (md/sm), icon 20 (stroke 1.5), touch target always ≥48 even if the button itself is 44. States: default, pressed (scale .97 + darker fill, 80ms), focus (2px ring, 2px offset), disabled (fill `border` color, text `textDisabled` — never disable on tap, use loading instead), loading (16px spinner replaces the leading slot, label stays, width doesn't jump). A `success` micro-animation (checkmark, 600ms) from the canvas is **not implemented yet** — flagged as a gap.
 
 ### TextField (`AppTextField`)
 

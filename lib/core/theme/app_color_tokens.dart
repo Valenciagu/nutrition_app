@@ -20,6 +20,10 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     required this.onActionPrimary,
     required this.aiActionSurface,
     required this.onAiAction,
+    required this.aiAccent,
+    required this.onAiAccent,
+    required this.aiSuggestionSurface,
+    required this.aiSuggestionBorder,
     required this.background,
     required this.surface,
     required this.surfaceElevated,
@@ -77,6 +81,15 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
   final Color aiActionSurface;
   final Color onAiAction;
 
+  /// `AISuggestionCard` (Fase 3 · C2): solid indigo for its main action and
+  /// the AI status dot ([aiAccent]/[onAiAccent]), on a pale indigo card
+  /// ([aiSuggestionSurface] + [aiSuggestionBorder]). Distinct from
+  /// [aiActionSurface]: the lighter button fill would vanish on this card.
+  final Color aiAccent;
+  final Color onAiAccent;
+  final Color aiSuggestionSurface;
+  final Color aiSuggestionBorder;
+
   final Color background;
   final Color surface;
   final Color surfaceElevated;
@@ -113,6 +126,10 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     onActionPrimary: Color(0xFFFFFFFF),
     aiActionSurface: Color(0xFFEEEDFB),
     onAiAction: Color(0xFF332D93),
+    aiAccent: Color(0xFF4740C4),
+    onAiAccent: Color(0xFFFFFFFF),
+    aiSuggestionSurface: Color(0xFFF3F2FD),
+    aiSuggestionBorder: Color(0xFFE5E3FA),
     background: Color(0xFFF7F8F7),
     surface: Color(0xFFFFFFFF),
     surfaceElevated: Color(0xFFFFFFFF),
@@ -155,6 +172,12 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     onActionPrimary: Color(0xFF06301D),
     aiActionSurface: Color(0xFF262163),
     onAiAction: Color(0xFFCFCCFA),
+    // TODO(design-sync): C2 has no dark frame in the canvas — placeholders
+    // following the dark indigo family above (light foreground on dark tint).
+    aiAccent: Color(0xFF9D98F5),
+    onAiAccent: Color(0xFF14123A),
+    aiSuggestionSurface: Color(0xFF1B1934),
+    aiSuggestionBorder: Color(0xFF2E2A5C),
     background: Color(0xFF0C110F),
     surface: Color(0xFF141A17),
     surfaceElevated: Color(0xFF1C2420),
@@ -186,6 +209,10 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     Color? onActionPrimary,
     Color? aiActionSurface,
     Color? onAiAction,
+    Color? aiAccent,
+    Color? onAiAccent,
+    Color? aiSuggestionSurface,
+    Color? aiSuggestionBorder,
     Color? background,
     Color? surface,
     Color? surfaceElevated,
@@ -215,6 +242,10 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
       onActionPrimary: onActionPrimary ?? this.onActionPrimary,
       aiActionSurface: aiActionSurface ?? this.aiActionSurface,
       onAiAction: onAiAction ?? this.onAiAction,
+      aiAccent: aiAccent ?? this.aiAccent,
+      onAiAccent: onAiAccent ?? this.onAiAccent,
+      aiSuggestionSurface: aiSuggestionSurface ?? this.aiSuggestionSurface,
+      aiSuggestionBorder: aiSuggestionBorder ?? this.aiSuggestionBorder,
       background: background ?? this.background,
       surface: surface ?? this.surface,
       surfaceElevated: surfaceElevated ?? this.surfaceElevated,
@@ -250,6 +281,10 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
       onActionPrimary: l(onActionPrimary, other.onActionPrimary),
       aiActionSurface: l(aiActionSurface, other.aiActionSurface),
       onAiAction: l(onAiAction, other.onAiAction),
+      aiAccent: l(aiAccent, other.aiAccent),
+      onAiAccent: l(onAiAccent, other.onAiAccent),
+      aiSuggestionSurface: l(aiSuggestionSurface, other.aiSuggestionSurface),
+      aiSuggestionBorder: l(aiSuggestionBorder, other.aiSuggestionBorder),
       background: l(background, other.background),
       surface: l(surface, other.surface),
       surfaceElevated: l(surfaceElevated, other.surfaceElevated),

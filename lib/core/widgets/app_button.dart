@@ -19,6 +19,11 @@ enum AppButtonVariant {
 
   /// The lighter indigo pill used to mark an AI-originated action.
   aiAction,
+
+  /// Solid indigo — the main action of an `AISuggestionCard` only (Fase 3 ·
+  /// C2, "Recalcular mi día"): on that pale indigo card, [aiAction]'s fill
+  /// would disappear. Not a general-purpose primary.
+  aiPrimary,
   text,
 }
 
@@ -183,6 +188,11 @@ class _AppButtonState extends State<AppButton> {
         );
       case AppButtonVariant.aiAction:
         return _ButtonStyle(background: colors.aiActionSurface, foreground: colors.onAiAction);
+      case AppButtonVariant.aiPrimary:
+        return _ButtonStyle(
+          background: _pressed ? colors.aiAccent.withValues(alpha: 0.85) : colors.aiAccent,
+          foreground: colors.onAiAccent,
+        );
       case AppButtonVariant.text:
         final accentColor = accent ?? colors.actionPrimary;
         return _ButtonStyle(background: Colors.transparent, foreground: accentColor);

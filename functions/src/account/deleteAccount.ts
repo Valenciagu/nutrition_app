@@ -10,7 +10,7 @@ import { getAuth } from "firebase-admin/auth";
  * Mantener esta lista al día con cada nueva subcolección de usuario
  * (Instrucciones.md §69 tiene el inventario canónico).
  */
-const USER_SUBCOLLECTIONS = ["nutritionPlans", "recipes", "aiUsage", "shoppingLists", "foodAnalyses"];
+const USER_SUBCOLLECTIONS = ["nutritionPlans", "recipes", "aiUsage", "shoppingLists", "foodAnalyses", "extraMeals"];
 
 /**
  * Elimina la cuenta del usuario autenticado y TODOS sus datos —

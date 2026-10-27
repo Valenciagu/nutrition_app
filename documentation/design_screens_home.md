@@ -9,8 +9,12 @@ Transcripción de `Fase 3 - Home.dc.html` (Claude Design canvas, ver `desing.md`
 ## C1 · Home, mañana, estado normal — NO IMPLEMENTADO (necesita Épica 6)
 Saludo + racha (badge "12") + avatar. Card con anillo de kcal libres + 3 `MacroBar` (proteína/carbos/grasas). "Ahora toca": `MealCard` grande de la siguiente comida con botones Cocinar/Cambiar. "Acciones rápidas": grid 2x2 de accesos (Analizar comida, Tengo ingredientes, Lista de compra, Preguntar a la IA).
 
-## C2 · Home, tarde, tras comida imprevista — NO IMPLEMENTADO (necesita Épica 6)
-Igual que C1 pero con un `AISuggestionCard` (banda indigo) arriba: "Registraste una hamburguesa. Podemos equilibrar la cena..." con acciones "Recalcular mi día"/"Ahora no". Al pasarse de un macro, la barra se raya en su propio color — nunca rojo, nunca "te pasaste". Card de racha ("12 días seguidos").
+## C2 · Home, tarde, tras comida imprevista — `AISuggestionCard` IMPLEMENTADA (2026-10-26)
+Igual que C1 pero con un `AISuggestionCard` arriba del anillo: "Registraste una hamburguesa. Podemos equilibrar la cena y seguir cerca de tu objetivo." con acciones "Recalcular mi día"/"Ahora no". Al pasarse de un macro, la barra se raya en su propio color — nunca rojo, nunca "te pasaste". Card de racha ("12 días seguidos", "Registra la cena y llegas a 13.").
+
+Spec de la tarjeta (canvas, leído 2026-10-26): fondo `#F3F2FD`, borde 1 px `#E5E3FA`, radio 20, padding 16×18, gap 12; punto 9 px `#4740C4` (margen sup. 6) + texto 500 14,5/1,5; botones de 42 px: "Recalcular mi día" sólido `#4740C4` texto blanco, "Ahora no" blanco con borde `#DAD8F6` y texto `#332D93`. Nota del canvas: la propuesta aparece arriba porque caduca, es contexto y no un aviso permanente.
+
+Implementado: la tarjeta (tokens `aiAccent`/`onAiAccent`/`aiSuggestionSurface`/`aiSuggestionBorder`, botón `aiPrimary`; "Ahora no" usa `neutral` con texto principal — desviación menor para no abrir otra variante). **No implementado de C2:** las `MacroBar` rayadas (carbos/grasas no se registran en el plan) y la card de racha (la racha sigue como badge del header).
 
 ## C3 · Home, primer día (empty) — IMPLEMENTADO
 Saludo + avatar (sin racha, no hay nada que contar todavía). Card con el anillo **apagado** (borde uniforme, sin arco) mostrando solo la meta de kcal calculada en el Onboarding. "Tu primer día empieza aquí" + CTA "Analizar mi comida" (abre la hoja de acción C5). "Empieza por aquí": 3 filas (`QuickActionTile`) — plan del día, lista de compra, preguntar a la IA. Como hoy nadie tiene todavía seguimiento diario real (Épica 6 no existe), este es el único estado de Home que tiene sentido construir ahora — no es una limitación de esta épica, es honesto con el estado real de la app.

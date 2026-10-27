@@ -24,6 +24,9 @@ abstract class AnalyticsService {
   Future<void> logMealRegistered();
   Future<void> logMealReplaced();
 
+  /// Comida fuera del plan (Épica 19); `source`: `manual` | `photo`.
+  Future<void> logExtraMealLogged({required String source});
+
   Future<void> logFoodPhotoAnalyzed({required bool isFoodPhoto});
   Future<void> logIngredientPhotoAnalyzed({required bool isIngredientPhoto, required int ingredientCount});
 

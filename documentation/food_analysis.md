@@ -42,8 +42,19 @@ Flutter (FoodAnalysisResultCard)
 
 ## Decisiones de alcance, documentadas no adivinadas
 
-- **El resultado no se vincula al plan/registro de comidas** — Épica 6 (`PlannedMeal`) exige un `slotLabelKey`/horario predefinido por el plan; una foto analizada es, por definición, algo no planeado. Vincular esto necesita un concepto de "comida ad-hoc" que no existe en ningún epic del backlog todavía (ni siquiera "Registrar sin foto" del propio menú de cámara lo tiene). El análisis queda guardado en `foodAnalyses` como historial, sin acción de "agregar a mi día" todavía.
+- ~~**El resultado no se vincula al plan/registro de comidas**~~ — **resuelto 2026-10-26 (LOG-102, Épica 19)**: el botón "Registrar comida" bajo el resultado lo suma a hoy como comida extra (`logExtraMeal` con `source: photo`, cifras tomadas del documento `foodAnalyses` en el servidor, idempotente). Ver `documentation/meal_log.md`.
 - **Retención de fotos (resuelto 2026-10-19)**: `analyzeFoodPhoto` borra la foto de Storage al terminar, con éxito o error (`finally` → `deletePhotoQuietly`, que nunca hace fallar el análisis). El documento de Firestore ya no guarda `imagePath` (apuntaría a un archivo borrado). Red de seguridad: `storage-lifecycle.json` (raíz del repo) — regla del bucket que borra todo lo que esté bajo `users/` con más de 1 día. **Ojo**: cualquier archivo futuro que sí deba persistir (p. ej. foto de perfil) tiene que vivir fuera de `users/` o ajustar esa regla. Se aplica una sola vez con `gcloud storage buckets update gs://nutritionapp-eee08.firebasestorage.app --lifecycle-file=storage-lifecycle.json` (el nombre exacto del bucket está en Firebase Console → Storage); la función necesita `firebase deploy --only functions:analyzeFoodPhoto`.
-- **Solo "Analizar mi comida" quedó conectado** de las 3 opciones del menú de cámara — "Tengo ingredientes" (Épica 9, premium) y "Registrar sin foto" (sin épica dueña) siguen mostrando "muy pronto".
+- Las 3 opciones del menú de cámara ya están conectadas: "Tengo ingredientes" (Épica 9, 2026-10-25) y "Registrar sin foto" (LOG-105, 2026-10-26).
 
 `flutter analyze` y `flutter build web --debug` limpios; `tsc`/`npm run build` limpios en `functions/` (8 Cloud Functions en total ahora).
+
+## Canvas · Fase 5 (Análisis de comida), leído 2026-10-26
+
+Bloque de `Fases 5-12 - Entrega final.dc.html`: "Cámara → análisis → resultado editable → registro". La palabra "estimación" y el símbolo ~ van siempre junto a la cifra.
+
+- **E1 · Cámara analizando**: cámara siempre en oscuro, "Identificando tu plato…", "Mantén el plato completo dentro del marco"; barrido verde por el marco cada 1,4 s.
+- **E2 · Detección con overlays**: un overlay por alimento con sus kcal (Pollo 330, Brócoli 42…), "Estimación ~576 kcal · 4 alimentos", proteína/carbos/grasas, "Valores aproximados. Toca cualquier alimento para ajustar la cantidad." Acciones **"Corregir"** (tan visible como registrar: la IA puede equivocarse) y **"Registrar comida"**. Overlays escalonados (60 ms, scale .92→1), fuera del centro del plato.
+- **E3 · Error de análisis**: "No pudimos reconocer el plato" + consejo de luz/ángulo; dos salidas, **"Repetir la foto"** y **"Escribir qué comí"**; nunca códigos de error; sin red → "Sin conexión" y la foto se guarda para después.
+
+Estado frente al canvas: la app hoy no hace E1 (usa la cámara del sistema) ni overlays por alimento (el modelo devuelve un plato, no alimentos con posición). "Registrar comida" está hecho (LOG-102). "Corregir" se cubre con el ajuste de porción de la comida extra en D1. E3 no está construido como pantalla propia.
+

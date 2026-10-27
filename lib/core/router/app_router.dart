@@ -35,6 +35,7 @@ import '../../features/profile/presentation/pages/privacy_data_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/recipes/domain/entities/recipe.dart';
 import '../../features/recipes/presentation/pages/cooking_mode_page.dart';
+import '../../features/meal_log/presentation/pages/log_meal_page.dart';
 import '../../features/recipes/presentation/pages/recipe_detail_page.dart';
 import '../constants/route_paths.dart';
 import '../services/analytics/firebase_analytics_service.dart';
@@ -201,6 +202,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.ingredientRecipeCooking,
         pageBuilder: (context, state) => _flowPage(context, state, CookingModePage(recipe: state.extra! as Recipe)),
       ),
+      GoRoute(name: 'log_meal', path: RoutePaths.logMeal, builder: (context, state) => const LogMealPage()),
       GoRoute(name: 'login', path: RoutePaths.login, builder: (context, state) => const LoginPage()),
       GoRoute(
         name: 'sign_up',

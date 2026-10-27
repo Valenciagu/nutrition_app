@@ -10,8 +10,11 @@ import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_state_block.dart';
 import '../../../../core/widgets/round_icon_button.dart';
+import '../../../meal_log/presentation/providers/extra_meal_providers.dart';
+import '../../domain/entities/food_analysis_result.dart';
 import '../providers/food_analysis_providers.dart';
 import '../widgets/food_analysis_result_card.dart';
 
@@ -105,7 +108,12 @@ class _FoodAnalysisPageState extends ConsumerState<FoodAnalysisPage> {
                         },
                         data: (result) => result == null
                             ? const SizedBox.shrink()
-                            : FoodAnalysisResultCard(result: result),
+                            : Column(
+                                children: [
+                                  FoodAnalysisResultCard(result: result),
+                                  if (result.isFoodPhoto && result.calories != null) _RegisterMealButton(result: result),
+                                ],
+                              ),
                       ),
                     ),
                   ),
@@ -122,6 +130,45 @@ class _FoodAnalysisPageState extends ConsumerState<FoodAnalysisPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// "Registrar comida" de E2 (canvas Fase 5, LOG-102): suma el análisis a
+/// hoy como comida extra. El servidor toma las cifras del análisis guardado
+/// (no de este cliente) y es idempotente: dos toques no la registran dos
+/// veces. "Corregir" (E2) queda como el ajuste de porción en D1 — no hay
+/// edición por alimento porque el análisis devuelve un solo plato.
+class _RegisterMealButton extends ConsumerWidget {
+  const _RegisterMealButton({required this.result});
+
+  final FoodAnalysisResult result;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final isSaving = ref.watch(extraMealControllerProvider).isLoading;
+
+    Future<void> register() async {
+      final ok = await ref
+          .read(extraMealControllerProvider.notifier)
+          .logFromPhotoAnalysis(date: DateTime.now(), analysisId: result.id);
+      if (!context.mounted) return;
+      final error = ref.read(extraMealControllerProvider).error;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(ok ? l10n.logMealSuccess : (error == null ? l10n.genericErrorMessage : l10n.messageForError(error)))),
+      );
+      if (ok) context.pop();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.space20, 0, AppSpacing.space20, AppSpacing.space24),
+      child: AppButton(
+        label: l10n.foodAnalysisRegisterAction,
+        fullWidth: true,
+        isLoading: isSaving,
+        onPressed: isSaving ? null : register,
       ),
     );
   }

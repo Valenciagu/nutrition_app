@@ -12,4 +12,6 @@ export { generateRecipe } from "./recipes/generateRecipe";
 export { analyzeFoodPhoto } from "./foodAnalysis/analyzeFoodPhoto";
 export { detectIngredients } from "./ingredients/detectIngredients";
 export { suggestRecipesFromIngredients } from "./ingredients/suggestRecipesFromIngredients";
+export { logExtraMeal } from "./mealLog/logExtraMeal";
+export { editExtraMeal } from "./mealLog/editExtraMeal";
 export { deleteAccount } from "./account/deleteAccount";

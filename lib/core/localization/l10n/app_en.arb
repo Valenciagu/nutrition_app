@@ -321,7 +321,7 @@
   "ingredientsMissingSectionTitle": "You'd still need",
   "ingredientsCloseAction": "Close",
   "cameraSheetLogManualTitle": "Log without a photo",
-  "cameraSheetLogManualSubtitle": "Search or type what you ate",
+  "cameraSheetLogManualSubtitle": "Type what you ate",
   "cameraSourceCameraOption": "Take a photo",
   "cameraSourceGalleryOption": "Choose from gallery",
 
@@ -533,5 +533,49 @@
   },
   "aiSuggestionDinner": "What should I have for dinner?",
   "aiSuggestionMoreProtein": "More protein",
-  "aiSuggestionNoDairy": "Dairy-free"
+  "aiSuggestionNoDairy": "Dairy-free",
+  "logMealIntro": "Note something you ate outside your plan. It counts toward today.",
+  "logMealNameLabel": "What did you eat?",
+  "logMealNameHint": "E.g. two arepas with cheese",
+  "logMealNameError": "Use between 2 and 80 characters.",
+  "logMealCaloriesLabel": "Calories",
+  "logMealCaloriesHelper": "An estimate is fine.",
+  "logMealCaloriesError": "Enter a number between 1 and 5000.",
+  "logMealProteinLabel": "Protein",
+  "logMealCarbsLabel": "Carbs",
+  "logMealFatLabel": "Fat",
+  "logMealGramsUnit": "g",
+  "logMealOptionalHelper": "Optional",
+  "logMealSubmit": "Add to my day",
+  "logMealSuccess": "Added to your day.",
+  "extraMealsSectionTitle": "Off the plan",
+  "extraMealOverlineWithPortion": "Off the plan · ×{portion}",
+  "@extraMealOverlineWithPortion": {
+    "placeholders": { "portion": { "type": "String" } }
+  },
+  "extraMealPortionLabel": "Portion",
+  "extraMealPortionHint": "Ate more or less? Adjust it and the numbers update.",
+  "extraMealPortionValue": "×{portion}",
+  "@extraMealPortionValue": {
+    "placeholders": { "portion": { "type": "String" } }
+  },
+  "extraMealPortionDecreaseSemantics": "Smaller portion",
+  "extraMealPortionIncreaseSemantics": "Larger portion",
+  "extraMealAllergenWarning": "May contain something you avoid.",
+  "extraMealSaveAction": "Save",
+  "extraMealDeleteAction": "Delete",
+  "extraMealDeleteConfirmTitle": "Delete this meal?",
+  "extraMealDeleteConfirmMessage": "It will stop counting toward your day.",
+  "foodAnalysisRegisterAction": "Log this meal",
+  "homeAiSuggestionMessage": "You logged {meal}. We can balance the rest of your day and stay close to your goal.",
+  "@homeAiSuggestionMessage": {
+    "placeholders": { "meal": { "type": "String" } }
+  },
+  "homeAiSuggestionRecalculate": "Recalculate my day",
+  "homeAiSuggestionDismiss": "Not now",
+  "homeAiSuggestionDone": "Done, we adjusted the rest of your day.",
+  "homeAiSuggestionAdjustMessage": "I ate {meal} outside my plan (about {calories} kcal). Adjust my remaining meals today so I stay close to my goal.",
+  "@homeAiSuggestionAdjustMessage": {
+    "placeholders": { "meal": { "type": "String" }, "calories": { "type": "int" } }
+  }
 }

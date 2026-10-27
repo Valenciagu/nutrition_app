@@ -47,6 +47,11 @@ abstract final class RoutePaths {
   static const String ingredientRecipe = '/ingredients/recipe';
   static const String ingredientRecipeCooking = '/ingredients/recipe/cook';
 
+  /// Épica 19 — "Registrar sin foto" (LOG-105): comida fuera del plan
+  /// escrita a mano. Mismo nivel superior que [foodAnalysis] (se abre desde
+  /// la hoja de cámara de `MainShell`/Home).
+  static const String logMeal = '/log-meal';
+
   /// D3 (Épica 7) — anidada bajo `plan` (no una tab propia) para que D3 y D5
   /// vivan en la pila de navegación del tab Plan, con el back nativo
   /// funcionando sin lógica extra. `recipe` toma `date`/`mealId`, no

@@ -41,7 +41,7 @@ export function buildNutritionAdjustmentSystemPrompt(input: {
     goalLine,
     avoidLine,
     likedLine,
-    `Ya consumido hoy (comidas ya registradas, NO las repitas ni las cuentes de nuevo): ${input.registeredCalories} kcal.`,
+    `Ya consumido hoy (comidas del plan ya registradas y comidas fuera del plan; NO las repitas ni las cuentes de nuevo): ${input.registeredCalories} kcal.`,
     `Presupuesto de calorías que queda para el resto del día: ~${input.remainingCalorieBudget} kcal, repartido entre las comidas pendientes de abajo.`,
     "Comidas pendientes a actualizar, en este orden — responde con EXACTAMENTE la misma cantidad, en el mismo orden:",
     pendingLines,

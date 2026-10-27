@@ -73,6 +73,16 @@ service cloud.firestore {
         allow write: if false;
       }
 
+      // `extraMeals/{mealId}` (Épica 19, LOG-101) — comidas fuera del plan.
+      // Mismo criterio que `nutritionPlans`: el cliente solo lee; crear,
+      // cambiar la porción o borrar pasa por `logExtraMeal`/`editExtraMeal`
+      // (Admin SDK), que validan las cifras y, para las de foto, las toman
+      // del análisis guardado en vez de confiar en el cliente.
+      match /extraMeals/{mealId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+
       // `notificationPreferences` (Épica 12) — es un campo más del documento
       // `users/{userId}` (no una subcolección aparte), así que ya queda
       // cubierto por el `allow read, write` de arriba sin ninguna regla

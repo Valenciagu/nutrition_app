@@ -375,7 +375,7 @@
   "ingredientsMissingSectionTitle": "Te falta conseguir",
   "ingredientsCloseAction": "Cerrar",
   "cameraSheetLogManualTitle": "Registrar sin foto",
-  "cameraSheetLogManualSubtitle": "Buscar o escribir lo que comiste",
+  "cameraSheetLogManualSubtitle": "Escribe lo que comiste",
   "cameraSourceCameraOption": "Tomar foto",
   "cameraSourceGalleryOption": "Elegir de la galería",
 
@@ -587,5 +587,49 @@
   },
   "aiSuggestionDinner": "¿Qué ceno?",
   "aiSuggestionMoreProtein": "Más proteína",
-  "aiSuggestionNoDairy": "Sin lactosa"
+  "aiSuggestionNoDairy": "Sin lactosa",
+  "logMealIntro": "Anota algo que comiste fuera de tu plan. Suma a tu día de hoy.",
+  "logMealNameLabel": "¿Qué comiste?",
+  "logMealNameHint": "Ej.: dos arepas con queso",
+  "logMealNameError": "Escribe entre 2 y 80 caracteres.",
+  "logMealCaloriesLabel": "Calorías",
+  "logMealCaloriesHelper": "Una estimación está bien.",
+  "logMealCaloriesError": "Escribe un número entre 1 y 5000.",
+  "logMealProteinLabel": "Proteína",
+  "logMealCarbsLabel": "Carbohidratos",
+  "logMealFatLabel": "Grasas",
+  "logMealGramsUnit": "g",
+  "logMealOptionalHelper": "Opcional",
+  "logMealSubmit": "Agregar a mi día",
+  "logMealSuccess": "Agregado a tu día.",
+  "extraMealsSectionTitle": "Fuera del plan",
+  "extraMealOverlineWithPortion": "Fuera del plan · ×{portion}",
+  "@extraMealOverlineWithPortion": {
+    "placeholders": { "portion": { "type": "String" } }
+  },
+  "extraMealPortionLabel": "Porción",
+  "extraMealPortionHint": "Si comiste más o menos, ajústala. Las cifras se recalculan solas.",
+  "extraMealPortionValue": "×{portion}",
+  "@extraMealPortionValue": {
+    "placeholders": { "portion": { "type": "String" } }
+  },
+  "extraMealPortionDecreaseSemantics": "Menos porción",
+  "extraMealPortionIncreaseSemantics": "Más porción",
+  "extraMealAllergenWarning": "Puede contener algo que evitas.",
+  "extraMealSaveAction": "Guardar",
+  "extraMealDeleteAction": "Eliminar",
+  "extraMealDeleteConfirmTitle": "¿Eliminar esta comida?",
+  "extraMealDeleteConfirmMessage": "Dejará de contar en tu día.",
+  "foodAnalysisRegisterAction": "Registrar comida",
+  "homeAiSuggestionMessage": "Registraste {meal}. Podemos equilibrar lo que queda del día y seguir cerca de tu objetivo.",
+  "@homeAiSuggestionMessage": {
+    "placeholders": { "meal": { "type": "String" } }
+  },
+  "homeAiSuggestionRecalculate": "Recalcular mi día",
+  "homeAiSuggestionDismiss": "Ahora no",
+  "homeAiSuggestionDone": "Listo, ajustamos lo que queda de tu día.",
+  "homeAiSuggestionAdjustMessage": "Comí {meal} fuera del plan (unas {calories} kcal). Ajusta las comidas que me quedan hoy para seguir cerca de mi objetivo.",
+  "@homeAiSuggestionAdjustMessage": {
+    "placeholders": { "meal": { "type": "String" }, "calories": { "type": "int" } }
+  }
 }

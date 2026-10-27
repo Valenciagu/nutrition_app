@@ -77,7 +77,7 @@ test("aiUsage: el contador de cuota es invisible para el cliente", async () => {
   await assertFails(setDoc(doc(alice(), "users/alice/aiUsage/2026-10-19"), { count: 0 }));
 });
 
-for (const collection of ["nutritionPlans", "recipes"]) {
+for (const collection of ["nutritionPlans", "recipes", "extraMeals"]) {
   test(`${collection}: el dueño lee, pero nadie escribe contenido de la IA`, async () => {
     await seed(`users/alice/${collection}/x`, { name: "algo" });
     await assertSucceeds(getDoc(doc(alice(), `users/alice/${collection}/x`)));

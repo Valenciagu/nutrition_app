@@ -60,15 +60,20 @@ Future<void> startIngredientAnalysis(BuildContext context, WidgetRef ref) {
 
 /// C5 · Acción central (Fase 3 · Home). "Analizar mi comida" (Épica 8) y
 /// "Tengo ingredientes" (Épica 9) abren la cámara/galería; "Registrar sin
-/// foto" (sin épica dueña todavía) sigue confirmando la intención con un
-/// snackbar.
+/// foto" (Épica 19, LOG-105) abre el formulario de comida extra.
 Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
   final l10n = context.l10n;
   final colors = context.colors;
 
-  void handleComingSoon(BuildContext sheetContext) {
+  // Escribe vía Cloud Function autenticada: mismo criterio de invitado que
+  // las fotos (ver `pickPhotoAndOpen`).
+  void handleLogManual(BuildContext sheetContext) {
     Navigator.of(sheetContext).pop();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.comingSoonSnackbarMessage)));
+    if (ref.read(authStateChangesProvider).valueOrNull == null) {
+      context.go(RoutePaths.signUp);
+    } else {
+      context.push(RoutePaths.logMeal);
+    }
   }
 
   void handleAnalyzeMeal(BuildContext sheetContext) {
@@ -109,7 +114,7 @@ Future<void> showCameraActionSheet(BuildContext context, WidgetRef ref) {
             iconBackgroundColor: colors.background,
             title: l10n.cameraSheetLogManualTitle,
             subtitle: l10n.cameraSheetLogManualSubtitle,
-            onTap: () => handleComingSoon(sheetContext),
+            onTap: () => handleLogManual(sheetContext),
           ),
           const SizedBox(height: AppSpacing.space16),
           AppButton(

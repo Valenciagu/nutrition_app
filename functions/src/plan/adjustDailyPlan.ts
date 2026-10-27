@@ -84,7 +84,20 @@ export const adjustDailyPlan = onCall<AdjustDailyPlanRequest, Promise<AdjustDail
       weightKg: profile.weightKg ?? undefined,
       activityLevel: profile.activityLevel,
     });
-    const registeredCalories = registeredMeals.reduce((sum, meal) => sum + meal.calories, 0);
+    // Lo ya comido incluye las comidas fuera del plan de ese día (Épica 19):
+    // si no, "ya comí una hamburguesa" registrada como comida extra no
+    // movería el presupuesto y el ajuste no equilibraría nada.
+    const extraMealsSnapshot = await getFirestore()
+      .collection("users")
+      .doc(request.auth.uid)
+      .collection("extraMeals")
+      .where("date", "==", date)
+      .get();
+    const extraCalories = extraMealsSnapshot.docs.reduce((sum, doc) => {
+      const data = doc.data() as { base?: { calories?: number }; portion?: number };
+      return sum + Math.round((data.base?.calories ?? 0) * (data.portion ?? 1));
+    }, 0);
+    const registeredCalories = registeredMeals.reduce((sum, meal) => sum + meal.calories, 0) + extraCalories;
     const remainingCalorieBudget = Math.max(targetCalories - registeredCalories, 300);
 
     const quota = await consumeAiQuota(request.auth.uid, profile.isPremium, QUOTA_FEATURE);

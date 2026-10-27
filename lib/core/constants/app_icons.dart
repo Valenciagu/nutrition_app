@@ -17,6 +17,9 @@ abstract final class AppIcons {
   static const IconData search = PhosphorIconsRegular.magnifyingGlass;
   static const IconData check = PhosphorIconsBold.check;
   static const IconData error = PhosphorIconsRegular.warningCircle;
+  static const IconData warning = PhosphorIconsRegular.warning;
+  static const IconData minus = PhosphorIconsBold.minus;
+  static const IconData plus = PhosphorIconsBold.plus;
   static const IconData send = PhosphorIconsBold.arrowUp;
 
   static const IconData gallery = PhosphorIconsRegular.image;
