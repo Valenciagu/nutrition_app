@@ -101,6 +101,50 @@ Implemented in `app_spacing.dart`, `app_radius.dart`, `app_elevation.dart`, `app
 - **Curves**: standard `cubic-bezier(.2,0,0,1)`, enter `cubic-bezier(0,0,0,1)`, exit `cubic-bezier(.3,0,1,1)`.
 - **Breakpoints**: compact <360 (1 col, -1 type step), base 360-429, large 430-599, expanded ≥600 (2 col/tablet).
 
+## Motion patterns (user, 2026-10-25 — mandatory for every agent)
+
+The user wants a very interactive, animated app (benchmark: Fitia) and gave a **standing approval** to add motion that isn't drawn on the canvas — but **the canvas is still mandatory**. Motion is a layer *on top of* the canvas, never a replacement for it, and it must look the same everywhere. These rules exist so nobody invents.
+
+### Principles
+
+1. **Canvas first, motion second.** Layout, colors, typography, components, copy and states come from the Claude Design canvas exactly as today. An animation only describes how an element *arrives at*, *leaves* or *reacts within* the canvas state. **The resting frame of every animation is exactly the canvas screen.** Motion never adds elements, colors, shapes or decoration, and never changes layout or flow. If a screen isn't on the canvas yet, fetch it first (see the `nutrition-app-design` skill) — motion is not a reason to design a screen yourself.
+2. **Every animation has a job**: feedback (the tap registered), continuity (where this came from / went), waiting (progress or the AI working), or confirmation (it worked). Nothing moves just to decorate — no idle floating/pulsing/bouncing on static content, no parallax, no page curls.
+3. **Brand tone.** "Cocina luminosa, no laboratorio": calm, quick, soft — never springy-cartoonish or flashy. "La IA tiene voz, no control": AI motion uses the existing indigo AI surfaces + status dot and stays calm; it never moves the user's own content around by itself.
+4. **Only the catalog below.** Pick the pattern that matches the situation and use its shared implementation. Don't re-tune durations/offsets per screen. A genuinely new need → add a row to the catalog (and its shared implementation) in the same change, then reuse it. Two screens doing the same thing must animate the same way.
+5. **Tokens only.** Durations and curves from `AppMotion`; the extra values the catalog introduces (offsets, stagger, scales) become `AppMotion` tokens when first implemented (MOTION-101) — never inline numbers.
+6. **Performance & accessibility** (non-negotiable): interruptible, never blocks input; reduce-motion (`MediaQuery.disableAnimations`) maps every pattern to a 140ms fade (or an instant state change for progress), never removes feedback entirely; stable 60fps in profile mode on a real device; loops pause off-screen and sit behind a `RepaintBoundary`; prefer implicit animations / `flutter_animate` over hand-rolled controllers; dispose every controller.
+7. **Still ask the user first:** celebration moments (M12) and anything that would change layout/flow. Everything else in the catalog is pre-approved.
+
+### Catalog
+
+Specs use the tokens above (instant 80 · fast 140 · base 220 · slow 320 · progress 600; curves standard/enter/exit). "Exists" = already in the code — keep it, extract it into the shared implementation when its MOTION task runs.
+
+| ID | Pattern | Use when | Spec | Shared implementation (planned) | Status |
+|---|---|---|---|---|---|
+| M01 | Press feedback | Anything tappable: buttons, cards, tiles, list rows, chips | Scale to 0.97 while pressed, `instant`, `standard`; back on release/cancel | `AppButton` (own, uses `AppMotion.pressScale`); everything else via `AppPressable` (`core/widgets/motion/app_pressable.dart`) — `AppCard` (when tappable), `QuickActionTile`, `MealCard`, `SelectableChip`, `RoundIconButton`, `OnboardingOptionCard`, B4 food tile, bottom-nav tabs + camera | **Done** (2026-10-26) |
+| M02 | Selection toggle | Chips, option cards, checkboxes, switches | Color/border cross-fade `fast` `standard`; check icon scale 0.6→1 + fade `fast` `enter` | `AnimatedContainer`/`AnimatedDefaultTextStyle` + `appPopIn()` (`motion/app_entrance.dart`) in `SelectableChip`, `OnboardingOptionCard`, B4 food tile; bottom-nav active color | **Done** (2026-10-26) |
+| M03 | Content swap | Content changing in place: onboarding step, loading→data→error, tab body, a value replaced | Outgoing fades `fast` `exit`; incoming fades + rises 8px `base` `enter` | `AppContentSwitcher` (`motion/app_content_switcher.dart`) — onboarding steps | **Done** (2026-10-26) |
+| M04 | List entrance stagger | First appearance of a list/grid: plan meals, grocery list, onboarding options, analysis results, profile rows; a newly arrived chat bubble (`play:` flag, no stagger) | Each item fades + rises 12px, `base`, `enter`, 40ms stagger, max 6 staggered (rest appear with the 6th); first build only — never on scroll/rebuild | `.appListEntrance(index)` + `AppEntranceScope` for lazy lists (`motion/app_entrance.dart`) — D1 meals, B9 preview, B1/B3 options, grocery list, ingredient recipes | **Done** (2026-10-26) |
+| M05 | Screen transition | Every route change | Push inside a tab: shared-axis horizontal `slow`; full-screen flows (food/ingredient analysis, cooking mode, update-required): fade-through vertical `slow`; tab switch: fade-through `base` | `AppPageTransitionsBuilder` (`core/theme/app_page_transitions.dart`) via `pageTransitionsTheme` (Android); `_flowPage` in `app_router.dart` for the vertical flows. **Platform exception:** iOS keeps the native Cupertino push (shared axis has no edge-swipe back). Tab switch: `AppTabTransition` (`motion/app_tab_transition.dart`) in `MainShell` — incoming half of fade-through only (fade + scale from `tabEnterScaleFrom`), since the `IndexedStack` hides the outgoing tab instantly | **Done** (2026-10-26) |
+| M06 | Sheet / dialog | `showAppBottomSheet`, dialogs | Slide up + scrim fade `base` `enter`; dismiss `fast` `exit` | `sheetAnimationStyle` in `showAppBottomSheet` | **Done** (2026-10-26) |
+| M07 | Shared element | The same image/card shown in a list and its detail (meal D1→D3, recipe) | `Hero`, `slow`, `standard` | Hero tags helper (MOTION-105) | **Blocked** — D3 shows a loading skeleton first, so the Hero target doesn't exist when the push starts; making it fly would change D3's loading layout (not allowed). Revisit when meals have real photos or D3's loading state is redesigned on the canvas |
+| M08 | Progress fill | `ProgressRing`, bars, macro tiles, quota/streak numbers | Animate from the previous value to the new one, `progress`, `standard`; numbers count up in sync | `ProgressRing` (`animate`, `centerNumber`) + `AppCountUpText` (`motion/app_count_up_text.dart`) in `MacroStatTile` | **Done** (2026-10-26) |
+| M09 | Content loading | Waiting for data whose shape is known | Existing shimmer skeleton (1.3s loop), matching the real layout | `AppSkeletonBar` / `AppStateBlock.loading` | Exists |
+| M10 | AI working | Only while the AI is generating/analyzing: B8, food & ingredient analysis, recipe generation, plan adjust/alternatives, chat | Branded loader: brand food illustrations cycle — each enters (scale 0.85→1 + fade, `base`, `enter`), holds ~1s, leaves (fade, `fast`, `exit`) — with the indigo AI status dot and the screen's existing copy. Chat keeps its typing-dots bubble (900ms loop). B8 keeps its canvas choreography | One `AiLoader` widget in core, content swappable for a Rive file later (MOTION-102) | Partial — chat dots + B8 exist (durations now named tokens); chat reply swaps dots→text with M03 + `AnimatedSize`. Branded loader waits for the food SVGs (prompt: `documentation/ai_loader_illustrations_prompt.md`) |
+| M11 | Success confirmation | A completed action: meal registered, saved, added to list | Check icon scale 0.6→1 + fade `base` `enter` on the triggering element; light haptic | `appPopIn(duration: base)` — `MealCard` registered check + circle fill | Partial (2026-10-26) — `AppButton` success state pending |
+| M12 | Celebration | Streak milestone, B9 plan reveal, grocery list fully checked | **Needs the user's OK per moment** before building | — (MOTION-106) | Not approved yet |
+| M13 | Error feedback | Invalid field, a failed action the user triggered | Horizontal shake ±4px, 3 cycles in `base`; error color per the canvas; medium haptic | `AppShake` (`motion/app_shake.dart`) — wired into `AppTextField` (every form), which also cross-fades its border/fill in `fast` on focus/error | **Done** (2026-10-26) |
+
+**Not used anywhere:** parallax, idle loops on static content, spring/elastic overshoot beyond the specs above, confetti outside an approved M12, auto-playing motion that moves the user's content.
+
+### Animation sources
+
+Every animation asset (Rive, Lottie, animated/sequence SVG) added to the app gets a row here **in the same change that adds it**. Animations written purely in code (`flutter_animate`, implicit/explicit Flutter animations) using the app's own assets don't need a row.
+
+| File | What / where used | Source (URL or "canvas" / "commissioned") | Author | License (commercial use OK?) | Added |
+|---|---|---|---|---|---|
+| _none yet_ | | | | | |
+
 ## Components — status
 
 The canvas defines exactly 10 base components ("lo que no está aquí se construye combinando estos, no creando uno nuevo" — closed system). Status in this codebase:

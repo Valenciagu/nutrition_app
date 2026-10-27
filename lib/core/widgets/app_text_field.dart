@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/app_color_tokens.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import 'motion/app_shake.dart';
 
 /// The app's single text field (Fichas de componentes > 02 · TextField).
 ///
@@ -99,79 +101,86 @@ class _AppTextFieldState extends State<AppTextField> {
           ),
         ),
         const SizedBox(height: 6),
-        Container(
-          height: AppSpacing.fieldHeight,
-          decoration: BoxDecoration(
-            color: !widget.enabled
-                ? colors.background
-                : hasError
-                    ? colors.errorSurface
-                    : colors.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
+        // M13 (sacude al aparecer un error) + el borde/fondo cruzan en
+        // `fast` al enfocar o marcar error, catálogo "Motion patterns".
+        AppShake(
+          hasError: hasError,
+          child: AnimatedContainer(
+            duration: AppMotion.fast,
+            curve: AppMotion.standard,
+            height: AppSpacing.fieldHeight,
+            decoration: BoxDecoration(
               color: !widget.enabled
-                  ? colors.border.withValues(alpha: 0.6)
+                  ? colors.background
                   : hasError
-                      ? colors.error
-                      : _focusNode.hasFocus
-                          ? colors.actionPrimary
-                          : colors.border,
-              width: hasError
-                  ? AppSpacing.borderSelected
-                  : _focusNode.hasFocus
-                      ? AppSpacing.borderFocus
-                      : AppSpacing.borderHairline,
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          alignment: Alignment.center,
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: widget.controller,
-                  focusNode: _focusNode,
-                  enabled: widget.enabled,
-                  obscureText: widget.kind == AppTextFieldKind.password && _obscure,
-                  keyboardType: widget.kind == AppTextFieldKind.numeric
-                      ? const TextInputType.numberWithOptions(decimal: true)
-                      : TextInputType.text,
-                  inputFormatters: widget.kind == AppTextFieldKind.numeric
-                      ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))]
-                      : null,
-                  textInputAction: widget.textInputAction,
-                  onChanged: widget.onChanged,
-                  onSubmitted: widget.onSubmitted,
-                  style: AppTypography.bodyL.copyWith(
-                    fontSize: 15,
-                    height: 1,
-                    fontWeight: widget.kind == AppTextFieldKind.numeric ? FontWeight.w600 : FontWeight.w400,
-                    color: colors.textPrimary,
-                  ),
-                  decoration: InputDecoration(
-                    isCollapsed: true,
-                    border: InputBorder.none,
-                    hintText: widget.hintText,
-                    hintStyle: AppTypography.bodyL.copyWith(fontSize: 15, color: colors.textDisabled),
-                  ),
-                ),
+                      ? colors.errorSurface
+                      : colors.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: !widget.enabled
+                    ? colors.border.withValues(alpha: 0.6)
+                    : hasError
+                        ? colors.error
+                        : _focusNode.hasFocus
+                            ? colors.actionPrimary
+                            : colors.border,
+                width: hasError
+                    ? AppSpacing.borderSelected
+                    : _focusNode.hasFocus
+                        ? AppSpacing.borderFocus
+                        : AppSpacing.borderHairline,
               ),
-              if (widget.kind == AppTextFieldKind.numeric && widget.unitLabel != null)
-                Text(
-                  widget.unitLabel!,
-                  style: AppTypography.label.copyWith(fontSize: 14, color: colors.textSecondary),
-                ),
-              if (widget.kind == AppTextFieldKind.search)
-                Icon(AppIcons.search, size: 20, color: colors.textSecondary),
-              if (widget.kind == AppTextFieldKind.password)
-                GestureDetector(
-                  onTap: () => setState(() => _obscure = !_obscure),
-                  child: Text(
-                    (_obscure ? widget.showPasswordActionLabel : widget.hidePasswordActionLabel) ?? '',
-                    style: AppTypography.label.copyWith(fontSize: 12.5, color: colors.actionPrimary),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            alignment: Alignment.center,
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: widget.controller,
+                    focusNode: _focusNode,
+                    enabled: widget.enabled,
+                    obscureText: widget.kind == AppTextFieldKind.password && _obscure,
+                    keyboardType: widget.kind == AppTextFieldKind.numeric
+                        ? const TextInputType.numberWithOptions(decimal: true)
+                        : TextInputType.text,
+                    inputFormatters: widget.kind == AppTextFieldKind.numeric
+                        ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))]
+                        : null,
+                    textInputAction: widget.textInputAction,
+                    onChanged: widget.onChanged,
+                    onSubmitted: widget.onSubmitted,
+                    style: AppTypography.bodyL.copyWith(
+                      fontSize: 15,
+                      height: 1,
+                      fontWeight: widget.kind == AppTextFieldKind.numeric ? FontWeight.w600 : FontWeight.w400,
+                      color: colors.textPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      isCollapsed: true,
+                      border: InputBorder.none,
+                      hintText: widget.hintText,
+                      hintStyle: AppTypography.bodyL.copyWith(fontSize: 15, color: colors.textDisabled),
+                    ),
                   ),
                 ),
-            ],
+                if (widget.kind == AppTextFieldKind.numeric && widget.unitLabel != null)
+                  Text(
+                    widget.unitLabel!,
+                    style: AppTypography.label.copyWith(fontSize: 14, color: colors.textSecondary),
+                  ),
+                if (widget.kind == AppTextFieldKind.search)
+                  Icon(AppIcons.search, size: 20, color: colors.textSecondary),
+                if (widget.kind == AppTextFieldKind.password)
+                  GestureDetector(
+                    onTap: () => setState(() => _obscure = !_obscure),
+                    child: Text(
+                      (_obscure ? widget.showPasswordActionLabel : widget.hidePasswordActionLabel) ?? '',
+                      style: AppTypography.label.copyWith(fontSize: 12.5, color: colors.actionPrimary),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
         if (widget.errorText != null || widget.helperText != null) ...[

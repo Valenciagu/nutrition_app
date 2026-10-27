@@ -10,6 +10,7 @@ import '../../../domain/calorie_estimate.dart';
 import '../../../domain/entities/onboarding_answers.dart';
 import '../../providers/onboarding_providers.dart';
 import '../../widgets/onboarding_option_card.dart';
+import '../../../../../core/widgets/motion/app_entrance.dart';
 
 /// B3 · Nivel de actividad, selección única con auto-avance (180 ms) —
 /// misma regla que B1. Primera aparición de un cálculo "vivo" (estimación de
@@ -80,7 +81,7 @@ class _ActivityLevelStepState extends ConsumerState<ActivityLevelStep> {
                 subtitle: copy.subtitle,
                 selected: selected == level,
                 onTap: () => _select(level),
-              );
+              ).appListEntrance(level.index);
             }),
             const SizedBox(height: 10),
           ],

@@ -209,7 +209,7 @@ class _PopulatedHome extends ConsumerWidget {
           decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(22)),
           child: Column(
             children: [
-              ProgressRing(progress: progress, centerValue: '$caloriesLeft', centerLabel: l10n.homeCaloriesLeftLabel),
+              ProgressRing(progress: progress, centerNumber: caloriesLeft, centerLabel: l10n.homeCaloriesLeftLabel),
               const SizedBox(height: AppSpacing.space16),
               Row(
                 children: [
@@ -342,7 +342,7 @@ class _EmptyHome extends ConsumerWidget {
           decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(22)),
           child: Column(
             children: [
-              ProgressRing(progress: 0, centerValue: '$dailyGoal', centerLabel: l10n.homeCaloriesAheadLabel, dimmed: true),
+              ProgressRing(progress: 0, centerNumber: dailyGoal, centerLabel: l10n.homeCaloriesAheadLabel, dimmed: true),
               const SizedBox(height: 12),
               Text(l10n.homeEmptyTitle, style: AppTypography.titleM.copyWith(fontSize: 17, color: colors.textPrimary), textAlign: TextAlign.center),
               const SizedBox(height: 6),

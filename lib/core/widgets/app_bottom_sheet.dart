@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
@@ -23,10 +24,19 @@ Future<T?> showAppBottomSheet<T>(
   AppBottomSheetHeight height = AppBottomSheetHeight.auto,
 }) {
   final colors = context.colors;
+  final reduced = AppMotion.reduced(context);
 
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: height != AppBottomSheetHeight.auto,
+    // M06 (catálogo "Motion patterns"): sube en `base` con curva `enter`,
+    // se cierra en `fast` con `exit`; el scrim se desvanece con la ruta.
+    sheetAnimationStyle: AnimationStyle(
+      duration: reduced ? AppMotion.fast : AppMotion.base,
+      reverseDuration: AppMotion.fast,
+      curve: AppMotion.enter,
+      reverseCurve: AppMotion.exit,
+    ),
     backgroundColor: colors.surfaceElevated,
     barrierColor: const Color(0x6B101512),
     shape: const RoundedRectangleBorder(

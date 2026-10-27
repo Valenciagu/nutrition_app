@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
 import '../theme/app_typography.dart';
+import 'motion/app_count_up_text.dart';
 
 /// 05/10 de Fase 4 (`documentation/design_screens_plan.md`) — una cifra de
 /// macro (kcal/proteína/carbos/grasas): número grande + label pequeño
@@ -22,7 +23,11 @@ class MacroStatTile extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Text('$value', style: AppTypography.numericM.copyWith(fontSize: 19, fontWeight: FontWeight.w800, color: color)),
+          // M08 (catálogo "Motion patterns"): la cifra cuenta hasta su valor.
+          AppCountUpText(
+            value: value,
+            style: AppTypography.numericM.copyWith(fontSize: 19, fontWeight: FontWeight.w800, color: color),
+          ),
           const SizedBox(height: 2),
           Text(label, style: AppTypography.bodyM.copyWith(fontSize: 11, color: colors.textSecondary)),
         ],

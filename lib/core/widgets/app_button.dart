@@ -131,7 +131,9 @@ class _AppButtonState extends State<AppButton> {
         onTapUp: _isEnabled ? (_) => setState(() => _pressed = false) : null,
         onTap: _isEnabled ? widget.onPressed : null,
         child: AnimatedScale(
-          scale: _pressed ? 0.97 : 1,
+          // M01 — sin escala con "reducir movimiento"; el cambio de color
+          // de `_resolveStyle` sigue dando el feedback.
+          scale: _pressed && !AppMotion.reduced(context) ? AppMotion.pressScale : 1,
           duration: AppMotion.instant,
           curve: AppMotion.standard,
           child: AnimatedContainer(

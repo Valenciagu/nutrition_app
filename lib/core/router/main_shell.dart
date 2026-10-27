@@ -7,6 +7,7 @@ import '../../features/home/presentation/widgets/camera_action_sheet.dart';
 import '../../features/notifications/presentation/providers/notification_providers.dart';
 import '../localization/app_localizations_ext.dart';
 import '../widgets/bottom_navigation.dart';
+import '../widgets/motion/app_tab_transition.dart';
 
 /// Envuelve las 4 tabs del shell principal (Home, Plan, IA, Perfil) con la
 /// barra de navegación + botón de cámara central — un [StatefulShellBranch]
@@ -30,7 +31,8 @@ class MainShell extends ConsumerWidget {
     ref.watch(notificationBootstrapProvider);
 
     return Scaffold(
-      body: navigationShell,
+      // M05 (catálogo "Motion patterns"): la tab entrante aparece con fade.
+      body: AppTabTransition(index: navigationShell.currentIndex, child: navigationShell),
       bottomNavigationBar: BottomNavigation(
         currentIndex: navigationShell.currentIndex,
         onTabSelected: (index) => navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),

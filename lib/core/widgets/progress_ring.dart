@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_typography.dart';
+import 'motion/app_count_up_text.dart';
 
 /// 05 · ProgressRing (Fichas de componentes). Anillo de progreso circular
 /// con un valor y una etiqueta en el centro. Usado para las kcal del día en
@@ -12,18 +14,30 @@ class ProgressRing extends StatelessWidget {
   const ProgressRing({
     super.key,
     required this.progress,
-    required this.centerValue,
+    this.centerValue,
+    this.centerNumber,
     required this.centerLabel,
     this.size = 104,
     this.strokeWidth = 10,
     this.color,
     this.dimmed = false,
-  });
+    this.animate = true,
+  }) : assert((centerValue == null) != (centerNumber == null), 'Pass exactly one of centerValue / centerNumber');
 
   /// 0.0-1.0. Ignorado si [dimmed] es true.
   final double progress;
-  final String centerValue;
+
+  /// Texto fijo del centro. Para una cifra, preferir [centerNumber]: cuenta
+  /// en sincronía con el arco (M08).
+  final String? centerValue;
+  final int? centerNumber;
   final String centerLabel;
+
+  /// M08 (catálogo "Motion patterns"): el arco se llena desde el valor
+  /// anterior (o desde 0 la primera vez) en `progress`. `false` cuando quien
+  /// lo usa ya mueve [progress] cuadro a cuadro (B8, su propia coreografía) —
+  /// animarlo encima solo lo retrasaría.
+  final bool animate;
   final double size;
   final double strokeWidth;
   final Color? color;
@@ -34,33 +48,45 @@ class ProgressRing extends StatelessWidget {
     final colors = context.colors;
     final ringColor = color ?? colors.actionPrimary;
 
+    final target = dimmed ? 0.0 : progress.clamp(0, 1).toDouble();
+    final valueStyle = AppTypography.titleL.copyWith(
+      fontSize: size * 0.22,
+      color: dimmed ? colors.textDisabled : colors.textPrimary,
+    );
+
     return SizedBox(
       width: size,
       height: size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CustomPaint(
-            size: Size(size, size),
-            painter: _RingPainter(
-              progress: dimmed ? 0 : progress.clamp(0, 1),
-              color: dimmed ? colors.border : ringColor,
-              trackColor: colors.border,
-              strokeWidth: strokeWidth,
-              showTrack: !dimmed,
-              fullTrackOnly: dimmed,
+          // `RepaintBoundary`: mientras el arco anima, solo se repinta esta
+          // capa, no el resto de la pantalla.
+          RepaintBoundary(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: target),
+              duration: animate && !AppMotion.reduced(context) ? AppMotion.progress : Duration.zero,
+              curve: AppMotion.standard,
+              builder: (context, animatedProgress, _) => CustomPaint(
+                size: Size(size, size),
+                painter: _RingPainter(
+                  progress: animatedProgress,
+                  color: dimmed ? colors.border : ringColor,
+                  trackColor: colors.border,
+                  strokeWidth: strokeWidth,
+                  showTrack: !dimmed,
+                  fullTrackOnly: dimmed,
+                ),
+              ),
             ),
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                centerValue,
-                style: AppTypography.titleL.copyWith(
-                  fontSize: size * 0.22,
-                  color: dimmed ? colors.textDisabled : colors.textPrimary,
-                ),
-              ),
+              if (centerNumber != null && animate)
+                AppCountUpText(value: centerNumber!, style: valueStyle)
+              else
+                Text(centerValue ?? '$centerNumber', style: valueStyle),
               const SizedBox(height: 2),
               Text(
                 centerLabel,

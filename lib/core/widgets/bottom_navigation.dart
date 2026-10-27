@@ -2,7 +2,9 @@ import '../constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_typography.dart';
+import 'motion/app_pressable.dart';
 
 class BottomNavTab {
   const BottomNavTab({required this.icon, required this.label});
@@ -56,13 +58,15 @@ class BottomNavigation extends StatelessWidget {
               child: Center(
                 child: GestureDetector(
                   onTap: onCameraTap,
+                  // M01 (catálogo "Motion patterns") — la acción más repetida
+                  // del producto responde al tacto como cualquier botón.
                   // `Container.margin` no acepta valores negativos (lanza un
                   // assertion error) — el efecto "elevado sobre la barra" del
                   // diseño se logra desplazando el widget con `Transform`
                   // en vez de un margen negativo.
                   child: Transform.translate(
                     offset: const Offset(0, -26),
-                    child: Container(
+                    child: AppPressable(child: Container(
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
@@ -72,7 +76,7 @@ class BottomNavigation extends StatelessWidget {
                       ),
                       alignment: Alignment.center,
                       child: Icon(AppIcons.camera, color: colors.onActionPrimary, size: 24),
-                    ),
+                    )),
                   ),
                 ),
               ),
@@ -91,20 +95,31 @@ class BottomNavigation extends StatelessWidget {
     final active = index == currentIndex;
     final color = active ? colors.actionPrimary : colors.textDisabled;
 
+    // M02 (selección): el color del tab activo cruza en `fast` en vez de
+    // saltar; M01 al presionar.
     return Expanded(
       child: GestureDetector(
         onTap: () => onTabSelected(index),
         behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(tab.icon, color: color, size: 24),
-            const SizedBox(height: 4),
-            Text(
-              tab.label,
-              style: AppTypography.label.copyWith(fontSize: 10.5, color: color, fontWeight: active ? FontWeight.w600 : FontWeight.w500),
-            ),
-          ],
+        child: AppPressable(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TweenAnimationBuilder<Color?>(
+                tween: ColorTween(end: color),
+                duration: AppMotion.fast,
+                curve: AppMotion.standard,
+                builder: (context, animatedColor, _) => Icon(tab.icon, color: animatedColor, size: 24),
+              ),
+              const SizedBox(height: 4),
+              AnimatedDefaultTextStyle(
+                duration: AppMotion.fast,
+                curve: AppMotion.standard,
+                style: AppTypography.label.copyWith(fontSize: 10.5, color: color, fontWeight: active ? FontWeight.w600 : FontWeight.w500),
+                child: Text(tab.label),
+              ),
+            ],
+          ),
         ),
       ),
     );

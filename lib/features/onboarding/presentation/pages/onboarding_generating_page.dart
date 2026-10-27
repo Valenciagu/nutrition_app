@@ -6,6 +6,7 @@ import '../../../../core/constants/route_paths.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/theme/app_color_tokens.dart';
+import '../../../../core/theme/app_motion.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -37,7 +38,7 @@ class _OnboardingGeneratingPageState extends ConsumerState<OnboardingGeneratingP
     with SingleTickerProviderStateMixin {
   late final AnimationController _choreography = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 5600),
+    duration: AppMotion.planGenerationLoop,
   )..repeat();
 
   @override
@@ -105,6 +106,8 @@ class _OnboardingGeneratingPageState extends ConsumerState<OnboardingGeneratingP
                           size: 118,
                           strokeWidth: 10,
                           color: colors.macroFat,
+                          // La coreografía ya mueve `progress` cada cuadro.
+                          animate: false,
                         ),
                         const SizedBox(height: AppSpacing.space20),
                         Text(

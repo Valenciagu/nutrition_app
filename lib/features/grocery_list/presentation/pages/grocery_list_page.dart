@@ -16,6 +16,7 @@ import '../../../../core/widgets/round_icon_button.dart';
 import '../../../onboarding/presentation/onboarding_catalog.dart';
 import '../../domain/entities/grocery_item.dart';
 import '../providers/grocery_list_providers.dart';
+import '../../../../core/widgets/motion/app_entrance.dart';
 
 /// Lista de compra semanal (Épica 10). Sin mock propio en el canvas de
 /// diseño (Fase 4 solo define la fila "Generar lista de compra" en D1, que
@@ -101,42 +102,47 @@ class _GroceryListContent extends ConsumerWidget {
       for (final category in _categoryOrder) category: data.items.where((i) => i.category == category).toList(),
     };
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.space20, 0, AppSpacing.space20, AppSpacing.space24),
-      children: [
-        for (final category in _categoryOrder)
-          if (byCategory[category]!.isNotEmpty) ...[
+    // M04 (catálogo "Motion patterns"): encabezados y filas entran en orden;
+    // el scope evita que se repita al volver a hacer scroll hacia arriba.
+    var entranceIndex = 0;
+    return AppEntranceScope(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.space20, 0, AppSpacing.space20, AppSpacing.space24),
+        children: [
+          for (final category in _categoryOrder)
+            if (byCategory[category]!.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.space16, bottom: AppSpacing.space8),
+                child: Text(
+                  _categoryLabel(l10n, category),
+                  style: AppTypography.label.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700, color: colors.textSecondary),
+                ),
+              ).appListEntrance(entranceIndex++),
+              for (final item in byCategory[category]!) ...[
+                _GroceryItemRow(item: item).appListEntrance(entranceIndex++),
+                const SizedBox(height: 8),
+              ],
+            ],
+          if (data.mealsWithoutRecipe.isNotEmpty) ...[
             Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.space16, bottom: AppSpacing.space8),
+              padding: const EdgeInsets.only(top: AppSpacing.space16, bottom: AppSpacing.space4),
               child: Text(
-                _categoryLabel(l10n, category),
+                l10n.groceryMissingRecipesTitle,
                 style: AppTypography.label.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700, color: colors.textSecondary),
               ),
             ),
-            for (final item in byCategory[category]!) ...[
-              _GroceryItemRow(item: item),
+            Text(
+              l10n.groceryMissingRecipesHint,
+              style: AppTypography.bodyM.copyWith(fontSize: 12.5, color: colors.textSecondary),
+            ),
+            const SizedBox(height: AppSpacing.space8),
+            for (final meal in data.mealsWithoutRecipe) ...[
+              _MissingRecipeRow(meal: meal),
               const SizedBox(height: 8),
             ],
           ],
-        if (data.mealsWithoutRecipe.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.space16, bottom: AppSpacing.space4),
-            child: Text(
-              l10n.groceryMissingRecipesTitle,
-              style: AppTypography.label.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700, color: colors.textSecondary),
-            ),
-          ),
-          Text(
-            l10n.groceryMissingRecipesHint,
-            style: AppTypography.bodyM.copyWith(fontSize: 12.5, color: colors.textSecondary),
-          ),
-          const SizedBox(height: AppSpacing.space8),
-          for (final meal in data.mealsWithoutRecipe) ...[
-            _MissingRecipeRow(meal: meal),
-            const SizedBox(height: 8),
-          ],
         ],
-      ],
+      ),
     );
   }
 

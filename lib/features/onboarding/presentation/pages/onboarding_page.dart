@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/motion/app_content_switcher.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
 import '../providers/onboarding_providers.dart';
 import '../widgets/step_header.dart';
@@ -73,8 +74,8 @@ class OnboardingPage extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space20),
             Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 180),
+              // M03 (catálogo "Motion patterns") — un paso reemplaza al otro.
+              child: AppContentSwitcher(
                 child: KeyedSubtree(key: ValueKey(stepIndex), child: steps[stepIndex]),
               ),
             ),

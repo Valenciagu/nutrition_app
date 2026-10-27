@@ -23,6 +23,7 @@ import '../widgets/adjust_plan_sheet.dart';
 import '../widgets/day_strip.dart';
 import '../widgets/replace_meal_sheet.dart';
 import '../widgets/week_plan_view.dart';
+import '../../../../core/widgets/motion/app_entrance.dart';
 
 /// D1/D2 · Plan del día / Plan semanal (Fase 4). Reemplaza el
 /// `ComingSoonPage` de la Épica 4. Ver `documentation/plan.md` para el
@@ -229,7 +230,7 @@ class _PopulatedPlan extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 10),
-        for (final meal in plan.meals) ...[
+        for (final (index, meal) in plan.meals.indexed) ...[
           MealCard(
             overlineText: meal.status == MealStatus.registered
                 ? l10n.planMealOverlineRegistered(mealSlotLabel(l10n, meal.slotLabelKey))
@@ -241,7 +242,7 @@ class _PopulatedPlan extends ConsumerWidget {
             isRegistered: meal.status == MealStatus.registered,
             isElevated: meal.id == nextUpId,
             onTap: () => onMealTap(meal),
-          ),
+          ).appListEntrance(index),
           const SizedBox(height: 10),
         ],
         QuickActionTile(

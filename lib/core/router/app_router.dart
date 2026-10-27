@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:animations/animations.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,6 +39,9 @@ import '../../features/recipes/presentation/pages/recipe_detail_page.dart';
 import '../constants/route_paths.dart';
 import '../services/analytics/firebase_analytics_service.dart';
 import '../services/firebase_instances.dart';
+import '../theme/app_color_tokens.dart';
+import '../theme/app_motion.dart';
+import '../theme/app_page_transitions.dart';
 import 'main_shell.dart';
 
 /// El único [GoRouter] de la app. No crear otros routers ni navegar con
@@ -158,7 +162,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: 'update_required',
         path: RoutePaths.updateRequired,
-        builder: (context, state) => const UpdateRequiredPage(),
+        pageBuilder: (context, state) => _flowPage(context, state, const UpdateRequiredPage()),
       ),
       GoRoute(name: 'welcome', path: RoutePaths.welcome, builder: (context, state) => const WelcomePage()),
       GoRoute(name: 'onboarding', path: RoutePaths.onboarding, builder: (context, state) => const OnboardingPage()),
@@ -175,12 +179,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: 'food_analysis',
         path: RoutePaths.foodAnalysis,
-        builder: (context, state) => FoodAnalysisPage(imageBytes: state.extra! as Uint8List),
+        pageBuilder: (context, state) => _flowPage(context, state, FoodAnalysisPage(imageBytes: state.extra! as Uint8List)),
       ),
       GoRoute(
         name: 'ingredient_analysis',
         path: RoutePaths.ingredientAnalysis,
-        builder: (context, state) => IngredientDetectionPage(imageBytes: state.extra! as Uint8List),
+        pageBuilder: (context, state) => _flowPage(context, state, IngredientDetectionPage(imageBytes: state.extra! as Uint8List)),
       ),
       GoRoute(
         name: 'ingredient_recipes',
@@ -195,7 +199,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: 'ingredient_recipe_cooking',
         path: RoutePaths.ingredientRecipeCooking,
-        builder: (context, state) => CookingModePage(recipe: state.extra! as Recipe),
+        pageBuilder: (context, state) => _flowPage(context, state, CookingModePage(recipe: state.extra! as Recipe)),
       ),
       GoRoute(name: 'login', path: RoutePaths.login, builder: (context, state) => const LoginPage()),
       GoRoute(
@@ -234,9 +238,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         name: 'cooking_mode',
                         path: RoutePaths.cookingModeSegment,
-                        builder: (context, state) => CookingModePage(
-                          recipe: state.extra! as Recipe,
-                          mealId: state.pathParameters['mealId']!,
+                        pageBuilder: (context, state) => _flowPage(
+                          context,
+                          state,
+                          CookingModePage(recipe: state.extra! as Recipe, mealId: state.pathParameters['mealId']!),
                         ),
                       ),
                     ],
@@ -294,4 +299,27 @@ final routerProvider = Provider<GoRouter>((ref) {
 
 class _RouterRefreshNotifier extends ChangeNotifier {
   void notify() => notifyListeners();
+}
+
+/// M05 · Screen transition, variante vertical (catálogo "Motion patterns"
+/// en `documentation/design_system.md`) para los flujos de pantalla
+/// completa — análisis de foto/ingredientes, modo cocina, actualización
+/// obligatoria. `name` se conserva para que `FirebaseAnalyticsObserver` siga
+/// reportando el nombre estable de la ruta.
+Page<void> _flowPage(BuildContext context, GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    name: state.name,
+    child: child,
+    transitionDuration: AppMotion.slow,
+    reverseTransitionDuration: AppMotion.slow,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) => buildAppTransition(
+      context,
+      animation,
+      secondaryAnimation,
+      child,
+      SharedAxisTransitionType.vertical,
+      context.colors.background,
+    ),
+  );
 }

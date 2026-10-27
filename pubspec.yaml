@@ -76,6 +76,8 @@ dependencies:
   flutter_native_splash: ^2.4.7
   firebase_remote_config: ^5.5.0
   package_info_plus: ^10.2.2
+  flutter_animate: ^4.5.2
+  animations: ^2.2.0
 
 dev_dependencies:
   flutter_test:

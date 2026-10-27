@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_color_tokens.dart';
+import 'app_page_transitions.dart';
 import 'app_radius.dart';
 import 'app_typography.dart';
 
@@ -71,6 +72,16 @@ abstract final class AppTheme {
         ),
       ),
       splashFactory: NoSplash.splashFactory,
+      // M05 (catálogo "Motion patterns"). iOS conserva la transición nativa
+      // a propósito: el shared axis no tiene el gesto de deslizar desde el
+      // borde para volver, y quitarlo sería peor que cualquier ganancia
+      // visual (excepción de plataforma documentada en design_system.md).
+      pageTransitionsTheme: PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: AppPageTransitionsBuilder(fillColor: tokens.background),
+          TargetPlatform.iOS: const CupertinoPageTransitionsBuilder(),
+        },
+      ),
     );
   }
 }

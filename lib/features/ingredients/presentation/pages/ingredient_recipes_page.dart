@@ -15,6 +15,7 @@ import '../../../../core/widgets/hatched_placeholder.dart';
 import '../../../grocery_list/presentation/providers/grocery_list_providers.dart';
 import '../../domain/entities/ingredient_suggestions.dart';
 import '../providers/ingredient_analysis_providers.dart';
+import '../../../../core/widgets/motion/app_entrance.dart';
 
 /// F2 · Recetas con lo que tienes (Fase 6). Pide las recetas al entrar, con
 /// los ingredientes confirmados en F1. Cada tarjeta lleva un badge ("Tienes
@@ -99,16 +100,21 @@ class _IngredientRecipesPageState extends ConsumerState<IngredientRecipesPage> {
                   },
                   data: (result) => result == null
                       ? const SizedBox.shrink()
-                      : ListView.separated(
-                          itemCount: result.recipes.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.space16),
-                          itemBuilder: (context, index) {
-                            final suggestion = result.recipes[index];
-                            void open() => context.push(RoutePaths.ingredientRecipe, extra: suggestion);
-                            return index < 2
-                                ? _LargeRecipeCard(suggestion: suggestion, onTap: open)
-                                : _CompactRecipeCard(suggestion: suggestion, onTap: open);
-                          },
+                      // M04 (catálogo "Motion patterns"); el scope evita
+                      // repetir la entrada al volver a hacer scroll.
+                      : AppEntranceScope(
+                          child: ListView.separated(
+                            itemCount: result.recipes.length,
+                            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.space16),
+                            itemBuilder: (context, index) {
+                              final suggestion = result.recipes[index];
+                              void open() => context.push(RoutePaths.ingredientRecipe, extra: suggestion);
+                              final card = index < 2
+                                  ? _LargeRecipeCard(suggestion: suggestion, onTap: open)
+                                  : _CompactRecipeCard(suggestion: suggestion, onTap: open);
+                              return card.appListEntrance(index);
+                            },
+                          ),
                         ),
                 ),
               ),

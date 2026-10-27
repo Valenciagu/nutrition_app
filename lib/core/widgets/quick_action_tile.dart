@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
 import 'app_svg_icon.dart';
+import 'motion/app_pressable.dart';
 import '../theme/app_typography.dart';
 
 /// QuickActionTile — uno de los dos componentes nuevos que propone Fase 3 ·
@@ -43,48 +44,50 @@ class QuickActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
+    return AppPressable(
+      child: Material(
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 48),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: iconBackgroundColor, borderRadius: BorderRadius.circular(11)),
-                child: svgIcon != null
-                    ? AppSvgIcon(svgIcon!, size: 20, color: colors.textPrimary)
-                    : Icon(icon, size: 20, color: colors.textPrimary),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: AppTypography.bodyM.copyWith(fontSize: 14, fontWeight: FontWeight.w600)),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle!,
-                        style: AppTypography.bodyM.copyWith(fontSize: 12.5, color: colors.textSecondary),
-                      ),
-                    ],
-                  ],
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 48),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: iconBackgroundColor, borderRadius: BorderRadius.circular(11)),
+                  child: svgIcon != null
+                      ? AppSvgIcon(svgIcon!, size: 20, color: colors.textPrimary)
+                      : Icon(icon, size: 20, color: colors.textPrimary),
                 ),
-              ),
-              if (trailingText != null)
-                Text(trailingText!, style: AppTypography.bodyM.copyWith(fontSize: 13, color: colors.textDisabled))
-              else
-                Icon(AppIcons.chevronRight, color: colors.textDisabled),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: AppTypography.bodyM.copyWith(fontSize: 14, fontWeight: FontWeight.w600)),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle!,
+                          style: AppTypography.bodyM.copyWith(fontSize: 12.5, color: colors.textSecondary),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (trailingText != null)
+                  Text(trailingText!, style: AppTypography.bodyM.copyWith(fontSize: 13, color: colors.textDisabled))
+                else
+                  Icon(AppIcons.chevronRight, color: colors.textDisabled),
+              ],
+            ),
           ),
         ),
       ),

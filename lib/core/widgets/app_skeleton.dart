@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
+import '../theme/app_motion.dart';
 
 /// A single shimmering skeleton bar, matching the loading silhouette from
 /// Fichas de componentes > 10 · StateBlock (shimmer sweep, 1.3s loop).
@@ -19,7 +20,7 @@ class AppSkeletonBar extends StatefulWidget {
 class _AppSkeletonBarState extends State<AppSkeletonBar> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1300),
+    duration: AppMotion.skeletonLoop,
   )..repeat();
 
   @override

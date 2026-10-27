@@ -10,6 +10,7 @@ import '../../../domain/entities/onboarding_answers.dart';
 import '../../onboarding_catalog.dart';
 import '../../providers/onboarding_providers.dart';
 import '../../widgets/onboarding_option_card.dart';
+import '../../../../../core/widgets/motion/app_entrance.dart';
 
 /// B1 · Objetivo, selección única. Al elegir una opción, avanza sola tras
 /// 180 ms (se ve la selección antes de cambiar de pantalla) — regla del
@@ -76,7 +77,7 @@ class _GoalStepState extends ConsumerState<GoalStep> {
                 selected: selected == goal,
                 imageAsset: goalImageAsset(goal),
                 onTap: () => _select(goal),
-              );
+              ).appListEntrance(goal.index);
             }),
             const SizedBox(height: 12),
           ],

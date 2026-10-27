@@ -2,7 +2,10 @@ import '../constants/app_icons.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_color_tokens.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_typography.dart';
+import 'motion/app_entrance.dart';
+import 'motion/app_pressable.dart';
 
 /// Variante semántica de selección. `negative` es el único sitio del sistema
 /// donde el rojo aparece por selección (no por error) — significa exclusión
@@ -47,35 +50,48 @@ class SelectableChip extends StatelessWidget {
       textColor = colors.textPrimary;
     }
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 48),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            border: Border.all(color: borderColor, width: selected ? 1.5 : 1),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: AppTypography.label.copyWith(
-                  fontSize: 14,
-                  color: textColor,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                ),
+    // M01 (presión) + M02 (selección), catálogo "Motion patterns": color y
+    // borde cruzan en `fast`, el check aparece con pop-in y el ancho del
+    // chip se ajusta suave en vez de saltar al mostrarse/ocultarse el check.
+    return AppPressable(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: AnimatedContainer(
+            duration: AppMotion.fast,
+            curve: AppMotion.standard,
+            constraints: const BoxConstraints(minHeight: 48),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: backgroundColor ?? Colors.transparent,
+              border: Border.all(color: borderColor, width: selected ? 1.5 : 1),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: AnimatedSize(
+              duration: AppMotion.fast,
+              curve: AppMotion.standard,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedDefaultTextStyle(
+                    duration: AppMotion.fast,
+                    curve: AppMotion.standard,
+                    style: AppTypography.label.copyWith(
+                      fontSize: 14,
+                      color: textColor,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                    ),
+                    child: Text(label),
+                  ),
+                  if (selected && showCheckWhenSelected) ...[
+                    const SizedBox(width: 8),
+                    Icon(AppIcons.check, size: 15, color: textColor).appPopIn(context),
+                  ],
+                ],
               ),
-              if (selected && showCheckWhenSelected) ...[
-                const SizedBox(width: 8),
-                Icon(AppIcons.check, size: 15, color: textColor),
-              ],
-            ],
+            ),
           ),
         ),
       ),

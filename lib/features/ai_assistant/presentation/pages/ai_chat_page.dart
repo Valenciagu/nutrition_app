@@ -7,10 +7,13 @@ import '../../../../core/constants/route_paths.dart';
 import '../../../../core/localization/app_localizations_ext.dart';
 import '../../../../core/localization/generated/app_localizations.dart';
 import '../../../../core/theme/app_color_tokens.dart';
+import '../../../../core/theme/app_motion.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_state_block.dart';
+import '../../../../core/widgets/motion/app_content_switcher.dart';
+import '../../../../core/widgets/motion/app_entrance.dart';
 import '../../../authentication/presentation/providers/auth_providers.dart';
 import '../../domain/entities/chat_message.dart';
 import '../providers/ai_chat_providers.dart';
@@ -68,6 +71,10 @@ class _ChatScaffoldState extends ConsumerState<_ChatScaffold> {
   final _scrollController = ScrollController();
   final _textController = TextEditingController();
 
+  // Burbujas que ya hicieron su entrada (M04): solo la recién llegada
+  // anima; una que se vuelve a construir por scroll aparece quieta.
+  final _enteredMessageIds = <String>{};
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -80,8 +87,8 @@ class _ChatScaffoldState extends ConsumerState<_ChatScaffold> {
       if (!_scrollController.hasClients) return;
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOut,
+        duration: AppMotion.base,
+        curve: AppMotion.standard,
       );
     });
   }
@@ -125,7 +132,11 @@ class _ChatScaffoldState extends ConsumerState<_ChatScaffold> {
                       controller: _scrollController,
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space20, vertical: AppSpacing.space16),
                       itemCount: chatState.messages.length,
-                      itemBuilder: (context, index) => _MessageBubble(message: chatState.messages[index]),
+                      itemBuilder: (context, index) {
+                        final message = chatState.messages[index];
+                        final isNew = _enteredMessageIds.add(message.id);
+                        return _MessageBubble(message: message).appListEntrance(0, play: isNew);
+                      },
                     ),
             ),
             _Footer(
@@ -205,18 +216,30 @@ class _MessageBubble extends StatelessWidget {
           bottomRight: Radius.circular(isUser ? 6 : 18),
         ),
       ),
-      child: message.isPending
-          ? const _TypingDots()
-          : Text(
-              message.isError
-                  ? (message.isQuotaExceeded ? l10n.aiChatQuotaExceededMessage : l10n.genericErrorMessage)
-                  : message.text,
-              style: AppTypography.bodyM.copyWith(
-                fontSize: 14.5,
-                height: 1.5,
-                color: isUser ? Colors.white : (message.isError ? colors.error : colors.textPrimary),
-              ),
-            ),
+      // M03 (catálogo "Motion patterns"): al llegar la respuesta, los
+      // puntos de "escribiendo" dan paso al texto y la burbuja crece suave.
+      child: AnimatedSize(
+        duration: AppMotion.base,
+        curve: AppMotion.standard,
+        alignment: isUser ? Alignment.topRight : Alignment.topLeft,
+        child: AppContentSwitcher(
+          child: KeyedSubtree(
+            key: ValueKey(message.isPending),
+            child: message.isPending
+                ? const _TypingDots()
+                : Text(
+                    message.isError
+                        ? (message.isQuotaExceeded ? l10n.aiChatQuotaExceededMessage : l10n.genericErrorMessage)
+                        : message.text,
+                    style: AppTypography.bodyM.copyWith(
+                      fontSize: 14.5,
+                      height: 1.5,
+                      color: isUser ? Colors.white : (message.isError ? colors.error : colors.textPrimary),
+                    ),
+                  ),
+          ),
+        ),
+      ),
     );
 
     return Padding(
@@ -255,7 +278,7 @@ class _TypingDots extends StatefulWidget {
 }
 
 class _TypingDotsState extends State<_TypingDots> with SingleTickerProviderStateMixin {
-  late final _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat();
+  late final _controller = AnimationController(vsync: this, duration: AppMotion.typingDotsLoop)..repeat();
 
   @override
   void dispose() {

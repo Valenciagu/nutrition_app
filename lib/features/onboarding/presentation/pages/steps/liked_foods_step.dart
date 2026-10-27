@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/localization/app_localizations_ext.dart';
 import '../../../../../core/theme/app_color_tokens.dart';
+import '../../../../../core/theme/app_motion.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/widgets/app_button.dart';
+import '../../../../../core/widgets/motion/app_entrance.dart';
+import '../../../../../core/widgets/motion/app_pressable.dart';
 import '../../onboarding_catalog.dart';
 import '../../providers/onboarding_providers.dart';
 
@@ -107,14 +110,15 @@ class _FoodTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    // M01 (presión) + M02 (selección), catálogo "Motion patterns".
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedScale(
-        scale: 1,
-        duration: const Duration(milliseconds: 140),
-        child: Container(
+      child: AppPressable(
+        child: AnimatedContainer(
+          duration: AppMotion.fast,
+          curve: AppMotion.standard,
           decoration: BoxDecoration(
-            color: selected ? colors.actionPrimarySurface : null,
+            color: selected ? colors.actionPrimarySurface : colors.actionPrimarySurface.withValues(alpha: 0),
             border: Border.all(color: selected ? colors.actionPrimary : colors.border, width: selected ? 1.5 : 1),
             borderRadius: BorderRadius.circular(14),
           ),
@@ -142,21 +146,23 @@ class _FoodTile extends StatelessWidget {
                           decoration: BoxDecoration(color: colors.actionPrimary, shape: BoxShape.circle),
                           alignment: Alignment.center,
                           child: Icon(AppIcons.check, size: 12, color: colors.onActionPrimary),
-                        ),
+                        ).appPopIn(context),
                       ),
                   ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                child: Text(
-                  label,
+                child: AnimatedDefaultTextStyle(
+                  duration: AppMotion.fast,
+                  curve: AppMotion.standard,
                   textAlign: TextAlign.center,
                   style: AppTypography.label.copyWith(
                     fontSize: 12.5,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                     color: selected ? colors.onActionPrimarySurface : colors.textPrimary,
                   ),
+                  child: Text(label),
                 ),
               ),
             ],

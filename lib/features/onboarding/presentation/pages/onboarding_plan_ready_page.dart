@@ -16,6 +16,7 @@ import '../../../plan/domain/entities/planned_meal.dart';
 import '../../domain/entities/onboarding_answers.dart';
 import '../onboarding_catalog.dart';
 import '../providers/onboarding_providers.dart';
+import '../../../../core/widgets/motion/app_entrance.dart';
 
 /// B9 · Tu plan está listo (Fase 2 · Bloque B). "Recompensa antes que la
 /// cuenta" (nota del propio diseño): el usuario ve su plan real ANTES de
@@ -74,7 +75,7 @@ class OnboardingPlanReadyPage extends ConsumerWidget {
                   children: [
                     ProgressRing(
                       progress: 1,
-                      centerValue: '$totalCalories',
+                      centerNumber: totalCalories,
                       centerLabel: l10n.onboardingPlanReadyCaloriesUnit,
                       size: 110,
                       strokeWidth: 10,
@@ -85,14 +86,14 @@ class OnboardingPlanReadyPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              for (final meal in preview) ...[
+              for (final (index, meal) in preview.indexed) ...[
                 MealCard(
                   overlineText: '${mealSlotLabel(l10n, meal.slotLabelKey)} · ${_timeLabel(meal)}',
                   title: meal.name,
                   detailText: l10n.planMealDetailPending(meal.calories, meal.proteinGrams),
                   isRegistered: false,
                   onTap: () {},
-                ),
+                ).appListEntrance(index),
                 const SizedBox(height: 10),
               ],
               const SizedBox(height: 10),

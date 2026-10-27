@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_color_tokens.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import 'motion/app_pressable.dart';
 
 /// The app's generic surface container: white/elevated surface, `xl` radius,
 /// hairline border (Fase 1 - Fundamentos > 05). Use this instead of a raw
@@ -29,19 +30,22 @@ class AppCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Material(
-      color: elevated ? colors.surfaceElevated : colors.surface,
-      borderRadius: BorderRadius.circular(AppRadius.xl),
-      child: InkWell(
-        onTap: onTap,
+    return AppPressable(
+      enabled: onTap != null,
+      child: Material(
+        color: elevated ? colors.surfaceElevated : colors.surface,
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: colors.border),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppRadius.xl),
+              border: Border.all(color: colors.border),
+            ),
+            child: child,
           ),
-          child: child,
         ),
       ),
     );
