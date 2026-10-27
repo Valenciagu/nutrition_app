@@ -39,7 +39,7 @@ Nada de esto se guarda en Firestore: no existe una pantalla de "mis recetas".
 
 ## Lista de compra (Épica 10, extendida)
 
-"Añadir X a la lista de compra" escribe en `users/{uid}/shoppingLists/{weekKey}.extraItems` (`arrayUnion`, sin duplicados). `firestore.rules` permite ahora `checkedItems` y `extraItems`, ambas listas y opcionales, con `extraItems` acotada a 100 (con test de reglas). `groceryListProvider` mezcla esos ítems con los que salen de las recetas del plan; si ya estaban por una receta, no se duplican, y los manuales no muestran línea de origen. Se marcan como comprados igual que el resto. Todavía no se pueden borrar desde la lista.
+"Añadir X a la lista de compra" escribe en `users/{uid}/shoppingLists/{weekKey}.extraItems` (`arrayUnion`, sin duplicados). `firestore.rules` permite ahora `checkedItems` y `extraItems`, ambas listas y opcionales, con `extraItems` acotada a 100 (con test de reglas). `groceryListProvider` mezcla esos ítems con los que salen de las recetas del plan; si ya estaban por una receta, no se duplican, y los manuales no muestran línea de origen. Se marcan como comprados igual que el resto. Desde el 2026-10-26 se pueden quitar con ✕ los que existen solo porque se añadieron a mano (`GroceryItem.isRemovable`); quitarlos borra también su estado de comprado. Los que una receta del plan también pide no llevan ✕.
 
 ## Cliente (`lib/features/ingredients/`)
 
@@ -57,7 +57,6 @@ Reusado: `RecipeDetailBody`/`RecipeInfoTag` (extraídos de D3), `CookingModePage
 
 ## Pendiente / gaps
 
-- **Desplegado por el usuario el 2026-10-26**: las tres funciones, `firestore.rules` y `storage.rules`.
+- **Desplegado por el usuario el 2026-10-26**: `suggestRecipesFromIngredients`, `analyzeFoodPhoto`, `firestore.rules` y `storage.rules`. `detectIngredients` quedó fuera de ese despliegue (F1 fallaba con "nuestro servidor tuvo un problema"); se despliega con `firebase deploy --only functions:detectIngredients`.
 - Sin probar en un dispositivo ni contra OpenAI real.
-- Borrar ítems manuales desde la lista de compra.
 - Tests: parseo, lista editable, filtro de seguridad, `sanitizeNameList` y reglas de `extraItems`. Faltan tests de las funciones completas con OpenAI simulado y widget tests de F1/F2.

@@ -442,6 +442,10 @@
   "groceryCategoryOther": "Other",
   "groceryEmptyTitle": "Nothing to buy yet",
   "groceryEmptyMessage": "Generate a plan and open a recipe to build your list.",
+  "groceryRemoveItemSemantics": "Remove {name} from the list",
+  "@groceryRemoveItemSemantics": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "groceryMissingRecipesTitle": "No recipe generated yet",
   "groceryMissingRecipesHint": "Tap a meal to generate its recipe and add its ingredients.",
   "grocerySourceLabel": "{quantity} · {slot} · {weekday}",

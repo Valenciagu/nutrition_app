@@ -53,6 +53,21 @@ class FirebaseGroceryListRepository implements GroceryListRepository {
     return _shoppingListRef(userId, weekKey).set({'extraItems': FieldValue.arrayUnion(names)}, SetOptions(merge: true));
   }
 
+  /// Una sola escritura: si se volviera a añadir el mismo ingrediente, no
+  /// debe reaparecer ya marcado como comprado.
+  @override
+  Future<void> removeExtraItem({
+    required String userId,
+    required String weekKey,
+    required List<String> names,
+    required String itemKey,
+  }) {
+    return _shoppingListRef(userId, weekKey).set({
+      'extraItems': FieldValue.arrayRemove(names),
+      'checkedItems': FieldValue.arrayRemove([itemKey]),
+    }, SetOptions(merge: true));
+  }
+
   DocumentReference<Map<String, dynamic>> _shoppingListRef(String userId, String weekKey) {
     return _firestore.collection('users').doc(userId).collection('shoppingLists').doc(weekKey);
   }

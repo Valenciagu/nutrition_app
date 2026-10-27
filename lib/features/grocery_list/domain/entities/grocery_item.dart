@@ -30,6 +30,7 @@ class GroceryItem {
     required this.category,
     required this.sources,
     required this.checked,
+    this.manualNames = const [],
   });
 
   /// Nombre normalizado (trim + minúsculas) — identifica el ítem tanto para
@@ -42,6 +43,17 @@ class GroceryItem {
   final List<GroceryItemSource> sources;
   final bool checked;
 
+  /// Entradas de `shoppingLists.extraItems` (añadidas a mano, Épica 9) que
+  /// produjeron este ítem, tal como se guardaron — puede haber variantes de
+  /// mayúsculas ("Arroz"/"arroz") con la misma [key]. Hacen falta exactas
+  /// para quitarlas con `arrayRemove`.
+  final List<String> manualNames;
+
+  /// Solo un ítem que existe ÚNICAMENTE porque se añadió a mano se puede
+  /// quitar: si una receta del plan también lo pide, quitarlo no lo sacaría
+  /// de la lista.
+  bool get isRemovable => sources.isEmpty && manualNames.isNotEmpty;
+
   GroceryItem copyWith({bool? checked}) {
     return GroceryItem(
       key: key,
@@ -49,6 +61,7 @@ class GroceryItem {
       category: category,
       sources: sources,
       checked: checked ?? this.checked,
+      manualNames: manualNames,
     );
   }
 }

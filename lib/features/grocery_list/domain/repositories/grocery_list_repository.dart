@@ -23,4 +23,13 @@ abstract class GroceryListRepository {
   Future<List<String>> getExtraItems({required String userId, required String weekKey});
 
   Future<void> addExtraItems({required String userId, required String weekKey, required List<String> names});
+
+  /// Quita las entradas manuales [names] (exactas, como las devolvió
+  /// [getExtraItems]) y el estado "comprado" de [itemKey].
+  Future<void> removeExtraItem({
+    required String userId,
+    required String weekKey,
+    required List<String> names,
+    required String itemKey,
+  });
 }

@@ -31,11 +31,14 @@ class GroceryListPage extends ConsumerWidget {
     final colors = context.colors;
     final dataAsync = ref.watch(groceryListProvider);
 
-    ref.listen(groceryItemCheckControllerProvider, (previous, next) {
+    void showErrorOnFailure(AsyncValue<void>? previous, AsyncValue<void> next) {
       if (next.hasError) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.genericErrorMessage)));
       }
-    });
+    }
+
+    ref.listen(groceryItemCheckControllerProvider, showErrorOnFailure);
+    ref.listen(removeGroceryItemControllerProvider, showErrorOnFailure);
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -217,6 +220,22 @@ class _GroceryItemRow extends ConsumerWidget {
                   ],
                 ),
               ),
+              // Solo lo añadido a mano se puede quitar; lo que pide una
+              // receta del plan sale de la lista al registrar esa comida.
+              if (item.isRemovable)
+                Semantics(
+                  button: true,
+                  label: l10n.groceryRemoveItemSemantics(item.name),
+                  excludeSemantics: true,
+                  child: InkResponse(
+                    onTap: () => ref.read(removeGroceryItemControllerProvider.notifier).remove(item),
+                    radius: 20,
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.space8),
+                      child: Icon(AppIcons.close, size: 18, color: colors.textSecondary),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

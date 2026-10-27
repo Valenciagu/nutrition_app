@@ -496,6 +496,10 @@
   "groceryCategoryOther": "Otros",
   "groceryEmptyTitle": "Nada que comprar todavía",
   "groceryEmptyMessage": "Genera un plan y abre alguna receta para armar tu lista.",
+  "groceryRemoveItemSemantics": "Quitar {name} de la lista",
+  "@groceryRemoveItemSemantics": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "groceryMissingRecipesTitle": "Sin receta generada",
   "groceryMissingRecipesHint": "Toca una comida para generar su receta y agregar sus ingredientes.",
   "grocerySourceLabel": "{quantity} · {slot} · {weekday}",

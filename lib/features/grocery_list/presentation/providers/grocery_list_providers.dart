@@ -93,10 +93,14 @@ final groceryListProvider = FutureProvider.autoDispose<GroceryListData>((ref) as
   }
 
   // Ítems añadidos a mano (Épica 9): si ya están porque una receta del plan
-  // los pide, no se duplican; si no, entran sin origen.
+  // los pide, no se duplican; si no, entran sin origen. Se guardan las
+  // entradas exactas por clave para poder quitarlas después.
+  final manualNamesByKey = <String, List<String>>{};
   for (final name in extraItems) {
     final key = name.trim().toLowerCase();
-    if (key.isEmpty || byKey.containsKey(key)) continue;
+    if (key.isEmpty) continue;
+    manualNamesByKey.putIfAbsent(key, () => []).add(name);
+    if (byKey.containsKey(key)) continue;
     byKey[key] = (name: name.trim(), category: categorizeIngredient(name), sources: <GroceryItemSource>[]);
   }
 
@@ -107,6 +111,7 @@ final groceryListProvider = FutureProvider.autoDispose<GroceryListData>((ref) as
             category: e.value.category,
             sources: e.value.sources,
             checked: checkedKeys.contains(e.key),
+            manualNames: manualNamesByKey[e.key] ?? const [],
           ))
       .toList()
     ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
@@ -129,6 +134,32 @@ class AddToGroceryListController extends AutoDisposeAsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() {
       return ref.read(groceryListRepositoryProvider).addExtraItems(userId: uid, weekKey: currentWeekKey(), names: names);
+    });
+    if (!state.hasError) ref.invalidate(groceryListProvider);
+  }
+}
+
+/// Quita de la lista un ítem añadido a mano (✕ en `GroceryListPage`, solo
+/// los que [GroceryItem.isRemovable]).
+final removeGroceryItemControllerProvider =
+    AsyncNotifierProvider<RemoveGroceryItemController, void>(RemoveGroceryItemController.new);
+
+class RemoveGroceryItemController extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {}
+
+  Future<void> remove(GroceryItem item) async {
+    final uid = ref.read(authStateChangesProvider).valueOrNull?.uid;
+    if (uid == null || !item.isRemovable) return;
+
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() {
+      return ref.read(groceryListRepositoryProvider).removeExtraItem(
+            userId: uid,
+            weekKey: currentWeekKey(),
+            names: item.manualNames,
+            itemKey: item.key,
+          );
     });
     if (!state.hasError) ref.invalidate(groceryListProvider);
   }
