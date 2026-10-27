@@ -1,3 +1,5 @@
+import '../../../recipes/domain/entities/dish_category.dart';
+
 /// Estado de una comida planificada. Deliberadamente solo 2 valores: el
 /// tercer estado visual del diseño (D1 · tarjeta "elevada" para la próxima
 /// comida pendiente) no es un dato guardado, es una comparación de
@@ -25,6 +27,7 @@ class PlannedMeal {
     required this.proteinGrams,
     this.status = MealStatus.pending,
     this.recipeId,
+    this.dishCategory,
   });
 
   /// Único dentro de un mismo día — lo usan las acciones de reemplazar y
@@ -48,6 +51,9 @@ class PlannedMeal {
   final MealStatus status;
   final String? recipeId;
 
+  /// RECIPE-101 — foto ilustrativa; `null` en planes anteriores.
+  final DishCategory? dishCategory;
+
   /// "HH:mm" — formato de 24 h igual en todos los idiomas, por eso no pasa
   /// por `AppLocalizations`. Lo comparten D1 (Plan) y C1 (Home).
   String get timeLabel =>
@@ -63,6 +69,7 @@ class PlannedMeal {
     int? proteinGrams,
     MealStatus? status,
     String? recipeId,
+    DishCategory? dishCategory,
   }) {
     return PlannedMeal(
       id: id ?? this.id,
@@ -74,6 +81,7 @@ class PlannedMeal {
       proteinGrams: proteinGrams ?? this.proteinGrams,
       status: status ?? this.status,
       recipeId: recipeId ?? this.recipeId,
+      dishCategory: dishCategory ?? this.dishCategory,
     );
   }
 
@@ -87,6 +95,7 @@ class PlannedMeal {
         'proteinGrams': proteinGrams,
         'status': status.name,
         'recipeId': recipeId,
+        'dishCategory': dishCategory?.id,
       };
 
   factory PlannedMeal.fromJson(Map<String, dynamic> json) {
@@ -100,6 +109,7 @@ class PlannedMeal {
       proteinGrams: json['proteinGrams'] as int,
       status: MealStatus.values.byName(json['status'] as String? ?? MealStatus.pending.name),
       recipeId: json['recipeId'] as String?,
+      dishCategory: DishCategory.fromId(json['dishCategory']),
     );
   }
 }

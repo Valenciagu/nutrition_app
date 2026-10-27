@@ -22,6 +22,7 @@ const meal = (calories: number, containsExcludedFood = false): GeneratedMeal => 
   name: "Comida",
   calories,
   proteinGrams: 20,
+  dishCategory: "protein_plate",
   containsExcludedFood,
 });
 
@@ -42,6 +43,7 @@ const recipe = (overrides: Partial<GeneratedRecipe> = {}): GeneratedRecipe => ({
   description: "Una receta de prueba",
   prepTimeMinutes: 20,
   difficulty: "easy",
+  dishCategory: "bowl",
   carbsGrams: 50,
   fatGrams: 15,
   ingredients: [

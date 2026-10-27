@@ -6,10 +6,11 @@ import '../../../../core/theme/app_color_tokens.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/hatched_placeholder.dart';
 import '../../../../core/widgets/macro_stat_tile.dart';
 import '../../domain/entities/recipe.dart';
 import '../../domain/entities/recipe_ingredient.dart';
+import '../../../../core/widgets/food_photo.dart';
+import '../dish_images.dart';
 
 /// Cuerpo desplazable de D3 (foto, nombre, etiquetas, macros, ingredientes),
 /// sin acciones. Extraído de `RecipeDetailPage` (Épica 7) al aparecer su
@@ -38,7 +39,7 @@ class RecipeDetailBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 300, width: double.infinity, child: HatchedPlaceholder()),
+          SizedBox(height: 300, width: double.infinity, child: FoodPhoto(imageAsset: dishImageAsset(recipe.dishCategory))),
           Transform.translate(
             // Esquinas superiores redondeadas montadas sobre la foto
             // (mock: `margin-top:-28px`) — `Transform.translate`, NUNCA

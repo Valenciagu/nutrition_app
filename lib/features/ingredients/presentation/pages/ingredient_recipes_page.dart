@@ -11,11 +11,12 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_state_block.dart';
-import '../../../../core/widgets/hatched_placeholder.dart';
 import '../../../grocery_list/presentation/providers/grocery_list_providers.dart';
 import '../../domain/entities/ingredient_suggestions.dart';
 import '../providers/ingredient_analysis_providers.dart';
 import '../../../../core/widgets/motion/app_entrance.dart';
+import '../../../../core/widgets/food_photo.dart';
+import '../../../recipes/presentation/dish_images.dart';
 
 /// F2 · Recetas con lo que tienes (Fase 6). Pide las recetas al entrar, con
 /// los ingredientes confirmados en F1. Cada tarjeta lleva un badge ("Tienes
@@ -23,9 +24,9 @@ import '../../../../core/widgets/motion/app_entrance.dart';
 /// en un toque. "Pedir más ideas a la IA" trae otras recetas distintas.
 ///
 /// Jerarquía del canvas: las dos primeras recetas en tarjeta grande con
-/// foto, el resto en fila compacta. Sin foto real de receta (ninguna
-/// función las genera), la zona de foto es el placeholder rayado — igual
-/// que D3.
+/// foto, el resto en fila compacta. La foto es la ilustrativa del tipo de
+/// plato (RECIPE-101, `dishImageAsset`); sin ella, placeholder rayado —
+/// igual que D3.
 class IngredientRecipesPage extends ConsumerStatefulWidget {
   const IngredientRecipesPage({super.key});
 
@@ -163,7 +164,7 @@ class _LargeRecipeCard extends ConsumerWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const HatchedPlaceholder(),
+                  FoodPhoto(imageAsset: dishImageAsset(recipe.dishCategory)),
                   Positioned(top: 10, left: 10, child: _AvailabilityBadge(missingCount: missing.length)),
                 ],
               ),
@@ -224,7 +225,10 @@ class _CompactRecipeCard extends StatelessWidget {
           padding: const EdgeInsets.all(13),
           child: Row(
             children: [
-              SizedBox.square(dimension: 66, child: HatchedPlaceholder(borderRadius: BorderRadius.circular(13))),
+              SizedBox.square(
+                dimension: 66,
+                child: FoodPhoto(imageAsset: dishImageAsset(recipe.dishCategory), borderRadius: BorderRadius.circular(13)),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

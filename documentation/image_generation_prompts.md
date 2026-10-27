@@ -88,3 +88,40 @@ Valores de `[ALIMENTO]`, en orden:
 - Revisa que las 5 parezcan **la misma serie**: misma luz desde la izquierda y mismo fondo claro. Si una desentona, regenérala.
 - Guárdalas en JPG o PNG y pásamelas. Yo las comprimo y las conecto en la app.
 - Verifica que la herramienta te permita usarlas comercialmente.
+
+---
+
+## Fotos por tipo de plato (RECIPE-101)
+
+Una foto por categoría, no por receta. La IA elige la categoría de cada comida o receta de una lista cerrada, y la app muestra esta foto como **imagen ilustrativa** en Plan (D1), Home, el detalle de receta (D3) y las recetas de "Tengo ingredientes". Son 16 fotos y no crecen con las combinaciones de ingredientes.
+
+Formato: **horizontal 4:3, 1600 × 1200 px**. Se muestra grande (D3, ~300 px de alto, recortada a lo ancho) y como miniatura cuadrada de 62 px (recorte del centro). Por eso **el plato va centrado y con margen alrededor**: así sobrevive a los dos recortes.
+
+Usa el **bloque de estilo** de arriba y debajo esta plantilla, cambiando solo `[PLATO]`:
+
+```
+IMAGE: 45° view of [PLATO], a single serving for one person, centered with generous empty margin on every side so it still reads when cropped to a small square. One dish only, no other plates. Horizontal 4:3.
+```
+
+Guarda cada foto con el nombre de la columna "Archivo" y pásamela; yo la optimizo y la activo.
+
+| # | Archivo | `[PLATO]` |
+|---|---|---|
+| 1 | `dish_salad.jpg` | `a wide white bowl of fresh green salad with lettuce, cherry tomatoes, cucumber, avocado and a few pieces of grilled chicken` |
+| 2 | `dish_bowl.jpg` | `a light grey ceramic bowl with rice, black beans, sliced avocado, pico de gallo and shredded chicken arranged in sections` |
+| 3 | `dish_soup.jpg` | `a white ceramic bowl of creamy pumpkin soup with a small swirl of cream and a few cilantro leaves` |
+| 4 | `dish_pasta.jpg` | `a white plate of spaghetti with homemade tomato sauce and a little grated cheese` |
+| 5 | `dish_rice.jpg` | `a white plate of golden rice with chicken, peas, carrots and red pepper (arroz con pollo style)` |
+| 6 | `dish_protein_plate.jpg` | `a white plate with a grilled chicken breast, a small portion of white rice and a side of steamed broccoli and carrots` |
+| 7 | `dish_fish.jpg` | `a white plate with a grilled white fish fillet, a lemon wedge, a small potato salad and green beans` |
+| 8 | `dish_eggs.jpg` | `a white plate with a vegetable omelette (tomato, onion, spinach) folded in half` |
+| 9 | `dish_wrap_sandwich.jpg` | `a whole-wheat wrap filled with chicken, lettuce and tomato, cut in half to show the filling, on a white plate` |
+| 10 | `dish_tacos_arepa.jpg` | `two corn arepas filled with shredded beef and white cheese on a white plate` |
+| 11 | `dish_oats_yogurt.jpg` | `a white bowl of oatmeal topped with sliced banana, a few strawberries and a drizzle of honey` |
+| 12 | `dish_smoothie.jpg` | `a tall clear glass of a pink fruit smoothie (strawberry and banana), next to a halved strawberry` |
+| 13 | `dish_toast.jpg` | `two slices of whole-grain toast topped with mashed avocado and a sliced boiled egg, on a white plate` |
+| 14 | `dish_snack_fruit.jpg` | `a small white bowl of mixed fresh fruit (mango, papaya, pineapple, blackberries) next to a few almonds` |
+| 15 | `dish_dessert.jpg` | `a small glass cup of natural yogurt layered with mango puree and a little granola` |
+| 16 | `dish_stir_fry.jpg` | `a white plate of sautéed vegetables (broccoli, red pepper, carrot, snow peas) with strips of beef, wok style` |
+
+Para activar una foto: se copia a `assets/images/` y su categoría se suma a `_dishesWithPhoto` en `lib/features/recipes/presentation/dish_images.dart`. Las que falten siguen con el placeholder rayado.

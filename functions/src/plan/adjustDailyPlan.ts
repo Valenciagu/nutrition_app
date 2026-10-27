@@ -1,4 +1,5 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import type { DishCategory } from "../dishCategory";
 import * as logger from "firebase-functions/logger";
 import { getFirestore } from "firebase-admin/firestore";
 import { zodTextFormat } from "openai/helpers/zod";
@@ -20,6 +21,8 @@ interface StoredMeal {
   name: string;
   calories: number;
   proteinGrams: number;
+  /** Ausente en comidas generadas antes de RECIPE-101. */
+  dishCategory?: DishCategory | null;
   status: "pending" | "registered";
   recipeId: string | null;
 }
@@ -151,6 +154,7 @@ export const adjustDailyPlan = onCall<AdjustDailyPlanRequest, Promise<AdjustDail
         name: parsed.meals[index].name,
         calories: parsed.meals[index].calories,
         proteinGrams: parsed.meals[index].proteinGrams,
+        dishCategory: parsed.meals[index].dishCategory,
       }));
 
       // El orden final respeta el orden original del plan (por horario), no

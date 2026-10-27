@@ -5,7 +5,7 @@ import '../theme/app_color_tokens.dart';
 import '../theme/app_elevation.dart';
 import '../theme/app_motion.dart';
 import '../theme/app_typography.dart';
-import 'hatched_placeholder.dart';
+import 'food_photo.dart';
 import 'motion/app_entrance.dart';
 import 'motion/app_pressable.dart';
 
@@ -31,6 +31,7 @@ class MealCard extends StatelessWidget {
     required this.detailText,
     required this.isRegistered,
     this.isElevated = false,
+    this.imageAsset,
     required this.onTap,
   });
 
@@ -39,6 +40,9 @@ class MealCard extends StatelessWidget {
   final String detailText;
   final bool isRegistered;
   final bool isElevated;
+
+  /// Foto ilustrativa del plato (RECIPE-101); `null` → placeholder rayado.
+  final String? imageAsset;
   final VoidCallback onTap;
 
   @override
@@ -65,7 +69,7 @@ class MealCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                _HatchedThumbnail(dimmed: isRegistered),
+                _Thumbnail(imageAsset: imageAsset, dimmed: isRegistered),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -130,20 +134,19 @@ class MealCard extends StatelessWidget {
   }
 }
 
-/// Comidas sin foto real todavía (Épica 7 apenas genera recetas, sin fotos)
-/// muestran `HatchedPlaceholder` — nunca un ícono genérico. Tamaño fijo de
-/// miniatura (62×62); D3/D5 usan el mismo widget compartido a tamaño de
-/// foto completa.
-class _HatchedThumbnail extends StatelessWidget {
-  const _HatchedThumbnail({required this.dimmed});
+/// Miniatura de 62×62: la foto del tipo de plato si existe, si no
+/// `HatchedPlaceholder` — nunca un ícono genérico (ver `FoodPhoto`).
+class _Thumbnail extends StatelessWidget {
+  const _Thumbnail({required this.imageAsset, required this.dimmed});
 
+  final String? imageAsset;
   final bool dimmed;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
       dimension: 62,
-      child: HatchedPlaceholder(borderRadius: BorderRadius.circular(12), dimmed: dimmed),
+      child: FoodPhoto(imageAsset: imageAsset, borderRadius: BorderRadius.circular(12), dimmed: dimmed),
     );
   }
 }

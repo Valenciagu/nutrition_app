@@ -31,6 +31,10 @@ abstract final class AppAssets {
   /// (`likedFoodCatalogIds`).
   static String food(String foodId) => 'assets/images/food_$foodId.jpg';
 
+  /// `assets/images/dish_<id>.jpg` — foto ilustrativa por tipo de plato
+  /// (RECIPE-101); el id es `DishCategory.id`.
+  static String dish(String categoryId) => 'assets/images/dish_$categoryId.jpg';
+
   // Iconos propios (grilla 24, trazo 1.75, `currentColor`). `Fill` es la
   // variante rellena; úsense con `AppSvgIcon`, no con `Icon`.
   static const String iconFoodScanner = 'assets/icons/food_scanner_regular.svg';

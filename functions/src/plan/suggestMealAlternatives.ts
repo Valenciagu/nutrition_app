@@ -1,4 +1,5 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import type { DishCategory } from "../dishCategory";
 import * as logger from "firebase-functions/logger";
 import { getFirestore } from "firebase-admin/firestore";
 import { zodTextFormat } from "openai/helpers/zod";
@@ -21,6 +22,7 @@ interface AlternativeResponse {
   name: string;
   calories: number;
   proteinGrams: number;
+  dishCategory: DishCategory;
 }
 
 interface SuggestMealAlternativesResponse {
@@ -114,6 +116,7 @@ export const suggestMealAlternatives = onCall<SuggestMealAlternativesRequest, Pr
         name: alt.name,
         calories: alt.calories,
         proteinGrams: alt.proteinGrams,
+        dishCategory: alt.dishCategory,
       }));
 
       meals[mealIndex] = { ...meal, candidates };

@@ -26,6 +26,7 @@ interface RecipeResponse {
   difficulty: "easy" | "medium" | "hard";
   calories: number;
   proteinGrams: number;
+  dishCategory?: string | null;
   carbsGrams: number;
   fatGrams: number;
   ingredients: { name: string; quantity: string; substitutes: string[] }[];
@@ -37,6 +38,7 @@ interface StoredMeal {
   name: string;
   calories: number;
   proteinGrams: number;
+  dishCategory?: string | null;
   recipeId: string | null;
 }
 
@@ -157,6 +159,8 @@ export const generateRecipe = onCall<GenerateRecipeRequest, Promise<RecipeRespon
         servings: 1,
         prepTimeMinutes: parsed.prepTimeMinutes,
         difficulty: parsed.difficulty,
+        // Misma foto en D1 y D3: manda la categoría de la comida si ya la tiene.
+        dishCategory: (meal.dishCategory as string | undefined) ?? parsed.dishCategory,
         calories: meal.calories,
         proteinGrams: meal.proteinGrams,
         carbsGrams: parsed.carbsGrams,

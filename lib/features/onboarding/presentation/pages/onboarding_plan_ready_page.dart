@@ -17,6 +17,7 @@ import '../../domain/entities/onboarding_answers.dart';
 import '../onboarding_catalog.dart';
 import '../providers/onboarding_providers.dart';
 import '../../../../core/widgets/motion/app_entrance.dart';
+import '../../../recipes/presentation/dish_images.dart';
 
 /// B9 · Tu plan está listo (Fase 2 · Bloque B). "Recompensa antes que la
 /// cuenta" (nota del propio diseño): el usuario ve su plan real ANTES de
@@ -92,6 +93,7 @@ class OnboardingPlanReadyPage extends ConsumerWidget {
                   title: meal.name,
                   detailText: l10n.planMealDetailPending(meal.calories, meal.proteinGrams),
                   isRegistered: false,
+                  imageAsset: dishImageAsset(meal.dishCategory),
                   onTap: () {},
                 ).appListEntrance(index),
                 const SizedBox(height: 10),

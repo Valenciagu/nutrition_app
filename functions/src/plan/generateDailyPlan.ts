@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { DishCategory } from "../dishCategory";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import { getFirestore } from "firebase-admin/firestore";
@@ -47,6 +48,8 @@ interface PlannedMealResponse {
   name: string;
   calories: number;
   proteinGrams: number;
+  /** RECIPE-101 — foto ilustrativa por tipo de plato. */
+  dishCategory: DishCategory;
   status: "pending";
   recipeId: null;
 }
@@ -159,6 +162,7 @@ export const generateDailyPlan = onCall<GenerateDailyPlanRequest, Promise<Genera
         name: parsed.meals[index].name,
         calories: parsed.meals[index].calories,
         proteinGrams: parsed.meals[index].proteinGrams,
+        dishCategory: parsed.meals[index].dishCategory,
         status: "pending",
         recipeId: null,
       }));

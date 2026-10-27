@@ -31,6 +31,7 @@ import '../../../plan/presentation/providers/plan_providers.dart';
 import '../../../plan/presentation/widgets/replace_meal_sheet.dart';
 import '../providers/home_providers.dart';
 import '../widgets/camera_action_sheet.dart';
+import '../../../recipes/presentation/dish_images.dart';
 import '../../../../core/widgets/ai_suggestion_card.dart';
 import '../providers/ai_suggestion_providers.dart';
 
@@ -352,6 +353,7 @@ class _UpNextMeal extends ConsumerWidget {
           detailText: l10n.planMealDetailPending(meal.calories, meal.proteinGrams),
           isRegistered: false,
           isElevated: true,
+          imageAsset: dishImageAsset(meal.dishCategory),
           onTap: openRecipe,
         ),
         const SizedBox(height: 10),

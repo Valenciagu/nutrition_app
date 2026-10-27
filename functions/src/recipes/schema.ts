@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DishCategorySchema } from "../dishCategory";
 
 /**
  * Salida estructurada del modelo para `generateRecipe` (prompt
@@ -28,6 +29,7 @@ export const GeneratedRecipeSchema = z.object({
   description: z.string().min(10).max(200),
   prepTimeMinutes: z.number().int().min(5).max(180),
   difficulty: z.enum(["easy", "medium", "hard"]),
+  dishCategory: DishCategorySchema,
   carbsGrams: z.number().int().min(0).max(300),
   fatGrams: z.number().int().min(0).max(200),
   ingredients: z.array(GeneratedRecipeIngredientSchema).min(2).max(12),

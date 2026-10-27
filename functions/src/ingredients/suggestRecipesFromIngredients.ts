@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { DishCategory } from "../dishCategory";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import { getFirestore } from "firebase-admin/firestore";
@@ -34,6 +35,7 @@ interface SuggestedRecipeResponse {
   difficulty: "easy" | "medium" | "hard";
   calories: number;
   proteinGrams: number;
+  dishCategory: DishCategory;
   carbsGrams: number;
   fatGrams: number;
   ingredients: { name: string; quantity: string; substitutes: string[] }[];
@@ -130,6 +132,7 @@ export const suggestRecipesFromIngredients = onCall<SuggestRecipesRequest, Promi
           servings: 1,
           prepTimeMinutes: recipe.prepTimeMinutes,
           difficulty: recipe.difficulty,
+          dishCategory: recipe.dishCategory,
           calories: recipe.calories,
           proteinGrams: recipe.proteinGrams,
           carbsGrams: recipe.carbsGrams,

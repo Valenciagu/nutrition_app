@@ -27,6 +27,7 @@ import '../widgets/day_strip.dart';
 import '../widgets/replace_meal_sheet.dart';
 import '../widgets/week_plan_view.dart';
 import '../../../../core/widgets/motion/app_entrance.dart';
+import '../../../recipes/presentation/dish_images.dart';
 
 /// D1/D2 · Plan del día / Plan semanal (Fase 4). Reemplaza el
 /// `ComingSoonPage` de la Épica 4. Ver `documentation/plan.md` para el
@@ -257,6 +258,7 @@ class _PopulatedPlan extends ConsumerWidget {
                 : l10n.planMealDetailPending(meal.calories, meal.proteinGrams),
             isRegistered: meal.status == MealStatus.registered,
             isElevated: meal.id == nextUpId,
+            imageAsset: dishImageAsset(meal.dishCategory),
             onTap: () => onMealTap(meal),
           ).appListEntrance(index),
           const SizedBox(height: 10),

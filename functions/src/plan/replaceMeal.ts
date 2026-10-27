@@ -52,7 +52,7 @@ export const replaceMeal = onCall<ReplaceMealRequest, Promise<ReplaceMealRespons
     }
 
     const meal = meals[mealIndex];
-    const candidates = (meal.candidates as Array<{ name: string; calories: number; proteinGrams: number }>) ?? [];
+    const candidates = (meal.candidates as Array<{ name: string; calories: number; proteinGrams: number; dishCategory?: string }>) ?? [];
     const chosen = candidates[candidateIndex];
     if (!chosen) {
       throw new HttpsError(
@@ -66,6 +66,9 @@ export const replaceMeal = onCall<ReplaceMealRequest, Promise<ReplaceMealRespons
       name: chosen.name,
       calories: chosen.calories,
       proteinGrams: chosen.proteinGrams,
+      // Candidatos guardados antes de RECIPE-101 no la traen.
+      dishCategory: chosen.dishCategory ?? null,
+      // La receta de la comida anterior ya no aplica.
       candidates: [],
     };
     await planRef.update({ meals });

@@ -1,3 +1,4 @@
+import 'dish_category.dart';
 import 'recipe_ingredient.dart';
 import 'recipe_step.dart';
 
@@ -13,10 +14,10 @@ enum RecipeDifficulty { easy, medium, hard }
 /// igual que `NutritionPlan`; `PlannedMeal.recipeId` (Épica 6) es el puente
 /// opcional desde una comida del plan hacia su receta completa.
 ///
-/// Sin `imageUrl` todavía: ninguna Cloud Function genera fotos de receta
-/// hoy, y el diseño (D3/D2) pide explícitamente un placeholder rayado en
-/// vez de un ícono genérico cuando no hay foto — no un campo a rellenar.
-/// Revisar si una épica futura (generación/búsqueda de imagen) lo necesita.
+/// Sin `imageUrl`: no se genera una foto por receta (costo y latencia, ver
+/// RECIPE-101 en TASKS.md). En su lugar [dishCategory] elige una foto
+/// ilustrativa de los assets; sin ella, placeholder rayado como pide el
+/// diseño.
 class Recipe {
   const Recipe({
     required this.id,
@@ -31,6 +32,7 @@ class Recipe {
     required this.fatGrams,
     required this.ingredients,
     required this.steps,
+    this.dishCategory,
   });
 
   final String id;
@@ -53,6 +55,9 @@ class Recipe {
   /// esta lista no esté vacía.
   final List<RecipeStep> steps;
 
+  /// RECIPE-101 — `null` en recetas guardadas antes de que existiera.
+  final DishCategory? dishCategory;
+
   Recipe copyWith({
     String? id,
     String? name,
@@ -66,6 +71,7 @@ class Recipe {
     int? fatGrams,
     List<RecipeIngredient>? ingredients,
     List<RecipeStep>? steps,
+    DishCategory? dishCategory,
   }) {
     return Recipe(
       id: id ?? this.id,
@@ -80,6 +86,7 @@ class Recipe {
       fatGrams: fatGrams ?? this.fatGrams,
       ingredients: ingredients ?? this.ingredients,
       steps: steps ?? this.steps,
+      dishCategory: dishCategory ?? this.dishCategory,
     );
   }
 
@@ -96,6 +103,7 @@ class Recipe {
         'fatGrams': fatGrams,
         'ingredients': ingredients.map((i) => i.toJson()).toList(),
         'steps': steps.map((s) => s.toJson()).toList(),
+        'dishCategory': dishCategory?.id,
       };
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -116,6 +124,7 @@ class Recipe {
       steps: (json['steps'] as List? ?? const [])
           .map((raw) => RecipeStep.fromJson(Map<String, dynamic>.from(raw as Map)))
           .toList(),
+      dishCategory: DishCategory.fromId(json['dishCategory']),
     );
   }
 }

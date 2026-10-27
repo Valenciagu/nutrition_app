@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DishCategorySchema } from "../dishCategory";
 
 /**
  * Salida estructurada del modelo para `generateDailyPlan` (prompt
@@ -13,6 +14,7 @@ export const GeneratedMealSchema = z.object({
   name: z.string().min(3).max(80),
   calories: z.number().int().min(50).max(2500),
   proteinGrams: z.number().int().min(0).max(200),
+  dishCategory: DishCategorySchema,
   containsExcludedFood: z
     .boolean()
     .describe("true if this meal contains any of the user's excluded allergens/foods, listed in the prompt"),

@@ -164,7 +164,7 @@ The canvas defines exactly 10 base components ("lo que no está aquí se constru
 | 09 | BottomNavigation | Deferred until 2+ tab features exist | — |
 | 10 | StateBlock | **Built** (empty/loading/error) | `core/widgets/app_state_block.dart` (`AppStateBlock`) |
 
-Fase 3 adds `AISuggestionCard` (`core/widgets/ai_suggestion_card.dart`, built 2026-10-26 for C2; the canvas says it's reusable in Plan and the analysis result).
+Fase 3 adds `AISuggestionCard` (`core/widgets/ai_suggestion_card.dart`, built 2026-10-26 for C2; the canvas says it's reusable in Plan and the analysis result). Since RECIPE-101 (2026-10-26), `FoodPhoto` (`core/widgets/food_photo.dart`) wraps a food asset with the hatched placeholder as fallback; `MealCard.imageAsset` uses it.
 
 Plus two generic surfaces implied by the foundations doc but not literally one of the 10: `AppCard` (`core/widgets/app_card.dart`) and `AppSkeletonBar` (`core/widgets/app_skeleton.dart`, the shimmer primitive `AppStateBlock.loading` uses).
 
